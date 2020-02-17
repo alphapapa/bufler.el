@@ -96,7 +96,9 @@
                                     (otherwise (prin1-to-string group)))
                                   'face (level-face level)))
        (format-buffer
-        (buffer level) (let* ((modified-s (propertize (if (buffer-modified-p buffer) "*" "")
+        (buffer level) (let* ((modified-s (propertize (if (and (buffer-file-name buffer)
+                                                               (buffer-modified-p buffer))
+                                                          "*" "")
                                                       'face 'font-lock-warning-face))
                               (name (propertize (buffer-name buffer)
                                                 'face (list :weight 'bold :inherit (level-face level)))))
@@ -192,8 +194,9 @@
 (sbuffer-define-buffer-command kill "Kill buffer." #'kill-buffer)
 (sbuffer-define-buffer-command pop "Pop to buffer." #'pop-to-buffer)
 (sbuffer-define-buffer-command save "Save buffer." (lambda (buffer)
-                                                     (with-current-buffer buffer
-                                                       (save-buffer))))
+                                                     (when (buffer-file-name buffer)
+                                                       (with-current-buffer buffer
+                                                         (save-buffer)))))
 
 (defun sbuffer--map-sections (fn sections)
   "Map FN across SECTIONS."
