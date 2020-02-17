@@ -40,8 +40,12 @@
     (define-key map (kbd "g") #'sbuffer)
     (define-key map (kbd "k") #'sbuffer-kill)
     (define-key map (kbd "s") #'sbuffer-save)
-    (define-key map (kbd "RET") #'sbuffer-pop))
-  map)
+    (define-key map (kbd "RET") #'sbuffer-pop)
+    map))
+
+;; FIXME: Move to config.
+(define-key sbuffer-mode-map (kbd "TAB") #'magit-section-cycle)
+(define-key sbuffer-mode-map (kbd "<C-tab>") nil)
 
 ;;;; Customization
 
