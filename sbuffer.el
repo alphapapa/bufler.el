@@ -37,7 +37,8 @@
 
 (defvar sbuffer-mode-map
   (let ((map (make-sparse-keymap magit-section-mode-map)))
-    (define-key map (kbd "g") #'sbuffer))
+    (define-key map (kbd "g") #'sbuffer)
+    (define-key map (kbd "RET") #'sbuffer-visit))
   map)
 
 ;;;; Customization
@@ -163,6 +164,13 @@
             (insert-thing it 1)))
         (setf buffer-read-only t)
         (pop-to-buffer (current-buffer))))))
+
+(defun sbuffer-visit ()
+  "Visit buffer at point."
+  (interactive)
+  (when-let* ((section (magit-current-section))
+              (buffer-p (eq 'sbuffer-buffer (oref section type))))
+    (pop-to-buffer (oref section value))))
 
 ;;;; Functions
 
