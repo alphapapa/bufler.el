@@ -133,6 +133,11 @@
        (by-major-mode
         (buffer) (propertize (symbol-name (buffer-local-value 'major-mode buffer))
                              'face 'magit-head))
+       (by-mode-prefix
+        (prefix buffer) (let ((mode (symbol-name (buffer-local-value 'major-mode buffer))))
+                          (propertize (if (string-prefix-p prefix mode)
+                                          prefix
+                                        mode) 'face 'magit-head)))
        (as-string
         (arg) (cl-typecase arg
                 (string arg)
@@ -145,7 +150,8 @@
         (level) (intern (format "prism-level-%s" level))))
     (with-current-buffer (get-buffer-create "*SBuffer*")
       (let* ((inhibit-read-only t)
-             (group-fns (list #'by-my-dirs #'by-default-directory #'by-indirect-p #'by-major-mode))
+             (group-fns (list #'by-my-dirs #'by-default-directory #'by-indirect-p
+                              (apply-partially #'by-mode-prefix "magit-")))
              (groups (group-buffers (-remove #'boring-p (buffer-list)) group-fns)))
         (setf groups (-sort #'format< groups))
         (magit-section-mode)
