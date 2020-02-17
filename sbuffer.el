@@ -49,7 +49,7 @@
   "FIXME"
   :type '(repeat directory))
 
-(setf sbuffer-dirs '("~/org" "~/src/emacs" "~/.emacs.d" "~/.bin" "~/.config" "/usr/share"
+(setf sbuffer-dirs '("~/org" ("~/src/emacs" 1) "~/.emacs.d" "~/.bin" "~/.config" "/usr/share"
                      "~/tmp" "/tmp"))
 
 ;;;; Commands
@@ -96,14 +96,22 @@
               (by-my-dirs
                (buffer) (let ((buffer-dir (buffer-local-value 'default-directory buffer)))
                           (or (cl-loop for test-dir in sbuffer-dirs
-                                       when (dir-p test-dir buffer-dir)
-                                       return test-dir)
+                                       for matched-dir = (match-dir test-dir buffer-dir)
+                                       when matched-dir return matched-dir)
                               "Paths")))
-              (dir-p (test-dir buffer-dir)
-                     (let ((test-dir (f-canonical test-dir))
-                           (buffer-dir (f-canonical buffer-dir)))
-                       (or (f-equal? test-dir buffer-dir)
-                           (f-ancestor-of? test-dir buffer-dir))))
+              (match-dir (test-dir buffer-dir)
+                         (pcase test-dir
+                           (`(,(and (pred stringp)  test-dir (guard (dir-related-p test-dir buffer-dir))) ,depth)
+                            (apply #'f-join test-dir (-take depth (f-split (f-relative buffer-dir test-dir)))))
+                           ((pred stringp) (when (dir-related-p test-dir buffer-dir)
+                                             test-dir)))
+
+                         )
+              (dir-related-p (test-dir buffer-dir)
+                             (let ((test-dir (f-canonical test-dir))
+                                   (buffer-dir (f-canonical buffer-dir)))
+                               (or (f-equal? test-dir buffer-dir)
+                                   (f-ancestor-of? test-dir buffer-dir))))
               (by-special-p
                (buffer) (if (string-match-p (rx bos (optional (1+ blank)) "*") (buffer-name buffer))
                             "*special*"
