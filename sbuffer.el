@@ -39,7 +39,7 @@
   (let ((map (make-sparse-keymap magit-section-mode-map)))
     (define-key map (kbd "g") #'sbuffer)
     (define-key map (kbd "k") #'sbuffer-kill)
-    (define-key map (kbd "RET") #'sbuffer-visit))
+    (define-key map (kbd "RET") #'sbuffer-pop))
   map)
 
 ;;;; Customization
@@ -95,8 +95,11 @@
                                     (otherwise (prin1-to-string group)))
                                   'face (level-face level)))
        (format-buffer
-        (buffer level) (propertize (buffer-name buffer)
-                                   'face (list :weight 'bold :inherit (level-face level))))
+        (buffer level) (let* ((modified-s (propertize (if (buffer-modified-p buffer) "*" "")
+                                                      'face 'font-lock-warning-face))
+                              (name (propertize (buffer-name buffer)
+                                                'face (list :weight 'bold :inherit (level-face level)))))
+                         (concat name modified-s)))
        (by-my-dirs
         (buffer) (let ((buffer-dir (buffer-local-value 'default-directory buffer)))
                    (or (cl-loop for test-dir in sbuffer-dirs
@@ -173,23 +176,33 @@
               (buffer-p (eq 'sbuffer-buffer (oref section type))))
     (pop-to-buffer (oref section value))))
 
-(defun sbuffer-kill ()
-  "Kill buffer at point or selected buffers."
-  (interactive)
-  (cl-labels ((kill-section
+(defmacro sbuffer-define-buffer-command (name docstring command)
+  "FIXME"
+  (declare (indent defun))
+  `(defun ,(intern (concat "sbuffer-" (symbol-name name))) (&rest _args)
+     ,docstring
+     (interactive)
+     (when-let* ((sections (or (magit-region-sections) (list (magit-current-section)))))
+       (sbuffer--map-sections ,command sections)
+       (sbuffer))))
+
+(sbuffer-define-buffer-command kill "Kill buffer." #'kill-buffer)
+(sbuffer-define-buffer-command pop "Pop to buffer." #'pop-to-buffer)
+
+(defun sbuffer--map-sections (fn sections)
+  "Map FN across SECTIONS."
+  (cl-labels ((do-section
                (section) (if (oref section children)
-                             (mapc #'kill-section (oref section children))
+                             (mapc #'do-section (oref section children))
                            (cl-typecase (oref section value)
-                             (list (mapc #'kill-thing (oref section value)))
-                             (buffer (kill-buffer (oref section value))))))
-              (kill-thing
+                             (list (mapc #'do-thing (oref section value)))
+                             (buffer (funcall fn (oref section value))))))
+              (do-thing
                (thing) (cl-typecase thing
-                         (buffer (kill-buffer thing))
-                         (magit-section (kill-section thing))
-                         (list (mapc #'kill-thing thing)))))
-    (when-let* ((sections (or (magit-region-sections) (list (magit-current-section)))))
-      (mapc #'kill-section sections))
-    (sbuffer)))
+                         (buffer (funcall fn thing))
+                         (magit-section (do-section thing))
+                         (list (mapc #'do-thing thing)))))
+    (mapc #'do-section sections)))
 
 ;;;; Functions
 
