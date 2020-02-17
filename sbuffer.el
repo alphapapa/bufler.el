@@ -39,6 +39,7 @@
   (let ((map (make-sparse-keymap magit-section-mode-map)))
     (define-key map (kbd "g") #'sbuffer)
     (define-key map (kbd "k") #'sbuffer-kill)
+    (define-key map (kbd "s") #'sbuffer-save)
     (define-key map (kbd "RET") #'sbuffer-pop))
   map)
 
@@ -157,7 +158,8 @@
       (let* ((inhibit-read-only t)
              (group-fns (list #'by-my-dirs #'by-default-directory #'by-indirect-p
                               (apply-partially #'by-mode-prefix "magit-")))
-             (groups (group-buffers (-remove #'boring-p (buffer-list)) group-fns)))
+             (groups (group-buffers (-remove #'boring-p (buffer-list)) group-fns))
+             (pos (point)))
         (setf groups (-sort #'format< groups))
         (magit-section-mode)
         (erase-buffer)
@@ -167,7 +169,8 @@
           (--each groups
             (insert-thing it 1)))
         (setf buffer-read-only t)
-        (pop-to-buffer (current-buffer))))))
+        (pop-to-buffer (current-buffer))
+        (goto-char pos)))))
 
 (defun sbuffer-visit ()
   "Visit buffer at point."
@@ -188,6 +191,9 @@
 
 (sbuffer-define-buffer-command kill "Kill buffer." #'kill-buffer)
 (sbuffer-define-buffer-command pop "Pop to buffer." #'pop-to-buffer)
+(sbuffer-define-buffer-command save "Save buffer." (lambda (buffer)
+                                                     (with-current-buffer buffer
+                                                       (save-buffer))))
 
 (defun sbuffer--map-sections (fn sections)
   "Map FN across SECTIONS."
