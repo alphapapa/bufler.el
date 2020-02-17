@@ -41,10 +41,21 @@
 
 ;;;; Customization
 
+(defgroup sbuffer nil
+  "FIXME"
+  :group 'convenience)
+
+(defcustom sbuffer-dirs nil
+  "FIXME"
+  :type '(repeat directory))
+
+(setf sbuffer-dirs '("~/org" "~/src/emacs" "~/.emacs.d" "~/.bin" "~/.config" "/usr/share"
+                     "~/tmp" "/tmp"))
 
 ;;;; Commands
 
-(define-derived-mode sbuffer magit-section-mode "SBuffer")
+(define-derived-mode sbuffer-mode magit-section-mode "SBuffer"
+  (call-interactively #'sbuffer))
 
 (defun sbuffer ()
   (interactive)
@@ -65,11 +76,11 @@
                                 (insert (make-string (* 2 level) ? ) (format-buffer buffer level) "\n")))
               (insert-group
                (group level) (pcase (car group)
-                               ('nil (pcase-let* ((`(,type . ,things) group))
+                               ('nil (pcase-let* ((`(,_type . ,things) group))
                                        (--each things
                                          (insert-thing it level))))
                                (_ (pcase-let* ((`(,type . ,things) group))
-                                    (magit-insert-section group (sbuffer-group type)
+                                    (magit-insert-section (sbuffer-group type)
                                       (magit-insert-heading (make-string (* 2 level) ? )
                                         (format-group type level))
                                       (--each things
@@ -84,15 +95,15 @@
                                           'face (level-face level)))
               (by-my-dirs
                (buffer) (let ((buffer-dir (buffer-local-value 'default-directory buffer)))
-                          (or (cl-loop for test-dir in '("~/org" "~/src/emacs/emacs")
+                          (or (cl-loop for test-dir in sbuffer-dirs
                                        when (dir-p test-dir buffer-dir)
                                        return test-dir)
                               "Paths")))
-              (dir-p (a b)
-                     (let ((a (f-canonical a))
-                           (b (f-canonical b)))
-                       (or (f-equal? a b)
-                           (f-ancestor-of? a b))))
+              (dir-p (test-dir buffer-dir)
+                     (let ((test-dir (f-canonical test-dir))
+                           (buffer-dir (f-canonical buffer-dir)))
+                       (or (f-equal? test-dir buffer-dir)
+                           (f-ancestor-of? test-dir buffer-dir))))
               (by-special-p
                (buffer) (if (string-match-p (rx bos (optional (1+ blank)) "*") (buffer-name buffer))
                             "*special*"
@@ -118,7 +129,7 @@
                (arg) (cl-typecase arg
                        (string arg)
                        (otherwise (format "%s" arg))))
-              (format< (a b) (string< (as-string a) (as-string b)))
+              (format< (test-dir buffer-dir) (string< (as-string test-dir) (as-string buffer-dir)))
               (boring-p (buffer)
                         (or (special-p buffer)
                             (hidden-p buffer)))
@@ -126,12 +137,12 @@
                (level) (intern (format "prism-level-%s" level))))
     (with-current-buffer (get-buffer-create "*SBuffer*")
       (let* ((inhibit-read-only t)
-             (group-fns (list #'by-my-dirs #'by-indirect-p #'by-major-mode #'by-default-directory))
+             (group-fns (list #'by-my-dirs #'by-default-directory #'by-indirect-p #'by-major-mode))
              (groups (group-buffers (-remove #'boring-p (buffer-list)) group-fns)))
         (setf groups (-sort #'format< groups))
         (magit-section-mode)
         (erase-buffer)
-        (magit-insert-section sbuffer-root (sbuffer-root)
+        (magit-insert-section (sbuffer-root)
           (magit-insert-heading (propertize "sbuffer"
                                             'face 'prism-level-0))
           (--each groups
