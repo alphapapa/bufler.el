@@ -38,6 +38,7 @@
 (defvar sbuffer-mode-map
   (let ((map (make-sparse-keymap magit-section-mode-map)))
     (define-key map (kbd "g") #'sbuffer)
+    (define-key map (kbd "k") #'sbuffer-kill)
     (define-key map (kbd "RET") #'sbuffer-visit))
   map)
 
@@ -83,7 +84,7 @@
                                 (--each things
                                   (insert-thing it level))))
                         (_ (pcase-let* ((`(,type . ,things) group))
-                             (magit-insert-section (sbuffer-group type)
+                             (magit-insert-section (sbuffer-group (cdr things))
                                (magit-insert-heading (make-string (* 2 level) ? )
                                  (format-group type level))
                                (--each things
@@ -171,6 +172,24 @@
   (when-let* ((section (magit-current-section))
               (buffer-p (eq 'sbuffer-buffer (oref section type))))
     (pop-to-buffer (oref section value))))
+
+(defun sbuffer-kill ()
+  "Kill buffer at point or selected buffers."
+  (interactive)
+  (cl-labels ((kill-section
+               (section) (if (oref section children)
+                             (mapc #'kill-section (oref section children))
+                           (cl-typecase (oref section value)
+                             (list (mapc #'kill-thing (oref section value)))
+                             (buffer (kill-buffer (oref section value))))))
+              (kill-thing
+               (thing) (cl-typecase thing
+                         (buffer (kill-buffer thing))
+                         (magit-section (kill-section thing))
+                         (list (mapc #'kill-thing thing)))))
+    (when-let* ((sections (or (magit-region-sections) (list (magit-current-section)))))
+      (mapc #'kill-section sections))
+    (sbuffer)))
 
 ;;;; Functions
 
