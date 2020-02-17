@@ -94,7 +94,7 @@
                                   'face (level-face level)))
        (format-buffer
         (buffer level) (propertize (buffer-name buffer)
-                                   'face (level-face level)))
+                                   'face (list :weight 'bold :inherit (level-face level))))
        (by-my-dirs
         (buffer) (let ((buffer-dir (buffer-local-value 'default-directory buffer)))
                    (or (cl-loop for test-dir in sbuffer-dirs
