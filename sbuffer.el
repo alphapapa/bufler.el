@@ -110,7 +110,13 @@ The depth number is appended to the prefix."
       ;; to implement "chains" of grouping functions.
       ((group-by (fns sequence)
                  (cl-typecase fns
+                   (function
+                    ;; "Regular" subgroups (naming things is hard).
+                    (-group-by fns sequence))
                    (list (cl-typecase (car fns)
+                           (function
+                            ;; "Regular" subgroups (naming things is hard).
+                            (group-buffers fns sequence))
                            (list
                             ;; "Recursive sub-subgroups" (naming things is hard).
 
@@ -121,13 +127,7 @@ The depth number is appended to the prefix."
                             (append (group-by (car fns) (-select (caar fns) sequence))
                                     (if (cdr fns)
                                         (group-by (cdr fns) (-select (-not (caar fns)) sequence))
-                                      (-select (-not (caar fns)) sequence))))
-                           (function
-                            ;; "Regular" subgroups (naming things is hard).
-                            (group-buffers fns sequence))))
-                   (function
-                    ;; "Regular" subgroups (naming things is hard).
-                    (-group-by fns sequence))))
+                                      (-select (-not (caar fns)) sequence))))))))
        (group-buffers (fns buffers)
                       (if (cdr fns)
                           (let ((groups (group-by (car fns) buffers)))
