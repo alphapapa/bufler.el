@@ -4,6 +4,10 @@
 
 # Note: This readme works with the org-make-toc <https://github.com/alphapapa/org-make-toc> package, which automatically updates the table of contents.
 
+#+BEGIN_HTML
+<a href=https://alphapapa.github.io/dont-tread-on-emacs/><img src="images/dont-tread-on-emacs-150.png" align="right"></a>
+#+END_HTML
+
 # [[https://melpa.org/#/package-name][file:https://melpa.org/packages/sbuffer-badge.svg]] [[https://stable.melpa.org/#/package-name][file:https://stable.melpa.org/packages/sbuffer-badge.svg]]
 
 *This is a work-in-progress.  It is not published as a package yet.  Please feel free to use it and offer feedback.*
@@ -94,32 +98,45 @@ This may seem confusing at first, but once you get the hang of it, it's powerful
 For example, a list of the currently default groups:
 
 #+BEGIN_SRC elisp
-  (list (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
-              (list (sbuffer-or "*Help/Info*"
-                                (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
-                                (sbuffer-group 'mode-match "*Info*" (rx bos "info-")))
-                    (sbuffer-group 'auto-mode))
-              (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
-                    (sbuffer-group 'auto-directory))
-              (list (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-")))
-              (sbuffer-group 'auto-mode)))
+  (list (list (sbuffer-or "*Help/Info*"
+                          (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
+                          (sbuffer-group 'mode-match "*Info*" (rx bos "info-"))))
+        (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
+              (sbuffer-group 'auto-directory))
+        (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
+              (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-"))
+              (sbuffer-group 'auto-mode))
+        (sbuffer-group 'dir '("~/.emacs.d") nil)
+        (list (sbuffer-group 'dir (if (bound-and-true-p org-directory)
+                                      org-directory
+                                    "~/org")
+                             nil)
+              (list (sbuffer-group 'auto-indirect)
+                    (sbuffer-group 'auto-file))
+              (sbuffer-not "*special*"
+                           (sbuffer-group 'auto-file))
+              (sbuffer-group 'auto-mode))
+        (sbuffer-group 'auto-directory)
+        (sbuffer-group 'auto-mode))
 #+END_SRC
 
 As you can see, groups are mostly (but not always) specified using the =sbuffer-group= function, followed by a type, and sometimes arguments.  The following group types are available (again, not guaranteed to be up-to-date, as this package is under rapid development):
 
 +  Auto-groups :: These types automatically create groups for the buffer's attribute of this type.
-     -  =auto-file=
-     -  =auto-directory=
-     -  =auto-mode=
-     -  =auto-indirect=
-     -  =auto-hidden=
-     -  =auto-special=
+     -  =auto-file=  Buffer's file name.
+     -  =auto-directory=  Buffer's directory.
+     -  =auto-mode=  Buffer's major mode.
+     -  =auto-indirect=  Whether the buffer is indirect (e.g. an indirect cloned buffer).
+     -  =auto-hidden=  Whether the buffer is hidden.
+     -  =auto-special=  Whether the buffer is hidden (i.e. whether its name starts with =*=).
 +  Regexp groups :: These types match a value against a buffer's attribute and group buffers which match.
      -  =name-match= Match a regular expression against the buffer's name.
      -  =mode-match= Match a regular expression against the buffer's major-mode.
 +  Meta groups :: These types compose multiple of the other types into a single group.  Use them directly, not by calling =sbuffer-group=.  /Please see the example above./
      -  =sbuffer-not= Groups buffers which do /not/ match the given predicate.
      -  =sbuffer-or=  Groups buffers which match any of the given predicates.
++  Other groups ::
+     -  =dir (DIRS DEPTH)=  Groups buffers which match one of the given DIRS.  DIRS may be one or a list of directory paths.  DEPTH may be nil or a depth above which to produce subdirectory groups (a feature probably broken at the moment).  See example above.
 
 * Development
 
