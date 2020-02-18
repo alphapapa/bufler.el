@@ -69,6 +69,7 @@ Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like t
 
 In the Sbuffer buffer, these keys are available (use =C-h m= to get the most up-to-date listing).  They operate on all buffers in the section at point.
 
++  =1-4= Show section levels.
 +  =g=  Refresh Sbuffer list.
 +  =RET=  Pop to buffer.
 +  =k=  Kill buffers.
@@ -128,9 +129,14 @@ Bug reports, feature requests, suggestions — /oh my/!
 
 GPLv3
 
+* COMMENT Footer
+
+#+BEGIN_SRC elisp
+# eval: (require 'org-make-toc)
+# before-save-hook: org-make-toc
+#+END_SRC
+
 # Local Variables:
-# # eval: (require 'org-make-toc)
-# # before-save-hook: org-make-toc
 # org-export-with-properties: ()
 # org-export-with-title: t
 # End:

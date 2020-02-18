@@ -5,7 +5,7 @@
 ;; Author: Adam Porter <adam@alphapapa.net>
 ;; URL: https://github.com/alphapapa/sbuffer.el
 ;; Keywords: convenience
-;; Package-Requires: ((emacs "26.3") (dash "2.17") (dash-functional "2.17") (f "0.17") (magit-section "0.1"))
+;; Package-Requires: ((emacs "26.3") (dash "2.17") (dash-functional "2.17") (f "0.17") (magit-section "0.1") (magit "2.90.1"))
 ;; Package-Version: 0.1-pre
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -38,10 +38,16 @@
 (require 'eieio)
 (require 'subr-x)
 
+;; For faces.
+(require 'outline)
+
 (require 'dash)
 (require 'dash-functional)
 (require 'f)
 (require 'magit-section)
+
+;; FIXME: Require Magit due to <https://github.com/magit/magit/issues/4052>.
+(require 'magit)
 
 ;;;; Variables
 
@@ -60,7 +66,7 @@
   :link '(url-link "http://github.com/alphapapa/sbuffer.el")
   :group 'convenience)
 
-(defcustom sbuffer-reverse t
+(defcustom sbuffer-reverse nil
   "Reverse group order after grouping buffers."
   :type 'boolean)
 
@@ -405,17 +411,38 @@ NAME, okay, `checkdoc'?"
 ;; These options must be defined after functions they call in their
 ;; values.
 
+;; (setf sbuffer-groups (list (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
+;;                                  (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
+;;                                        (sbuffer-group 'auto-directory))
+;;                                  (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-"))
+;;                                  (sbuffer-or "*Help/Info*"
+;;                                              (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
+;;                                              (sbuffer-group 'mode-match "*Info*" (rx bos "info-")))
+;;                                  (sbuffer-group 'auto-mode))
+;;                            (sbuffer-group 'auto-directory)
+;;                            (sbuffer-group 'auto-mode)))
+
 (defcustom sbuffer-groups
-  (list (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
-              (list (sbuffer-or "*Help/Info*"
-                                (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
-                                (sbuffer-group 'mode-match "*Info*" (rx bos "info-")))
-                    (sbuffer-group 'auto-mode))
-              (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
-                    (sbuffer-group 'auto-directory))
-              (list (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-")))
+  (list (list (sbuffer-or "*Help/Info*"
+                          (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
+                          (sbuffer-group 'mode-match "*Info*" (rx bos "info-"))))
+        (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
+              (sbuffer-group 'auto-directory))
+        (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
+              (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-"))
               (sbuffer-group 'auto-mode))
-	(sbuffer-group 'auto-directory))
+        (sbuffer-group 'dir '("~/.emacs.d") nil)
+        (list (sbuffer-group 'dir (if (bound-and-true-p org-directory)
+                                      org-directory
+                                    "~/org")
+                             nil)
+              (list (sbuffer-group 'auto-indirect)
+                    (sbuffer-group 'auto-file))
+              (sbuffer-not "*special*"
+                           (sbuffer-group 'auto-file))
+              (sbuffer-group 'auto-mode))
+        (sbuffer-group 'auto-directory)
+        (sbuffer-group 'auto-mode))
   "List of grouping functions recursively applied to buffers.
 Each item may be an Sbuffer grouping function or a list of
 grouping functions (each element of which may also be a list, and
