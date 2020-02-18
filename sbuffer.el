@@ -49,17 +49,20 @@
   "FIXME"
   :group 'convenience)
 
-(defcustom sbuffer-groups '(sbuffer-group-by-directory sbuffer-group-by-major-mode)
+(defcustom sbuffer-groups '(sbuffer-group-auto-directory sbuffer-group-auto-mode)
   "List of grouping functions recursively applied to buffers."
   :type '(repeat function))
 
-(defcustom sbuffer-dirs nil
-  "FIXME"
-  :type '(repeat (or directory
-                     (list directory integer))))
+(defcustom sbuffer-reverse t
+  "Reverse group order after grouping buffers."
+  :type 'boolean)
 
 (defface sbuffer-group
   '((t (:underline t)))
+  "FIXME")
+
+(defface sbuffer-buffer
+  '((t (:weight bold)))
   "FIXME")
 
 ;;;; Commands
@@ -70,6 +73,8 @@
 (defun sbuffer ()
   (interactive)
   (cl-labels
+      ;; This gets a little hairy because we have to wrap `seq-group-by'
+      ;; to implement "chains" of grouping functions.
       ((group-by (fns sequence)
                  (cl-typecase fns
                    (list (cl-typecase (car fns)
@@ -85,12 +90,11 @@
                                         (group-by (cdr fns) (-select (-not (caar fns)) sequence))
                                       (-select (-not (caar fns)) sequence))))
                            (function
-                            ;; "Regular" subgroups (naming things is hard)
+                            ;; "Regular" subgroups (naming things is hard).
                             (group-buffers fns sequence))))
                    (function
-                    ;; "Regular" subgroups (naming things is hard)
-                    (seq-group-by fns sequence)))
-                 )
+                    ;; "Regular" subgroups (naming things is hard).
+                    (seq-group-by fns sequence))))
        (group-buffers (fns buffers)
                       (if (cdr fns)
                           (let ((groups (group-by (car fns) buffers)))
@@ -99,13 +103,11 @@
                         (seq-group-by (car fns) buffers)))
        (insert-thing (thing &optional (level 0))
                      (pcase thing
-                       ((pred bufferp)
-                        (insert-buffer thing level))
-                       (_
-                        (insert-group thing level))))
+                       ((pred bufferp) (insert-buffer thing level))
+                       (_ (insert-group thing level))))
        (insert-buffer
         (buffer level) (magit-insert-section nil (sbuffer-buffer buffer)
-                         (insert (make-string (* 2 level) ? ) (format-buffer buffer level) "\n")))
+                         (insert (make-string (* 2 level) ? ) (sbuffer-format-buffer buffer level) "\n")))
        (insert-group
         (group level) (pcase (car group)
                         ('nil (pcase-let* ((`(,_type . ,things) group))
@@ -121,36 +123,23 @@
         (group level) (propertize (cl-typecase group
                                     (string group)
                                     (otherwise (prin1-to-string group)))
-                                  'face (list :inherit (list 'sbuffer-group (level-face level)))))
-       (format-buffer
-        (buffer level) (let* ((modified-s (propertize (if (and (buffer-file-name buffer)
-                                                               (buffer-modified-p buffer))
-                                                          "*" "")
-                                                      'face 'font-lock-warning-face))
-                              (name (propertize (buffer-name buffer)
-                                                'face (list :weight 'bold :inherit (level-face level)))))
-                         (concat name modified-s)))
-       (special-p
-        (buffer) (string-match-p (rx bos (optional (1+ blank)) "*") (buffer-name buffer)))
-       (hidden-p
-        (buffer) (string-prefix-p " " (buffer-name buffer)))
+                                  'face (list :inherit (list 'sbuffer-group (sbuffer-level-face level)))))
+       (hidden-p (buffer)
+                 (string-prefix-p " " (buffer-name buffer)))
        (as-string
         (arg) (cl-typecase arg
                 (string arg)
                 (otherwise (format "%s" arg))))
-       (format< (test-dir buffer-dir) (string< (as-string test-dir) (as-string buffer-dir)))
+       (format< (test-dir buffer-dir)
+                (string< (as-string test-dir) (as-string buffer-dir)))
        (boring-p (buffer)
-                 (hidden-p buffer))
-       (level-face
-        (level) (intern (format "prism-level-%s" level))))
+                 (hidden-p buffer)))
     (with-current-buffer (get-buffer-create "*SBuffer*")
       (let* ((inhibit-read-only t)
-             (group-fns sbuffer-groups ;; (list #'by-my-dirs #'by-default-directory #'by-indirect-p
-                        ;;       (apply-partially #'by-mode-prefix "magit-"))
-                        )
-             (groups (group-by group-fns (-remove #'boring-p (buffer-list))))
+             (groups (group-by sbuffer-groups (-remove #'boring-p (buffer-list))))
              (pos (point)))
-        (setf groups (nreverse (-sort #'format< groups)))
+        (when sbuffer-reverse
+          (setf groups (nreverse (-sort #'format< groups))))
         (magit-section-mode)
         (erase-buffer)
         (magit-insert-section (sbuffer-root)
@@ -161,6 +150,20 @@
         (setf buffer-read-only t)
         (pop-to-buffer (current-buffer))
         (goto-char pos)))))
+
+(defun sbuffer-level-face (level)
+  "Return face for LEVEL."
+  (intern (format "prism-level-%s" level)))
+
+(defun sbuffer-format-buffer (buffer depth)
+  "Return string for BUFFER to be displayed at DEPTH."
+  (let* ((modified-s (propertize (if (and (buffer-file-name buffer)
+                                          (buffer-modified-p buffer))
+                                     "*" "")
+                                 'face 'font-lock-warning-face))
+         (name (propertize (buffer-name buffer)
+                           'face (list :inherit (list 'sbuffer-buffer (sbuffer-level-face depth))))))
+    (concat name modified-s)))
 
 (defun sbuffer-visit ()
   "Visit buffer at point."
