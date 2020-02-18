@@ -414,7 +414,8 @@ NAME, okay, `checkdoc'?"
               (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
                     (sbuffer-group 'auto-directory))
               (list (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-")))
-              (sbuffer-group 'auto-mode)))
+              (sbuffer-group 'auto-mode))
+	(sbuffer-group 'auto-directory))
   "List of grouping functions recursively applied to buffers.
 Each item may be an Sbuffer grouping function or a list of
 grouping functions (each element of which may also be a list, and
