@@ -75,6 +75,10 @@ The depth number is appended to the prefix."
   '((t (:inherit default :slant italic)))
   "FIXME")
 
+(defface sbuffer-size
+  '((t (:inherit font-lock-comment-face)))
+  "FIXME")
+
 ;;;; Commands
 
 (define-derived-mode sbuffer-mode magit-section-mode "SBuffer")
@@ -122,10 +126,19 @@ The depth number is appended to the prefix."
                         ('nil (pcase-let* ((`(,_type . ,things) group))
                                 (--each things
                                   (insert-thing it level))))
-                        (_ (pcase-let* ((`(,type . ,things) group))
+                        (_ (pcase-let* ((`(,type . ,things) group)
+                                        (num-buffers 0))
+                             ;; This almost seems lazy, using `-tree-map-nodes'
+                             ;; with `bufferp', but it works, and it's correct,
+                             ;; and since `bufferp' is in C, maybe it's even fast.
+                             (-tree-map-nodes #'bufferp (lambda (&rest _)
+                                                          (cl-incf num-buffers))
+                                              group)
                              (magit-insert-section (sbuffer-group (cdr things))
                                (magit-insert-heading (make-string (* 2 level) ? )
-                                 (format-group type level))
+                                 (format-group type level)
+                                 (propertize (format " (%s)" num-buffers)
+                                             'face 'sbuffer-size))
                                (--each things
                                  (insert-thing it (1+ level))))))) )
        (format-group
@@ -174,8 +187,10 @@ The depth number is appended to the prefix."
                           'sbuffer-buffer-special 'sbuffer-buffer))
          (level-face (sbuffer-level-face depth))
          (face (list :inherit (list buffer-face level-face)))
-         (name (propertize (buffer-name buffer) 'face face)))
-    (concat name modified-s)))
+         (name (propertize (buffer-name buffer) 'face face))
+         (size (propertize (concat "(" (file-size-human-readable (buffer-size buffer)) ")")
+                           'face 'sbuffer-size)))
+    (concat name modified-s " " size)))
 
 (defun sbuffer-visit ()
   "Visit buffer at point."
