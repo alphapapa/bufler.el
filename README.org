@@ -144,6 +144,12 @@ As you can see, groups are mostly (but not always) specified using the =sbuffer-
 +  Other groups ::
      -  =dir (DIRS DEPTH)=  Groups buffers which match one of the given DIRS.  DIRS may be one or a list of directory paths.  DEPTH may be nil or a depth above which to produce subdirectory groups (a feature probably broken at the moment).  See example above.
 
+* Credits
+
++  Thanks to [[https://github.com/tarsius][Jonas Bernoulli]] for [[https://github.com/magit/magit/blob/master/lisp/magit-section.el][magit-section]].
++  Thanks to [[https://github.com/magnars/dash.el][Magnar Sveen]] and [[https://github.com/Fuco1][Matus Goljer]] for [[https://github.com/magnars/dash.el][dash.el]].
++  Thanks to [[https://github.com/rejeep][Johan Andersson]] for [[https://github.com/rejeep/f.el][f.el]].
+
 * Development
 
 Bug reports, feature requests, suggestions — /oh my/!
