@@ -16,7 +16,7 @@ Sbuffer is like Ibuffer, but using [[https://github.com/magit/magit][magit-secti
 
 * Screenshots
 
-This screenshot shows group faces themed by [[https://github.com/alphapapa/prism.el][prism]], which Sbuffer package optionally supports.
+This screenshot shows group faces themed by [[https://github.com/alphapapa/prism.el][prism]], which Sbuffer optionally supports.
 
 [[images/screenshot.png]]
 
