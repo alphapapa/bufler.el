@@ -97,7 +97,7 @@ The depth number is appended to the prefix."
 
 ;;;; Commands
 
-(define-derived-mode sbuffer-mode magit-section-mode "SBuffer")
+(define-derived-mode sbuffer-mode magit-section-mode "Sbuffer")
 
 ;;;###autoload
 (defun sbuffer ()
@@ -174,7 +174,7 @@ The depth number is appended to the prefix."
                 (string< (as-string test-dir) (as-string buffer-dir)))
        (boring-p (buffer)
                  (hidden-p buffer)))
-    (with-current-buffer (get-buffer-create "*SBuffer*")
+    (with-current-buffer (get-buffer-create "*Sbuffer*")
       (let* ((inhibit-read-only t)
              (groups (group-by sbuffer-groups (-remove #'boring-p (buffer-list))))
              (pos (point)))
