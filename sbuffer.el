@@ -435,6 +435,8 @@ NAME, okay, `checkdoc'?"
                             `(sbuffer-not ,name ,group))
                  (mode-match (name regexp)
                              `(sbuffer-group 'mode-match ,name ,regexp))
+                 (name-match (name regexp)
+                             `(sbuffer-group 'name-match ,name ,regexp))
                  (dir (dirs &optional depth)
                       `(sbuffer-group 'dir ,dirs ,depth))
                  (auto-directory () `(sbuffer-group 'auto-directory))
