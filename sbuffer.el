@@ -178,15 +178,16 @@ The depth number is appended to the prefix."
                  (hidden-p buffer)))
     (with-current-buffer (get-buffer-create "*Sbuffer*")
       (let* ((inhibit-read-only t)
-             (groups (group-by sbuffer-groups (-remove #'boring-p (buffer-list))))
+             (groups (->> (buffer-list) (-remove #'boring-p)
+                          (group-by sbuffer-groups)))
              (pos (point)))
         (when sbuffer-reverse
           (setf groups (nreverse (-sort #'format< groups))))
         (sbuffer-mode)
         (erase-buffer)
         (magit-insert-section (sbuffer-root)
-          (magit-insert-heading (propertize "sbuffer"
-                                            'face (sbuffer-level-face 1)))
+          (magit-insert-heading
+            (propertize "sbuffer" 'face (sbuffer-level-face 1)))
           (--each groups
             (insert-thing it 1)))
         (setf buffer-read-only t)
@@ -265,6 +266,9 @@ NAME, okay, `checkdoc'?"
 
 ;;;;; Buffer predicates
 
+;; These functions take a buffer as their sole argument.  They may be
+;; used in the grouping predicates defined later.
+
 (defun sbuffer-special-buffer-p (buffer)
   "Return non-nil if BUFFER is special.
 That is, if its name starts with \"*\"."
@@ -273,9 +277,11 @@ That is, if its name starts with \"*\"."
 
 ;;;;; Grouping
 
-;; Functions that group buffers.  Each one should take a buffer as its
-;; sole argument and return a key by which to group its buffer, or nil
-;; if it should not be grouped.
+;;;;;; Applicators
+
+;; These functions are used to partially apply arguments to the
+;; predicates defined below, and they're intended to be used to define
+;; groups in `sbuffer-groups'.
 
 (defun sbuffer-group (type &rest args)
   "Return a grouping function applying ARGS to `sbuffer-group-TYPE'.
@@ -301,6 +307,13 @@ The resulting group is named NAME."
   (byte-compile (lambda (x)
                   (when (not (funcall pred x))
                     name))))
+
+;;;;;; Grouping predicates
+
+;; These functions are intended to be partially applied using the
+;; applicator functions above.  Each one, in its partially applied
+;; form, should take a buffer as its sole argument and return a key by
+;; which to group its buffer, or nil if it should not be grouped.
 
 (defun sbuffer-group-dir (dirs depth buffer)
   "Group buffers in DIRS.
@@ -412,17 +425,6 @@ NAME, okay, `checkdoc'?"
 
 ;; These options must be defined after functions they call in their
 ;; values.
-
-;; (setf sbuffer-groups (list (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
-;;                                  (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
-;;                                        (sbuffer-group 'auto-directory))
-;;                                  (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-"))
-;;                                  (sbuffer-or "*Help/Info*"
-;;                                              (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
-;;                                              (sbuffer-group 'mode-match "*Info*" (rx bos "info-")))
-;;                                  (sbuffer-group 'auto-mode))
-;;                            (sbuffer-group 'auto-directory)
-;;                            (sbuffer-group 'auto-mode)))
 
 (defcustom sbuffer-groups
   (list (list (sbuffer-or "*Help/Info*"
