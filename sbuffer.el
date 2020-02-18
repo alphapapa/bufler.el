@@ -466,9 +466,10 @@ NAME, okay, `checkdoc'?"
     (group (group-or "*Help/Info*"
                      (mode-match "*Help*" (rx bos "help-"))
                      (mode-match "*Info*" (rx bos "info-"))))
-    (group (mode-match "*Magit*" (rx bos "magit-"))
+    (group (mode-match "*Magit*" (rx bos (or "magit" "forge") "-"))
            (auto-directory))
     (group (group-not "*Special*" (auto-file))
+           (group (name-match "**Special**" (rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
            (mode-match "*Helm*" (rx bos "helm-"))
            (auto-mode))
     (dir "~/.emacs.d")
