@@ -38,6 +38,7 @@
 
 (require 'cl-lib)
 (require 'eieio)
+(require 'project)
 (require 'subr-x)
 
 ;; For faces.
@@ -430,6 +431,12 @@ NAME, okay, `checkdoc'?"
       "*special*"
     "non-special buffers"))
 
+(sbuffer-defauto-group project
+  (when-let* ((project (with-current-buffer buffer
+                         (project-current)))
+              (project-root (car (project-roots project))))
+    (concat "Project: " project-root)))
+
 ;;;;;; Group-defining macro
 
 ;; This seems to work better than I expected.
@@ -453,7 +460,8 @@ NAME, okay, `checkdoc'?"
                  (auto-directory () `(sbuffer-group 'auto-directory))
                  (auto-file () `(sbuffer-group 'auto-file))
                  (auto-indirect () `(sbuffer-group 'auto-indirect))
-                 (auto-mode () `(sbuffer-group 'auto-mode)))
+                 (auto-mode () `(sbuffer-group 'auto-mode))
+                 (auto-project () `(sbuffer-group 'auto-project)))
      (list ,@groups)))
 
 ;;;; Additional customization

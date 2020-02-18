@@ -157,6 +157,7 @@ The following group types are available (again, not guaranteed to be up-to-date,
 +  Auto-groups :: These types automatically create groups for the buffer's attribute of this type.
      -  =auto-file=  Buffer's file name.
      -  =auto-directory=  Buffer's directory.
+     -  =auto-project=  Buffer's version-control project according to =project.el=.
      -  =auto-mode=  Buffer's major mode.
      -  =auto-indirect=  Whether the buffer is indirect (e.g. an indirect cloned buffer).
      -  =auto-hidden=  Whether the buffer is hidden.
