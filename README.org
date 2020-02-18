@@ -1,0 +1,137 @@
+#+TITLE: sbuffer
+
+#+PROPERTY: LOGGING nil
+
+# Note: This readme works with the org-make-toc <https://github.com/alphapapa/org-make-toc> package, which automatically updates the table of contents.
+
+# [[https://melpa.org/#/package-name][file:https://melpa.org/packages/sbuffer-badge.svg]] [[https://stable.melpa.org/#/package-name][file:https://stable.melpa.org/packages/sbuffer-badge.svg]]
+
+*This is a work-in-progress.  It is not published as a package yet.  Please feel free to use it and offer feedback.*
+
+Sbuffer is like Ibuffer, but using [[https://github.com/magit/magit][magit-section]] to group buffers in a very flexible way.
+
+* Screenshots
+
+This screenshot shows group faces themed by [[https://github.com/alphapapa/prism.el][prism]], which Sbuffer package optionally supports.
+
+[[images/screenshot.png]]
+
+# * Contents                                                         :noexport:
+# :PROPERTIES:
+# :TOC:      :include siblings
+# :END:
+# :CONTENTS:
+#   -  [[#installation][Installation]]
+#   -  [[#usage][Usage]]
+#   -  [[#changelog][Changelog]]
+#   -  [[#credits][Credits]]
+#   -  [[#development][Development]]
+#   -  [[#license][License]]
+# :END:
+
+* Installation
+:PROPERTIES:
+:TOC:      :depth 0
+:END:
+
+Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like this:
+
+#+BEGIN_SRC elisp
+  (use-package sbuffer
+    :quelpa (sbuffer :fetcher github :repo "alphapapa/sbuffer.el"))
+#+END_SRC
+
+# ** MELPA
+# 
+# If you installed from MELPA, you're done.  Just run one of the commands below.
+# 
+# ** Manual
+# 
+#   Install these required packages:
+# 
+#   + =foo=
+#   + =bar=
+# 
+#   Then put this file in your load-path, and put this in your init file:
+# 
+#   #+BEGIN_SRC elisp
+# (require 'sbuffer)
+#   #+END_SRC
+
+* Usage
+:PROPERTIES:
+:TOC:      :depth 0
+:END:
+
+  Run the command =sbuffer=.
+
+** Bindings
+
+In the Sbuffer buffer, these keys are available (use =C-h m= to get the most up-to-date listing).  They operate on all buffers in the section at point.
+
++  =g=  Refresh Sbuffer list.
++  =RET=  Pop to buffer.
++  =k=  Kill buffers.
++  =s=  Save buffers.
+
+** Tips
+
++  You can customize settings in the =sbuffer= group.
+
+** Grouping functions
+
+A full description of the =sbuffer-groups= grouping pseudo-DSL will be written as it develops.  For now, please consult the docstring for =sbuffer-groups=, reproduced here for convenience (but not guaranteed to be up-to-date):
+
+#+BEGIN_QUOTE
+List of grouping functions recursively applied to buffers.  Each item may be an Sbuffer grouping function or a list of grouping functions (each element of which may also be a list, and so forth, spiraling into infinity...oh, hello, Alice).
+
+When a buffer matches the first grouping function in a list of them, it is recursively grouped according to the rest of the functions in that group; otherwise it is matched by the rest of the functions after that group.  Therefore, a list may contain a single grouping function to prevent further sub-grouping of buffers matching a function.
+
+This may seem confusing at first, but once you get the hang of it, it's powerful and flexible.  Study the default groups and the resulting output, and you should figure it out quickly enough.
+#+END_QUOTE
+
+For example, a list of the currently default groups:
+
+#+BEGIN_SRC elisp
+  (list (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
+              (list (sbuffer-or "*Help/Info*"
+                                (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
+                                (sbuffer-group 'mode-match "*Info*" (rx bos "info-")))
+                    (sbuffer-group 'auto-mode))
+              (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
+                    (sbuffer-group 'auto-directory))
+              (list (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-")))
+              (sbuffer-group 'auto-mode)))
+#+END_SRC
+
+As you can see, groups are mostly (but not always) specified using the =sbuffer-group= function, followed by a type, and sometimes arguments.  The following group types are available (again, not guaranteed to be up-to-date, as this package is under rapid development):
+
++  Auto-groups :: These types automatically create groups for the buffer's attribute of this type.
+     -  =auto-file=
+     -  =auto-directory=
+     -  =auto-mode=
+     -  =auto-indirect=
+     -  =auto-hidden=
+     -  =auto-special=
++  Regexp groups :: These types match a value against a buffer's attribute and group buffers which match.
+     -  =name-match= Match a regular expression against the buffer's name.
+     -  =mode-match= Match a regular expression against the buffer's major-mode.
++  Meta groups :: These types compose multiple of the other types into a single group.  Use them directly, not by calling =sbuffer-group=.  /Please see the example above./
+     -  =sbuffer-not= Groups buffers which do /not/ match the given predicate.
+     -  =sbuffer-or=  Groups buffers which match any of the given predicates.
+
+* Development
+
+Bug reports, feature requests, suggestions — /oh my/!
+
+* License
+
+GPLv3
+
+# Local Variables:
+# # eval: (require 'org-make-toc)
+# # before-save-hook: org-make-toc
+# org-export-with-properties: ()
+# org-export-with-title: t
+# End:
+

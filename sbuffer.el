@@ -4,6 +4,7 @@
 
 ;; Author: Adam Porter <adam@alphapapa.net>
 ;; Keywords: convenience
+;; Package-Requires: ((emacs "26.3") (dash "2.17") (f "0.17") (magit-section "0.1"))
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -31,7 +32,6 @@
 (require 'dash)
 (require 'f)
 (require 'magit-section)
-(require 'prism)
 
 ;;;; Variables
 
@@ -46,12 +46,9 @@
 ;;;; Customization
 
 (defgroup sbuffer nil
-  "FIXME"
+  "Like Ibuffer, but using Magit-Section sections."
+  :link '(url-link "http://github.com/alphapapa/sbuffer.el")
   :group 'convenience)
-
-(defcustom sbuffer-groups '(sbuffer-group-auto-directory sbuffer-group-auto-mode)
-  "List of grouping functions recursively applied to buffers."
-  :type '(repeat function))
 
 (defcustom sbuffer-reverse t
   "Reverse group order after grouping buffers."
@@ -61,23 +58,23 @@
   "Prefix used to look up faces.
 The depth number is appended to the prefix."
   :type '(choice (const :tag "Outline faces" "outline-")
-                 (const :tag "Prism faces" "prism-level-")))
+                 (const :tag "Prism faces (requires `prism')" "prism-level-")))
 
 (defface sbuffer-group
   '((t (:underline nil :weight bold)))
-  "FIXME")
+  "Face for Sbuffer groups.")
 
 (defface sbuffer-buffer
   '((t (:inherit default)))
-  "FIXME")
+  "Face for normal (i.e. file-backed) buffers.")
 
 (defface sbuffer-buffer-special
   '((t (:inherit default :slant italic)))
-  "FIXME")
+  "Face for special buffers.")
 
 (defface sbuffer-size
   '((t (:inherit font-lock-comment-face)))
-  "FIXME")
+  "Face for the size of buffers and groups.")
 
 ;;;; Commands
 
@@ -173,6 +170,39 @@ The depth number is appended to the prefix."
         (pop-to-buffer (current-buffer))
         (goto-char pos)))))
 
+;;;;; Buffer commands
+
+(defun sbuffer-visit ()
+  "Visit buffer at point."
+  (interactive)
+  (when-let* ((section (magit-current-section))
+              (buffer-p (eq 'sbuffer-buffer (oref section type))))
+    (pop-to-buffer (oref section value))))
+
+(defmacro sbuffer-define-buffer-command (name docstring command)
+  "Define an Sbuffer command named `sbuffer-NAME' that calls COMMAND on selected buffers."
+  (declare (indent defun))
+  `(defun ,(intern (concat "sbuffer-" (symbol-name name))) (&rest _args)
+     ,docstring
+     (interactive)
+     (when-let* ((sections (or (magit-region-sections) (list (magit-current-section)))))
+       (sbuffer--map-sections ,command sections)
+       (sbuffer))))
+
+(sbuffer-define-buffer-command kill "Kill buffer."
+  #'kill-buffer)
+
+(sbuffer-define-buffer-command pop "Pop to buffer."
+  #'pop-to-buffer)
+
+(sbuffer-define-buffer-command save "Save buffer."
+  (lambda (buffer)
+    (when (buffer-file-name buffer)
+      (with-current-buffer buffer
+        (save-buffer)))))
+
+;;;; Functions
+
 (defun sbuffer-level-face (level)
   "Return face for LEVEL."
   (intern (format "%s%s" sbuffer-face-prefix level)))
@@ -192,30 +222,6 @@ The depth number is appended to the prefix."
                            'face 'sbuffer-size)))
     (concat name modified-s " " size)))
 
-(defun sbuffer-visit ()
-  "Visit buffer at point."
-  (interactive)
-  (when-let* ((section (magit-current-section))
-              (buffer-p (eq 'sbuffer-buffer (oref section type))))
-    (pop-to-buffer (oref section value))))
-
-(defmacro sbuffer-define-buffer-command (name docstring command)
-  "FIXME"
-  (declare (indent defun))
-  `(defun ,(intern (concat "sbuffer-" (symbol-name name))) (&rest _args)
-     ,docstring
-     (interactive)
-     (when-let* ((sections (or (magit-region-sections) (list (magit-current-section)))))
-       (sbuffer--map-sections ,command sections)
-       (sbuffer))))
-
-(sbuffer-define-buffer-command kill "Kill buffer." #'kill-buffer)
-(sbuffer-define-buffer-command pop "Pop to buffer." #'pop-to-buffer)
-(sbuffer-define-buffer-command save "Save buffer." (lambda (buffer)
-                                                     (when (buffer-file-name buffer)
-                                                       (with-current-buffer buffer
-                                                         (save-buffer)))))
-
 (defun sbuffer--map-sections (fn sections)
   "Map FN across SECTIONS."
   (cl-labels ((do-section
@@ -231,13 +237,98 @@ The depth number is appended to the prefix."
                          (list (mapc #'do-thing thing)))))
     (mapc #'do-section sections)))
 
-;;;; Functions
+;;;;; Buffer predicates
+
+(defun sbuffer-special-buffer-p (buffer)
+  (string-match-p (rx bos (optional (1+ blank)) "*")
+                  (buffer-name buffer)))
 
 ;;;;; Grouping
 
 ;; Functions that group buffers.  Each one should take a buffer as its
 ;; sole argument and return a key by which to group its buffer, or nil
 ;; if it should not be grouped.
+
+(defun sbuffer-group (type &rest args)
+  "Return a grouping function which applies ARGS to function `sbuffer-group-TYPE'."
+  (let ((fn (intern (concat "sbuffer-group-" (symbol-name type)))))
+    (apply #'apply-partially fn args)))
+
+(defun sbuffer-or (name &rest preds)
+  ;; Copied from dash-functional.el.
+  "Return a grouping function that groups buffers matching any of PREDS.
+The resulting group is named NAME."
+  (lambda (x)
+    (when (-any? (-cut funcall <> x) preds)
+      name)))
+
+(defun sbuffer-not (name pred)
+  ;; Copied from dash-functional.el.
+  "Return a grouping function that groups buffers which do not match PRED.
+The resulting group is named NAME."
+  (lambda (x)
+    (when (not (funcall pred x))
+      name)))
+
+(defun sbuffer-group-dir (dirs depth buffer)
+  "Group buffers in DIRS.
+DIRS may be one or a list of strings which are directory paths.
+If the BUFFER's `default-directory' is or is a descendant of
+DIRS, a string based on the first of DIRS is returned; otherwise,
+nil.
+
+DEPTH may be an integer specifying a maximum depth of
+subdirectories of DIR, up to which a group is created for the
+subdirectory.  For example, if DIR were \"~/src/emacs\", and
+DEPTH were 1, and a buffer's directory were
+\"~/src/emacs/sbuffer.el\", a group for
+\"~/src/emacs/sbuffer.el\" would be created rather than putting
+the buffer in a group for \"~/src/emacs\".  (NOTE THAT THIS
+FEATURE MAY BE BUGGY AT THE MOMENT.)
+
+Note that directory paths are canonicalized before comparing, so,
+e.g. symlinks are resolved."
+  (let* ((buffer-dir (buffer-local-value 'default-directory buffer))
+         (dirs (if (listp dirs) dirs (list dirs)))
+         (group-name (concat "Dir: " (car dirs))))
+    ;; MAYBE: Memoize `f-canonical' here.
+    (cl-labels ((dir-related-p (test-dir buffer-dir)
+                               (let ((test-dir (f-canonical test-dir))
+                                     (buffer-dir (f-canonical buffer-dir)))
+                                 (or (f-equal? test-dir buffer-dir)
+                                     (f-ancestor-of? test-dir buffer-dir)))))
+      (unless (listp dirs)
+        (setf dirs (list dirs)))
+      (cl-loop for dir in dirs
+               when (dir-related-p dir buffer-dir)
+               return (if depth
+                          (concat "Dir: "
+                                  (apply #'f-join dir
+                                         (-take depth (f-split (f-relative buffer-dir dir)))))
+                        group-name)))))
+
+(defun sbuffer-group-name-match (name regexp buffer)
+  "FIXME"
+  (cl-check-type name string)
+  (when (string-match-p regexp (buffer-name buffer))
+    (propertize name 'face 'magit-head)))
+
+(defun sbuffer-group-mode-match (name regexp buffer)
+  "Group buffers whose major mode matches REGEXP.
+If BUFFER's mode matches REGEXP, NAME is returned, otherwise
+nil."
+  (cl-check-type name string)
+  (let ((mode-name (symbol-name (buffer-local-value 'major-mode buffer))))
+    (when (string-match-p regexp mode-name)
+      (propertize name 'face 'magit-head))))
+
+;;;;;; Auto-groups
+
+;; These functions automatically create groups for buffers they match,
+;; keyed by their return value.  However, when one of these functions
+;; returns nil, the buffer is not grouped into a "nil" group, but is
+;; raised to the next level.  (This is implemented in the `sbuffer'
+;; function.)
 
 (defmacro sbuffer-defauto-group (name &rest body)
   "Define a grouping function named `sbuffer-group-by-NAME'.
@@ -274,175 +365,41 @@ nil if it should not be grouped."
       "*hidden*"
     "Normal"))
 
-(defun sbuffer-special-buffer-p (buffer)
-  (string-match-p (rx bos (optional (1+ blank)) "*")
-                  (buffer-name buffer)))
-
 (sbuffer-defauto-group special
   (if (sbuffer-special-buffer-p buffer)
       "*special*"
     "non-special buffers"))
 
-(defun sbuffer-group-buffer-name-match (name regexp buffer)
-  "FIXME"
-  (cl-check-type name string)
-  (when (string-match-p regexp (buffer-name buffer))
-    (propertize name 'face 'magit-head)))
+;;;; Additional customization
 
-(defun sbuffer-or (name &rest preds)
-  ;; Copied from dash-functional.el.
-  "FIXME"
-  (lambda (x)
-    (when (-any? (-cut funcall <> x) preds)
-      name)))
+;; These options must be defined after functions they call in their
+;; values.
 
-(defun sbuffer-not (name pred)
-  ;; Copied from dash-functional.el.
-  "FIXME"
-  (lambda (x)
-    (when (not (funcall pred x))
-      name)))
+(defcustom sbuffer-groups (list (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
+                                      (list (sbuffer-or "*Help/Info*"
+                                                        (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
+                                                        (sbuffer-group 'mode-match "*Info*" (rx bos "info-")))
+                                            (sbuffer-group 'auto-mode))
+                                      (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
+                                            (sbuffer-group 'auto-directory))
+                                      (list (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-")))
+                                      (sbuffer-group 'auto-mode)))
+  "List of grouping functions recursively applied to buffers.
+Each item may be an Sbuffer grouping function or a list of
+grouping functions (each element of which may also be a list, and
+so forth, spiraling into infinity...oh, hello, Alice).
 
-;;;;;; Directory-specific groups
+When a buffer matches the first grouping function in a list of
+them, it is recursively grouped according to the rest of the
+functions in that group; otherwise it is matched by the rest of
+the functions after that group.  Therefore, a list may contain a
+single grouping function to prevent further sub-grouping of
+buffers matching a function.
 
-;; Allow the user to specify certain directories that are grouped
-;; specially.
-
-;; (defmacro sbuffer-defdirs-multi-group (name &rest dir-regexp-pairs)
-;;   "Define a grouping function named `sbuffer-group-by-dirs-multi-NAME'.
-;; It takes one argument, a buffer, which is bound to `buffer' in
-;; BODY.  If the buffer's default-directory name matches any of the
-;; regexps in DIR-REGEXP-PAIRS, the buffer is placed into a group
-;; named according to the pair.  Each of DIR-REGEXP-PAIRS should be
-;; a cons in the form (NAME . REGEXP).  The first one that matches
-;; is used."
-;;   (declare (indent defun))
-;;   (let* ((fn-name (intern (concat "sbuffer-group-by-mode-match-" (symbol-name name))))
-;;          (docstring (format "Group buffers whose major-mode name matches regexp: %S." regexp))
-;;          (group-name (symbol-name name)))
-;;     `(defun ,fn-name (buffer)
-;;        ,docstring
-;;        (let ((mode-name (symbol-name (buffer-local-value 'major-mode buffer))))
-;;          (when (string-match-p ,regexp mode-name)
-;;            (propertize ,group-name 'face 'magit-head))))))
-
-(defun sbuffer-group-dir (dirs depth buffer)
-  "FIXME"
-  (let* ((buffer-dir (buffer-local-value 'default-directory buffer))
-         (dirs (if (listp dirs) dirs (list dirs)))
-         (group-name (concat "Dir: " (car dirs))))
-    ;; MAYBE: Memoize `f-canonical' here.
-    (cl-labels ((dir-related-p (test-dir buffer-dir)
-                               (let ((test-dir (f-canonical test-dir))
-                                     (buffer-dir (f-canonical buffer-dir)))
-                                 (or (f-equal? test-dir buffer-dir)
-                                     (f-ancestor-of? test-dir buffer-dir)))))
-      (unless (listp dirs)
-        (setf dirs (list dirs)))
-      (cl-loop for dir in dirs
-               when (dir-related-p dir buffer-dir)
-               return (if depth
-                          (concat "Dir: " (apply #'f-join dir (-take depth (f-split (f-relative buffer-dir dir)))))
-                        group-name)))))
-
-(defmacro sbuffer-defgroup-dir (dir &optional depth)
-  "Define a grouping function named `sbuffer-group-by-dir-NAME'.
-It takes one argument, a buffer, which is bound to `buffer' in
-BODY.  If the buffer's `default-directory' is or is a descendant
-of DIR, buffer is placed into a group named DIR.
-
-DEPTH may be an integer specifying a maximum depth of
-subdirectories of DIR, up to which a group is created for the
-subdirectory.  For example, if DIR were \"~/src/emacs\", and
-DEPTH were 1, and a buffer's directory were
-\"~/src/emacs/sbuffer.el\", a group for
-\"~/src/emacs/sbuffer.el\" would be created rather than putting
-the buffer in a group for \"~/src/emacs\".
-
-Note that directory paths are canonicalized before comparing, so,
-e.g. symlinks are resolved."
-  (declare (indent defun))
-  (let* ((fn-name (intern (concat "sbuffer-group-by-dir-" dir)))
-         (docstring (format "Group buffers whose `default-directory' is or is a descendant of %s." dir)))
-    `(defun ,fn-name (buffer)
-       ,docstring
-       (sbuffer-group-dir ,dir ,depth buffer))))
-
-;; FIXME: Move to config.
-(sbuffer-defgroup-dir "~/org")
-
-;;;;;; Mode-specific groups
-
-(defun sbuffer-group-mode-match (name regexp buffer)
-  "FIXME"
-  (cl-check-type name string)
-  (let ((mode-name (symbol-name (buffer-local-value 'major-mode buffer))))
-    (when (string-match-p regexp mode-name)
-      (propertize name 'face 'magit-head))))
-
-(defmacro sbuffer-defmode-match-group (name regexp)
-  "Define a grouping function named `sbuffer-group-by-mode-match-NAME'.
-It takes one argument, a buffer, which is bound to `buffer' in
-BODY.  If the buffer's major mode name matches REGEXP, the buffer
-is placed into a group named NAME."
-  (declare (indent defun))
-  (let* ((fn-name (intern (concat "sbuffer-group-by-mode-match-" (symbol-name name))))
-         (docstring (format "Group buffers whose major-mode name matches regexp: %S." regexp)))
-    `(defun ,fn-name (buffer)
-       ,docstring
-       (sbuffer-group-mode-match ,name ,regexp buffer))))
-
-;;  (sbuffer-defmode-match-group magit (rx bos "magit-"))
-
-;;;; FIXME Move to config
-
-(defun sbuffer-group (type &rest args)
-  "FIXME"
-  (let ((fn (intern (concat "sbuffer-group-" (symbol-name type)))))
-    (apply #'apply-partially fn args)))
-
-(setf sbuffer-groups
-      (list
-       (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
-             (list (sbuffer-or "*Help/Info*"
-                               (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
-                               (sbuffer-group 'mode-match "*Info*" (rx bos "info-")))
-                   (sbuffer-group 'auto-mode))
-             (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
-                   (sbuffer-group 'auto-directory))
-             (list (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-")))
-             (sbuffer-group 'auto-mode))
-       (list (sbuffer-group 'dir "~/org" nil)
-             (sbuffer-group 'mode-match "Magit" (rx bos "magit-"))
-             (list (sbuffer-group 'auto-indirect)  (sbuffer-group 'auto-file)))
-       (list (sbuffer-group 'dir "~/.emacs.d" nil) (sbuffer-group 'auto-directory))
-       (list (sbuffer-group 'dir "~/.bin" nil))
-       (list (sbuffer-group 'dir '("~/.config" "~/.homesick/repos/main/home/.config") nil)
-             (sbuffer-group 'auto-mode))
-       (list (sbuffer-group 'dir "~/src/emacs" 1))
-       (sbuffer-group 'dir "/usr/share" 1)
-       (sbuffer-group 'auto-directory) (sbuffer-group 'auto-mode)))
-
-;; (setf sbuffer-groups (list
-;;                       (list (sbuffer-not "*Special*" #'sbuffer-group-by-file)
-;;                             (list (sbuffer-or "*Help/Info*"
-;;                                               (apply-partially #'sbuffer-group-mode-match "*Help*" (rx bos "help-"))
-;;                                               (apply-partially #'sbuffer-group-mode-match "*Info*" (rx bos "info-")))
-;;                                   'sbuffer-group-by-major-mode)
-;;                             (list (apply-partially #'sbuffer-group-mode-match "*Magit*" (rx bos "magit-"))
-;;                                   #'sbuffer-group-by-directory)
-;;                             (list (apply-partially #'sbuffer-group-mode-match "*Helm*" (rx bos "helm-")))
-;;                             #'sbuffer-group-by-major-mode)
-;;                       (list (apply-partially #'sbuffer-group-dir "~/org" nil)
-;;                             (apply-partially #'sbuffer-group-mode-match "Magit" (rx bos "magit-"))
-;;                             (list #'sbuffer-group-by-indirect  #'sbuffer-group-by-file))
-;;                       (list (apply-partially #'sbuffer-group-dir "~/.emacs.d" nil) #'sbuffer-group-by-directory)
-;;                       (list (apply-partially #'sbuffer-group-dir "~/.bin" nil))
-;;                       (list (apply-partially #'sbuffer-group-dir '("~/.config" "~/.homesick/repos/main/home/.config") nil)
-;;                             #'sbuffer-group-by-major-mode)
-;;                       (list (apply-partially #'sbuffer-group-dir "~/src/emacs" 1))
-;;                       (apply-partially #'sbuffer-group-dir "/usr/share" 1)
-;;                       'sbuffer-group-by-directory 'sbuffer-group-by-major-mode))
+This may seem confusing at first, but once you get the hang of
+it, it's powerful and flexible.  Study the default groups and the
+resulting output, and you should figure it out quickly enough."
+  :type '(repeat (or function list)))
 
 ;; TODO: The groups should be set with a DSL that looks something like this:
 
@@ -483,10 +440,6 @@ is placed into a group named NAME."
 ;;                            (apply-partially #'sbuffer-group-dir "/usr/share" 1)
 ;;                            (apply-partially #'sbuffer-group-mode-match "*Magit*" (rx bos "magit-"))
 ;;                            'sbuffer-group-by-directory 'sbuffer-group-by-major-mode))
-
-
-(define-key sbuffer-mode-map (kbd "TAB") #'magit-section-cycle)
-(define-key sbuffer-mode-map (kbd "<C-tab>") nil)
 
 ;;;; Footer
 
