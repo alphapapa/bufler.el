@@ -20,6 +20,10 @@ This screenshot shows group faces themed by [[https://github.com/alphapapa/prism
 
 [[images/screenshot.png]]
 
+In the default Emacs theme:
+
+[[images/default-theme.png]]
+
 # * Contents                                                         :noexport:
 # :PROPERTIES:
 # :TOC:      :include siblings
