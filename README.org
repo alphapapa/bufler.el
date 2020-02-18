@@ -99,6 +99,8 @@ When a buffer matches the first grouping function in a list of them, it is recur
 This may seem confusing at first, but once you get the hang of it, it's powerful and flexible.  Study the default groups and the resulting output, and you should figure it out quickly enough.
 #+END_QUOTE
 
+*Note* that every element evaluates to either a function or a list of functions (because =sbuffer-group=, =sbuffer-not=, and =sbuffer-or= return partially applied functions).  Ultimately, it's lambdas all the way down.
+
 For example, a list of the currently default groups:
 
 #+BEGIN_SRC elisp
