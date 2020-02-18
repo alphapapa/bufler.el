@@ -3,8 +3,10 @@
 ;; Copyright (C) 2020  Adam Porter
 
 ;; Author: Adam Porter <adam@alphapapa.net>
+;; URL: https://github.com/alphapapa/sbuffer.el
 ;; Keywords: convenience
-;; Package-Requires: ((emacs "26.3") (dash "2.17") (f "0.17") (magit-section "0.1"))
+;; Package-Requires: ((emacs "26.3") (dash "2.17") (dash-functional "2.17") (f "0.17") (magit-section "0.1"))
+;; Package-Version: 0.1-pre
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -21,15 +23,23 @@
 
 ;;; Commentary:
 
-;;
+;; This is a work-in-progress.  It is not published as a package yet.
+;; Please feel free to use it and offer feedback.
+
+;; Sbuffer is like Ibuffer, but using
+;; [[https://github.com/magit/magit][magit-section]] to group buffers
+;; in a very flexible way.
 
 ;;; Code:
 
 ;;;; Requirements
 
 (require 'cl-lib)
+(require 'eieio)
+(require 'subr-x)
 
 (require 'dash)
+(require 'dash-functional)
 (require 'f)
 (require 'magit-section)
 
@@ -76,11 +86,15 @@ The depth number is appended to the prefix."
   '((t (:inherit font-lock-comment-face)))
   "Face for the size of buffers and groups.")
 
+;; Silence byte-compiler.  This is defined later in the file.
+(defvar sbuffer-groups)
+
 ;;;; Commands
 
 (define-derived-mode sbuffer-mode magit-section-mode "SBuffer")
 
 (defun sbuffer ()
+  "Show Sbuffer."
   (interactive)
   (cl-labels
       ;; This gets a little hairy because we have to wrap `seq-group-by'
@@ -180,7 +194,10 @@ The depth number is appended to the prefix."
     (pop-to-buffer (oref section value))))
 
 (defmacro sbuffer-define-buffer-command (name docstring command)
-  "Define an Sbuffer command named `sbuffer-NAME' that calls COMMAND on selected buffers."
+  "Define an Sbuffer command to call COMMAND on selected buffers.
+It is named `sbuffer-NAME' and uses DOCSTRING.
+
+NAME, okay, `checkdoc'?"
   (declare (indent defun))
   `(defun ,(intern (concat "sbuffer-" (symbol-name name))) (&rest _args)
      ,docstring
@@ -240,6 +257,8 @@ The depth number is appended to the prefix."
 ;;;;; Buffer predicates
 
 (defun sbuffer-special-buffer-p (buffer)
+  "Return non-nil if BUFFER is special.
+That is, if its name starts with \"*\"."
   (string-match-p (rx bos (optional (1+ blank)) "*")
                   (buffer-name buffer)))
 
@@ -250,7 +269,8 @@ The depth number is appended to the prefix."
 ;; if it should not be grouped.
 
 (defun sbuffer-group (type &rest args)
-  "Return a grouping function which applies ARGS to function `sbuffer-group-TYPE'."
+  "Return a grouping function applying ARGS to `sbuffer-group-TYPE'.
+TYPE, okay, `checkdoc'?"
   (let ((fn (intern (concat "sbuffer-group-" (symbol-name type)))))
     (apply #'apply-partially fn args)))
 
@@ -307,14 +327,18 @@ e.g. symlinks are resolved."
                                          (-take depth (f-split (f-relative buffer-dir dir)))))
                         group-name)))))
 
+;; These docstrings contain contorted English to satisfy the whims of
+;; `checkdoc'.
+
 (defun sbuffer-group-name-match (name regexp buffer)
-  "FIXME"
+  "Group BUFFERs whose names match REGEXP.
+If it matches, NAME is returned, otherwise nil."
   (cl-check-type name string)
   (when (string-match-p regexp (buffer-name buffer))
     (propertize name 'face 'magit-head)))
 
 (defun sbuffer-group-mode-match (name regexp buffer)
-  "Group buffers whose major mode matches REGEXP.
+  "Group buffers whose major modes match REGEXP.
 If BUFFER's mode matches REGEXP, NAME is returned, otherwise
 nil."
   (cl-check-type name string)
@@ -334,7 +358,9 @@ nil."
   "Define a grouping function named `sbuffer-group-by-NAME'.
 It takes one argument, a buffer, which is bound to `buffer' in
 BODY.  It should return a key by which to group its buffer, or
-nil if it should not be grouped."
+nil if it should not be grouped.
+
+NAME, okay, `checkdoc'?"
   (declare (indent defun))
   (let* ((fn-name (intern (concat "sbuffer-group-auto-" (symbol-name name))))
          (docstring (format "Group buffers by %s." name)))
