@@ -93,11 +93,12 @@ The depth number is appended to the prefix."
 
 (define-derived-mode sbuffer-mode magit-section-mode "SBuffer")
 
+;;;###autoload
 (defun sbuffer ()
   "Show Sbuffer."
   (interactive)
   (cl-labels
-      ;; This gets a little hairy because we have to wrap `seq-group-by'
+      ;; This gets a little hairy because we have to wrap `-group-by'
       ;; to implement "chains" of grouping functions.
       ((group-by (fns sequence)
                  (cl-typecase fns
@@ -118,13 +119,13 @@ The depth number is appended to the prefix."
                             (group-buffers fns sequence))))
                    (function
                     ;; "Regular" subgroups (naming things is hard).
-                    (seq-group-by fns sequence))))
+                    (-group-by fns sequence))))
        (group-buffers (fns buffers)
                       (if (cdr fns)
                           (let ((groups (group-by (car fns) buffers)))
                             (--map (cons (car it) (group-by (cdr fns) (cdr it)))
                                    groups))
-                        (seq-group-by (car fns) buffers)))
+                        (-group-by (car fns) buffers)))
        (insert-thing (thing &optional (level 0))
                      (pcase thing
                        ((pred bufferp) (insert-buffer thing level))
@@ -274,21 +275,24 @@ TYPE, okay, `checkdoc'?"
   (let ((fn (intern (concat "sbuffer-group-" (symbol-name type)))))
     (apply #'apply-partially fn args)))
 
+;; NOTE: We use `byte-compile' explicitly because uncompiled closures
+;; don't work in `-select', or something like that.
+
 (defun sbuffer-or (name &rest preds)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups buffers matching any of PREDS.
 The resulting group is named NAME."
-  (lambda (x)
-    (when (-any? (-cut funcall <> x) preds)
-      name)))
+  (byte-compile (lambda (x)
+                  (when (-any? (-cut funcall <> x) preds)
+                    name))))
 
 (defun sbuffer-not (name pred)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups buffers which do not match PRED.
 The resulting group is named NAME."
-  (lambda (x)
-    (when (not (funcall pred x))
-      name)))
+  (byte-compile (lambda (x)
+                  (when (not (funcall pred x))
+                    name))))
 
 (defun sbuffer-group-dir (dirs depth buffer)
   "Group buffers in DIRS.
@@ -401,15 +405,16 @@ NAME, okay, `checkdoc'?"
 ;; These options must be defined after functions they call in their
 ;; values.
 
-(defcustom sbuffer-groups (list (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
-                                      (list (sbuffer-or "*Help/Info*"
-                                                        (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
-                                                        (sbuffer-group 'mode-match "*Info*" (rx bos "info-")))
-                                            (sbuffer-group 'auto-mode))
-                                      (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
-                                            (sbuffer-group 'auto-directory))
-                                      (list (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-")))
-                                      (sbuffer-group 'auto-mode)))
+(defcustom sbuffer-groups
+  (list (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
+              (list (sbuffer-or "*Help/Info*"
+                                (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
+                                (sbuffer-group 'mode-match "*Info*" (rx bos "info-")))
+                    (sbuffer-group 'auto-mode))
+              (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
+                    (sbuffer-group 'auto-directory))
+              (list (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-")))
+              (sbuffer-group 'auto-mode)))
   "List of grouping functions recursively applied to buffers.
 Each item may be an Sbuffer grouping function or a list of
 grouping functions (each element of which may also be a list, and
