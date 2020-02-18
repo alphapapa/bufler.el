@@ -57,12 +57,22 @@
   "Reverse group order after grouping buffers."
   :type 'boolean)
 
+(defcustom sbuffer-face-prefix "outline-"
+  "Prefix used to look up faces.
+The depth number is appended to the prefix."
+  :type '(choice (const :tag "Outline faces" "outline-")
+                 (const :tag "Prism faces" "prism-level-")))
+
 (defface sbuffer-group
   '((t (:underline nil :weight bold)))
   "FIXME")
 
 (defface sbuffer-buffer
   '((t (:inherit default)))
+  "FIXME")
+
+(defface sbuffer-buffer-special
+  '((t (:inherit default :slant italic)))
   "FIXME")
 
 ;;;; Commands
@@ -152,7 +162,7 @@
 
 (defun sbuffer-level-face (level)
   "Return face for LEVEL."
-  (intern (format "prism-level-%s" level)))
+  (intern (format "%s%s" sbuffer-face-prefix level)))
 
 (defun sbuffer-format-buffer (buffer depth)
   "Return string for BUFFER to be displayed at DEPTH."
@@ -160,8 +170,11 @@
                                           (buffer-modified-p buffer))
                                      "*" "")
                                  'face 'font-lock-warning-face))
-         (name (propertize (buffer-name buffer)
-                           'face (list :inherit (list 'sbuffer-buffer (sbuffer-level-face depth))))))
+         (buffer-face (if (sbuffer-special-buffer-p buffer)
+                          'sbuffer-buffer-special 'sbuffer-buffer))
+         (level-face (sbuffer-level-face depth))
+         (face (list :inherit (list buffer-face level-face)))
+         (name (propertize (buffer-name buffer) 'face face)))
     (concat name modified-s)))
 
 (defun sbuffer-visit ()
@@ -246,9 +259,12 @@ nil if it should not be grouped."
       "*hidden*"
     "Normal"))
 
+(defun sbuffer-special-buffer-p (buffer)
+  (string-match-p (rx bos (optional (1+ blank)) "*")
+                  (buffer-name buffer)))
+
 (sbuffer-defauto-group special
-  (if (string-match-p (rx bos (optional (1+ blank)) "*")
-                      (buffer-name buffer))
+  (if (sbuffer-special-buffer-p buffer)
       "*special*"
     "non-special buffers"))
 
