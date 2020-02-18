@@ -58,70 +58,6 @@
   :type '(repeat (or directory
                      (list directory integer))))
 
-;; FIXME: Move to config.
-
-(setf sbuffer-groups (list (list (sbuffer-or "*Misc*"
-                                             (apply-partially #'sbuffer-group-buffer-name-match "*Flycheck*" (rx "*Flycheck"))))
-                           (list (sbuffer-or "*Help/Info*"
-                                             (apply-partially #'sbuffer-group-mode-match "*Help*" (rx bos "help-"))
-                                             (apply-partially #'sbuffer-group-mode-match "*Info*" (rx bos "info-")))
-                                 'sbuffer-group-by-major-mode)
-                           (list (apply-partially #'sbuffer-group-mode-match "*Helm*" (rx bos "helm-")))
-                           (list (apply-partially #'sbuffer-group-dir "~/org" nil)
-                                 (apply-partially #'sbuffer-group-mode-match "Magit" (rx bos "magit-"))
-                                 (list #'sbuffer-group-by-indirect #'sbuffer-group-by-file))
-                           (apply-partially #'sbuffer-group-dir "~/.emacs.d" nil)
-                           (apply-partially #'sbuffer-group-dir "~/.bin" nil)
-                           (apply-partially #'sbuffer-group-dir '("~/.config" "~/.homesick/repos/main/home/.config") nil)
-                           (apply-partially #'sbuffer-group-dir "~/src/emacs" 1)
-                           (apply-partially #'sbuffer-group-dir "/usr/share" 1)
-                           (apply-partially #'sbuffer-group-mode-match "*Magit*" (rx bos "magit-"))
-                           'sbuffer-group-by-directory 'sbuffer-group-by-major-mode))
-
-;; TODO: The groups should be set with a DSL that looks something like this:
-
-;; (sbuffer-set-groups '(((:or "*Misc*"
-;;                             (:name-match "*Flycheck*" (rx "*Flycheck"))))
-;;                       ((:or "*Help/Info*"
-;;                             (:mode-match "*Help*" (rx bos "help-"))
-;;                             (:mode-match "*Info*" (rx bos "info-")))
-;;                        :auto-mode)
-;;                       ((:mode-match "*Helm*" (rx bos "helm-")))
-;;                       ((:dir "~/org" nil)
-;;                        (:mode-match "Magit" (rx bos "magit-"))
-;;                        (:indirect :auto-file))
-;;                       (:dir "~/.emacs.d" nil)
-;;                       (:dir "~/.bin" nil)
-;;                       (:dir '("~/.config" "~/.homesick/repos/main/home/.config") nil)
-;;                       (:dir "~/src/emacs" 1)
-;;                       (:dir "/usr/share" 1)
-;;                       (:mode-match "*Magit*" (rx bos "magit-"))
-;;                       :auto-dir :auto-mode))
-
-;; The challenge is to transform that into this:
-
-;; (setf sbuffer-groups (list (list (sbuffer-or "*Misc*"
-;;                                              (apply-partially #'sbuffer-group-buffer-name-match "*Flycheck*" (rx "*Flycheck"))))
-;;                            (list (sbuffer-or "*Help/Info*"
-;;                                              (apply-partially #'sbuffer-group-mode-match "*Help*" (rx bos "help-"))
-;;                                              (apply-partially #'sbuffer-group-mode-match "*Info*" (rx bos "info-")))
-;;                                  'sbuffer-group-by-major-mode)
-;;                            (list (apply-partially #'sbuffer-group-mode-match "*Helm*" (rx bos "helm-")))
-;;                            (list (apply-partially #'sbuffer-group-dir "~/org" nil)
-;;                                  (apply-partially #'sbuffer-group-mode-match "Magit" (rx bos "magit-"))
-;;                                  (list #'sbuffer-group-by-indirect #'sbuffer-group-by-file))
-;;                            (apply-partially #'sbuffer-group-dir "~/.emacs.d" nil)
-;;                            (apply-partially #'sbuffer-group-dir "~/.bin" nil)
-;;                            (apply-partially #'sbuffer-group-dir '("~/.config" "~/.homesick/repos/main/home/.config") nil)
-;;                            (apply-partially #'sbuffer-group-dir "~/src/emacs" 1)
-;;                            (apply-partially #'sbuffer-group-dir "/usr/share" 1)
-;;                            (apply-partially #'sbuffer-group-mode-match "*Magit*" (rx bos "magit-"))
-;;                            'sbuffer-group-by-directory 'sbuffer-group-by-major-mode))
-
-
-(define-key sbuffer-mode-map (kbd "TAB") #'magit-section-cycle)
-(define-key sbuffer-mode-map (kbd "<C-tab>") nil)
-
 ;;;; Commands
 
 (define-derived-mode sbuffer-mode magit-section-mode "SBuffer"
@@ -210,7 +146,7 @@
                         )
              (groups (group-by group-fns (-remove #'boring-p (buffer-list))))
              (pos (point)))
-        (setf groups (-sort #'format< groups))
+        (setf groups (nreverse (-sort #'format< groups)))
         (magit-section-mode)
         (erase-buffer)
         (magit-insert-section (sbuffer-root)
@@ -317,9 +253,17 @@ nil if it should not be grouped."
     (propertize name 'face 'magit-head)))
 
 (defun sbuffer-or (name &rest preds)
+  ;; Copied from dash-functional.el.
   "FIXME"
   (lambda (x)
     (when (-any? (-cut funcall <> x) preds)
+      name)))
+
+(defun sbuffer-not (name pred)
+  ;; Copied from dash-functional.el.
+  "FIXME"
+  (lambda (x)
+    (when (not (funcall pred x))
       name)))
 
 ;;;;;; Directory-specific groups
@@ -412,6 +356,71 @@ is placed into a group named NAME."
        (sbuffer-group-mode-match ,name ,regexp buffer))))
 
 ;;  (sbuffer-defmode-match-group magit (rx bos "magit-"))
+
+;;;; FIXME Move to config
+
+(setf sbuffer-groups (list (list (sbuffer-or "*Misc*"
+                                             (apply-partially #'sbuffer-group-buffer-name-match "*Flycheck*" (rx "*Flycheck"))))
+                           (list (sbuffer-or "*Help/Info*"
+                                             (apply-partially #'sbuffer-group-mode-match "*Help*" (rx bos "help-"))
+                                             (apply-partially #'sbuffer-group-mode-match "*Info*" (rx bos "info-")))
+                                 'sbuffer-group-by-major-mode)
+                           (list (sbuffer-not "*Special*" #'sbuffer-group-by-file) #'sbuffer-group-by-major-mode)
+                           (list (apply-partially #'sbuffer-group-mode-match "*Helm*" (rx bos "helm-")))
+                           (list (apply-partially #'sbuffer-group-dir "~/org" nil)
+                                 (apply-partially #'sbuffer-group-mode-match "Magit" (rx bos "magit-"))
+                                 (list #'sbuffer-group-by-indirect  #'sbuffer-group-by-file))
+                           (apply-partially #'sbuffer-group-dir "~/.emacs.d" nil)
+                           (apply-partially #'sbuffer-group-dir "~/.bin" nil)
+                           (apply-partially #'sbuffer-group-dir '("~/.config" "~/.homesick/repos/main/home/.config") nil)
+                           (apply-partially #'sbuffer-group-dir "~/src/emacs" 1)
+                           (apply-partially #'sbuffer-group-dir "/usr/share" 1)
+                           (apply-partially #'sbuffer-group-mode-match "*Magit*" (rx bos "magit-"))
+                           'sbuffer-group-by-directory 'sbuffer-group-by-major-mode))
+
+;; TODO: The groups should be set with a DSL that looks something like this:
+
+;; (sbuffer-set-groups '(((:or "*Misc*"
+;;                             (:name-match "*Flycheck*" (rx "*Flycheck"))))
+;;                       ((:or "*Help/Info*"
+;;                             (:mode-match "*Help*" (rx bos "help-"))
+;;                             (:mode-match "*Info*" (rx bos "info-")))
+;;                        :auto-mode)
+;;                       ((:mode-match "*Helm*" (rx bos "helm-")))
+;;                       ((:dir "~/org" nil)
+;;                        (:mode-match "Magit" (rx bos "magit-"))
+;;                        (:indirect :auto-file))
+;;                       (:dir "~/.emacs.d" nil)
+;;                       (:dir "~/.bin" nil)
+;;                       (:dir '("~/.config" "~/.homesick/repos/main/home/.config") nil)
+;;                       (:dir "~/src/emacs" 1)
+;;                       (:dir "/usr/share" 1)
+;;                       (:mode-match "*Magit*" (rx bos "magit-"))
+;;                       :auto-dir :auto-mode))
+
+;; The challenge is to transform that into this:
+
+;; (setf sbuffer-groups (list (list (sbuffer-or "*Misc*"
+;;                                              (apply-partially #'sbuffer-group-buffer-name-match "*Flycheck*" (rx "*Flycheck"))))
+;;                            (list (sbuffer-or "*Help/Info*"
+;;                                              (apply-partially #'sbuffer-group-mode-match "*Help*" (rx bos "help-"))
+;;                                              (apply-partially #'sbuffer-group-mode-match "*Info*" (rx bos "info-")))
+;;                                  'sbuffer-group-by-major-mode)
+;;                            (list (apply-partially #'sbuffer-group-mode-match "*Helm*" (rx bos "helm-")))
+;;                            (list (apply-partially #'sbuffer-group-dir "~/org" nil)
+;;                                  (apply-partially #'sbuffer-group-mode-match "Magit" (rx bos "magit-"))
+;;                                  (list #'sbuffer-group-by-indirect #'sbuffer-group-by-file))
+;;                            (apply-partially #'sbuffer-group-dir "~/.emacs.d" nil)
+;;                            (apply-partially #'sbuffer-group-dir "~/.bin" nil)
+;;                            (apply-partially #'sbuffer-group-dir '("~/.config" "~/.homesick/repos/main/home/.config") nil)
+;;                            (apply-partially #'sbuffer-group-dir "~/src/emacs" 1)
+;;                            (apply-partially #'sbuffer-group-dir "/usr/share" 1)
+;;                            (apply-partially #'sbuffer-group-mode-match "*Magit*" (rx bos "magit-"))
+;;                            'sbuffer-group-by-directory 'sbuffer-group-by-major-mode))
+
+
+(define-key sbuffer-mode-map (kbd "TAB") #'magit-section-cycle)
+(define-key sbuffer-mode-map (kbd "<C-tab>") nil)
 
 ;;;; Footer
 
