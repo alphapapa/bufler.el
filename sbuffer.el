@@ -421,32 +421,53 @@ NAME, okay, `checkdoc'?"
       "*special*"
     "non-special buffers"))
 
+;;;;;; Group-defining macro
+
+;; This seems to work better than I expected.
+
+(defmacro sbuffer-defgroups (&rest groups)
+  "FIXME: Docstring."
+  (declare (indent defun))
+  `(cl-macrolet ((group (&rest groups) `(list ,@groups))
+                 (group-or (name &rest groups)
+                           `(sbuffer-or ,name ,@groups))
+                 (group-not (name group)
+                            `(sbuffer-not ,name ,group))
+                 (mode-match (name regexp)
+                             `(sbuffer-group 'mode-match ,name ,regexp))
+                 (dir (dirs &optional depth)
+                      `(sbuffer-group 'dir ,dirs ,depth))
+                 (auto-directory () `(sbuffer-group 'auto-directory))
+                 (auto-file () `(sbuffer-group 'auto-file))
+                 (auto-indirect () `(sbuffer-group 'auto-indirect))
+                 (auto-mode () `(sbuffer-group 'auto-mode)))
+     (list ,@groups)))
+
 ;;;; Additional customization
 
 ;; These options must be defined after functions they call in their
-;; values.
+;; values, and after the `sbuffer-defgroups' macro.
 
 (defcustom sbuffer-groups
-  (list (list (sbuffer-or "*Help/Info*"
-                          (sbuffer-group 'mode-match "*Help*" (rx bos "help-"))
-                          (sbuffer-group 'mode-match "*Info*" (rx bos "info-"))))
-        (list (sbuffer-group 'mode-match "*Magit*" (rx bos "magit-"))
-              (sbuffer-group 'auto-directory))
-        (list (sbuffer-not "*Special*" (sbuffer-group 'auto-file))
-              (sbuffer-group 'mode-match "*Helm*" (rx bos "helm-"))
-              (sbuffer-group 'auto-mode))
-        (sbuffer-group 'dir '("~/.emacs.d") nil)
-        (list (sbuffer-group 'dir (if (bound-and-true-p org-directory)
-                                      org-directory
-                                    "~/org")
-                             nil)
-              (list (sbuffer-group 'auto-indirect)
-                    (sbuffer-group 'auto-file))
-              (sbuffer-not "*special*"
-                           (sbuffer-group 'auto-file))
-              (sbuffer-group 'auto-mode))
-        (sbuffer-group 'auto-directory)
-        (sbuffer-group 'auto-mode))
+  (sbuffer-defgroups
+    (group (group-or "*Help/Info*"
+                     (mode-match "*Help*" (rx bos "help-"))
+                     (mode-match "*Info*" (rx bos "info-"))))
+    (group (mode-match "*Magit*" (rx bos "magit-"))
+           (auto-directory))
+    (group (group-not "*Special*" (auto-file))
+           (mode-match "*Helm*" (rx bos "helm-"))
+           (auto-mode))
+    (dir "~/.emacs.d")
+    (group (dir (if (bound-and-true-p org-directory)
+                    org-directory
+                  "~/org"))
+           (group (auto-indirect)
+                  (auto-file))
+           (group-not "*special*" (auto-file))
+           (auto-mode))
+    (auto-directory)
+    (auto-mode))
   "List of grouping functions recursively applied to buffers.
 Each item may be an Sbuffer grouping function or a list of
 grouping functions (each element of which may also be a list, and

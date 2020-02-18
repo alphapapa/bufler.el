@@ -101,7 +101,31 @@ This may seem confusing at first, but once you get the hang of it, it's powerful
 
 *Note* that every element evaluates to either a function or a list of functions (because =sbuffer-group=, =sbuffer-not=, and =sbuffer-or= return partially applied functions).  Ultimately, it's lambdas all the way down.
 
-For example, a list of the currently default groups:
+For convenience, the macro =sbuffer-defgroups= provides a more concise vocabulary.  For example, the default groups are defined like so:
+
+#+BEGIN_SRC elisp
+  (sbuffer-defgroups
+    (group (group-or "*Help/Info*"
+                     (mode-match "*Help*" (rx bos "help-"))
+                     (mode-match "*Info*" (rx bos "info-"))))
+    (group (mode-match "*Magit*" (rx bos "magit-"))
+           (auto-directory))
+    (group (group-not "*Special*" (auto-file))
+           (mode-match "*Helm*" (rx bos "helm-"))
+           (auto-mode))
+    (dir "~/.emacs.d")
+    (group (dir (if (bound-and-true-p org-directory)
+                    org-directory
+                  "~/org"))
+           (group (auto-indirect)
+                  (auto-file))
+           (group-not "*special*" (auto-file))
+           (auto-mode))
+    (auto-directory)
+    (auto-mode))
+#+END_SRC
+
+This expands to:
 
 #+BEGIN_SRC elisp
   (list (list (sbuffer-or "*Help/Info*"
@@ -126,7 +150,9 @@ For example, a list of the currently default groups:
         (sbuffer-group 'auto-mode))
 #+END_SRC
 
-As you can see, groups are mostly (but not always) specified using the =sbuffer-group= function, followed by a type, and sometimes arguments.  The following group types are available (again, not guaranteed to be up-to-date, as this package is under rapid development):
+So you'll probably want to use the macro.  *Note* that the macro does not /set/ the variable =sbuffer-groups=, it merely expands a groups form, so you should use, e.g. ~(setf sbuffer-groups (sbuffer-defgroups ...))~ to actually set the groups.
+
+The following group types are available (again, not guaranteed to be up-to-date, as this package is under rapid development):
 
 +  Auto-groups :: These types automatically create groups for the buffer's attribute of this type.
      -  =auto-file=  Buffer's file name.
