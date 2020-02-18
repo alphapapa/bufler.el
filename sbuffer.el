@@ -54,7 +54,7 @@
 ;;;; Variables
 
 (defvar sbuffer-mode-map
-  (let ((map (make-sparse-keymap magit-section-mode-map)))
+  (let ((map (copy-keymap magit-section-mode-map)))
     (define-key map (kbd "g") #'sbuffer)
     (define-key map (kbd "k") #'sbuffer-kill)
     (define-key map (kbd "s") #'sbuffer-save)
