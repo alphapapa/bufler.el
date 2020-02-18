@@ -58,17 +58,16 @@
   :type 'boolean)
 
 (defface sbuffer-group
-  '((t (:underline t)))
+  '((t (:underline nil :weight bold)))
   "FIXME")
 
 (defface sbuffer-buffer
-  '((t (:weight bold)))
+  '((t (:inherit default)))
   "FIXME")
 
 ;;;; Commands
 
-(define-derived-mode sbuffer-mode magit-section-mode "SBuffer"
-  (call-interactively #'sbuffer))
+(define-derived-mode sbuffer-mode magit-section-mode "SBuffer")
 
 (defun sbuffer ()
   (interactive)
@@ -140,7 +139,7 @@
              (pos (point)))
         (when sbuffer-reverse
           (setf groups (nreverse (-sort #'format< groups))))
-        (magit-section-mode)
+        (sbuffer-mode)
         (erase-buffer)
         (magit-insert-section (sbuffer-root)
           (magit-insert-heading (propertize "sbuffer"
