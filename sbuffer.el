@@ -59,16 +59,66 @@
                      (list directory integer))))
 
 ;; FIXME: Move to config.
-(setf sbuffer-dirs '("~/org" ("~/src/emacs" 1) "~/.emacs.d" "~/.bin" "~/.config" "/usr/share"
-                     "~/tmp" "/tmp"))
-(setf sbuffer-groups (list (apply-partially #'sbuffer-group-dir "~/org" nil)
+
+(setf sbuffer-groups (list (list (sbuffer-or "*Misc*"
+                                             (apply-partially #'sbuffer-group-buffer-name-match "*Flycheck*" (rx "*Flycheck"))))
+                           (list (sbuffer-or "*Help/Info*"
+                                             (apply-partially #'sbuffer-group-mode-match "*Help*" (rx bos "help-"))
+                                             (apply-partially #'sbuffer-group-mode-match "*Info*" (rx bos "info-")))
+                                 'sbuffer-group-by-major-mode)
+                           (list (apply-partially #'sbuffer-group-mode-match "*Helm*" (rx bos "helm-")))
+                           (list (apply-partially #'sbuffer-group-dir "~/org" nil)
+                                 (apply-partially #'sbuffer-group-mode-match "Magit" (rx bos "magit-"))
+                                 (list #'sbuffer-group-by-indirect #'sbuffer-group-by-file))
                            (apply-partially #'sbuffer-group-dir "~/.emacs.d" nil)
                            (apply-partially #'sbuffer-group-dir "~/.bin" nil)
                            (apply-partially #'sbuffer-group-dir '("~/.config" "~/.homesick/repos/main/home/.config") nil)
                            (apply-partially #'sbuffer-group-dir "~/src/emacs" 1)
                            (apply-partially #'sbuffer-group-dir "/usr/share" 1)
-                           (apply-partially #'sbuffer-group-mode-match "Magit" (rx bos "magit-"))
+                           (apply-partially #'sbuffer-group-mode-match "*Magit*" (rx bos "magit-"))
                            'sbuffer-group-by-directory 'sbuffer-group-by-major-mode))
+
+;; TODO: The groups should be set with a DSL that looks something like this:
+
+;; (sbuffer-set-groups '(((:or "*Misc*"
+;;                             (:name-match "*Flycheck*" (rx "*Flycheck"))))
+;;                       ((:or "*Help/Info*"
+;;                             (:mode-match "*Help*" (rx bos "help-"))
+;;                             (:mode-match "*Info*" (rx bos "info-")))
+;;                        :auto-mode)
+;;                       ((:mode-match "*Helm*" (rx bos "helm-")))
+;;                       ((:dir "~/org" nil)
+;;                        (:mode-match "Magit" (rx bos "magit-"))
+;;                        (:indirect :auto-file))
+;;                       (:dir "~/.emacs.d" nil)
+;;                       (:dir "~/.bin" nil)
+;;                       (:dir '("~/.config" "~/.homesick/repos/main/home/.config") nil)
+;;                       (:dir "~/src/emacs" 1)
+;;                       (:dir "/usr/share" 1)
+;;                       (:mode-match "*Magit*" (rx bos "magit-"))
+;;                       :auto-dir :auto-mode))
+
+;; The challenge is to transform that into this:
+
+;; (setf sbuffer-groups (list (list (sbuffer-or "*Misc*"
+;;                                              (apply-partially #'sbuffer-group-buffer-name-match "*Flycheck*" (rx "*Flycheck"))))
+;;                            (list (sbuffer-or "*Help/Info*"
+;;                                              (apply-partially #'sbuffer-group-mode-match "*Help*" (rx bos "help-"))
+;;                                              (apply-partially #'sbuffer-group-mode-match "*Info*" (rx bos "info-")))
+;;                                  'sbuffer-group-by-major-mode)
+;;                            (list (apply-partially #'sbuffer-group-mode-match "*Helm*" (rx bos "helm-")))
+;;                            (list (apply-partially #'sbuffer-group-dir "~/org" nil)
+;;                                  (apply-partially #'sbuffer-group-mode-match "Magit" (rx bos "magit-"))
+;;                                  (list #'sbuffer-group-by-indirect #'sbuffer-group-by-file))
+;;                            (apply-partially #'sbuffer-group-dir "~/.emacs.d" nil)
+;;                            (apply-partially #'sbuffer-group-dir "~/.bin" nil)
+;;                            (apply-partially #'sbuffer-group-dir '("~/.config" "~/.homesick/repos/main/home/.config") nil)
+;;                            (apply-partially #'sbuffer-group-dir "~/src/emacs" 1)
+;;                            (apply-partially #'sbuffer-group-dir "/usr/share" 1)
+;;                            (apply-partially #'sbuffer-group-mode-match "*Magit*" (rx bos "magit-"))
+;;                            'sbuffer-group-by-directory 'sbuffer-group-by-major-mode))
+
+
 (define-key sbuffer-mode-map (kbd "TAB") #'magit-section-cycle)
 (define-key sbuffer-mode-map (kbd "<C-tab>") nil)
 
@@ -80,10 +130,31 @@
 (defun sbuffer ()
   (interactive)
   (cl-labels
-      ((group-buffers (buffers fns)
+      ((group-by (fns sequence)
+                 (cl-typecase fns
+                   (list (cl-typecase (car fns)
+                           (list
+                            ;; "Recursive sub-subgroups" (naming things is hard).
+
+                            ;; First, separate all the buffers that match the
+                            ;; first function.  Then group them recursively with
+                            ;; their subgrouping.  Then group the buffers that
+                            ;; don't match the first function, and append them.
+                            (append (group-by (car fns) (-select (caar fns) sequence))
+                                    (if (cdr fns)
+                                        (group-by (cdr fns) (-select (-not (caar fns)) sequence))
+                                      (-select (-not (caar fns)) sequence))))
+                           (function
+                            ;; "Regular" subgroups (naming things is hard)
+                            (group-buffers fns sequence))))
+                   (function
+                    ;; "Regular" subgroups (naming things is hard)
+                    (seq-group-by fns sequence)))
+                 )
+       (group-buffers (fns buffers)
                       (if (cdr fns)
-                          (let ((groups (seq-group-by (car fns) buffers)))
-                            (--map (cons (car it) (group-buffers (cdr it) (cdr fns)))
+                          (let ((groups (group-by (car fns) buffers)))
+                            (--map (cons (car it) (group-by (cdr fns) (cdr it)))
                                    groups))
                         (seq-group-by (car fns) buffers)))
        (insert-thing (thing &optional (level 0))
@@ -129,8 +200,7 @@
                 (otherwise (format "%s" arg))))
        (format< (test-dir buffer-dir) (string< (as-string test-dir) (as-string buffer-dir)))
        (boring-p (buffer)
-                 (or (special-p buffer)
-                     (hidden-p buffer)))
+                 (hidden-p buffer))
        (level-face
         (level) (intern (format "prism-level-%s" level))))
     (with-current-buffer (get-buffer-create "*SBuffer*")
@@ -138,7 +208,7 @@
              (group-fns sbuffer-groups ;; (list #'by-my-dirs #'by-default-directory #'by-indirect-p
                         ;;       (apply-partially #'by-mode-prefix "magit-"))
                         )
-             (groups (group-buffers (-remove #'boring-p (buffer-list)) group-fns))
+             (groups (group-by group-fns (-remove #'boring-p (buffer-list))))
              (pos (point)))
         (setf groups (-sort #'format< groups))
         (magit-section-mode)
@@ -211,6 +281,12 @@ nil if it should not be grouped."
        ,docstring
        ,@body)))
 
+(sbuffer-defgroup file
+  (when-let* ((filename (or (buffer-file-name buffer)
+                            (buffer-file-name (buffer-base-buffer buffer)))))
+    (propertize (concat "File: " (file-name-nondirectory filename))
+                'face 'magit-section-heading)))
+
 (sbuffer-defgroup directory
   (propertize (concat "Dir: " (file-truename (buffer-local-value 'default-directory buffer)))
               'face 'magit-section-heading))
@@ -233,6 +309,18 @@ nil if it should not be grouped."
                       (buffer-name buffer))
       "*special*"
     "non-special buffers"))
+
+(defun sbuffer-group-buffer-name-match (name regexp buffer)
+  "FIXME"
+  (cl-check-type name string)
+  (when (string-match-p regexp (buffer-name buffer))
+    (propertize name 'face 'magit-head)))
+
+(defun sbuffer-or (name &rest preds)
+  "FIXME"
+  (lambda (x)
+    (when (-any? (-cut funcall <> x) preds)
+      name)))
 
 ;;;;;; Directory-specific groups
 
