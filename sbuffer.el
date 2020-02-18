@@ -292,6 +292,15 @@ TYPE, okay, `checkdoc'?"
 ;; NOTE: We use `byte-compile' explicitly because uncompiled closures
 ;; don't work in `-select', or something like that.
 
+(defun sbuffer-and (name &rest preds)
+  ;; Copied from dash-functional.el.
+  "Return a grouping function that groups buffers matching all of PREDS.
+The resulting group is named NAME.  This can also be used with a
+single predicate to apply a name to a group."
+  (byte-compile (lambda (x)
+                  (when (-all? (-cut funcall <> x) preds)
+                    name))))
+
 (defun sbuffer-or (name &rest preds)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups buffers matching any of PREDS.
@@ -429,6 +438,8 @@ NAME, okay, `checkdoc'?"
   "FIXME: Docstring."
   (declare (indent defun))
   `(cl-macrolet ((group (&rest groups) `(list ,@groups))
+                 (group-and (name &rest groups)
+                            `(sbuffer-and ,name ,@groups))
                  (group-or (name &rest groups)
                            `(sbuffer-or ,name ,@groups))
                  (group-not (name group)
