@@ -184,7 +184,7 @@ The depth number is appended to the prefix."
         (erase-buffer)
         (magit-insert-section (sbuffer-root)
           (magit-insert-heading (propertize "sbuffer"
-                                            'face 'prism-level-0))
+                                            'face (sbuffer-level-face 1)))
           (--each groups
             (insert-thing it 1)))
         (setf buffer-read-only t)
