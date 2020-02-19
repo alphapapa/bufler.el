@@ -166,6 +166,7 @@ The following group types are available (again, not guaranteed to be up-to-date,
      -  =name-match= Match a regular expression against the buffer's name.
      -  =mode-match= Match a regular expression against the buffer's major-mode.
 +  Meta groups :: These types compose multiple of the other types into a single group.  Use them directly, not by calling =sbuffer-group=.  /Please see the example above./
+     -  =sbuffer-and= Groups buffers which match all of the given predicates.
      -  =sbuffer-not= Groups buffers which do /not/ match the given predicate.
      -  =sbuffer-or=  Groups buffers which match any of the given predicates.
 +  Other groups ::
