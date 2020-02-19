@@ -40,6 +40,7 @@
 (require 'eieio)
 (require 'project)
 (require 'subr-x)
+(require 'vc)
 
 ;; For faces.
 (require 'outline)
@@ -79,6 +80,13 @@ The depth number is appended to the prefix."
   :type '(choice (const :tag "Outline faces" "outline-")
                  (const :tag "Prism faces (requires `prism')" "prism-level-")))
 
+(defcustom sbuffer-vc-state nil
+  "Show buffers' VC state.
+With a lot of file-backed buffers open, this might be slow,
+because `vc-registered' and `vc-refresh-state' must be called to
+get correct results."
+  :type 'boolean)
+
 (defface sbuffer-group
   '((t (:underline nil :weight bold)))
   "Face for Sbuffer groups.")
@@ -94,6 +102,10 @@ The depth number is appended to the prefix."
 (defface sbuffer-size
   '((t (:inherit font-lock-comment-face)))
   "Face for the size of buffers and groups.")
+
+(defface sbuffer-vc
+  '((t (:inherit font-lock-warning-face)))
+  "Face for the VC status of buffers.")
 
 ;; Silence byte-compiler.  This is defined later in the file.
 (defvar sbuffer-groups)
@@ -247,8 +259,20 @@ NAME, okay, `checkdoc'?"
          (face (list :inherit (list buffer-face level-face)))
          (name (propertize (buffer-name buffer) 'face face))
          (size (propertize (concat "(" (file-size-human-readable (buffer-size buffer)) ")")
-                           'face 'sbuffer-size)))
-    (concat name modified-s " " size)))
+                           'face 'sbuffer-size))
+         ;; Getting correct, up-to-date results from vc is harder than it should be.
+         (vc-state (when sbuffer-vc-state
+                     (or (when (and (buffer-file-name buffer)
+                                    (vc-registered (buffer-file-name buffer)))
+                           (with-current-buffer buffer
+                             ;; Unfortunately, this seems to be necessary to get the correct state.
+                             (vc-refresh-state))
+                           (pcase (vc-state (buffer-file-name buffer))
+                             ((and 'edited it)
+                              (propertize (format " %s" it)
+                                          'face 'sbuffer-vc))))
+                         ""))))
+    (concat name modified-s " " size vc-state)))
 
 (defun sbuffer--map-sections (fn sections)
   "Map FN across SECTIONS."
