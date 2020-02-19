@@ -16,13 +16,50 @@ Sbuffer is like Ibuffer, but using [[https://github.com/magit/magit][magit-secti
 
 * Screenshots
 
-This screenshot shows group faces themed by [[https://github.com/alphapapa/prism.el][prism]], which Sbuffer optionally supports.
+This screenshot shows group faces themed by the default theme and the theme [[https://github.com/alphapapa/prism.el][prism]], which Sbuffer optionally supports.
 
-[[images/screenshot.png]]
+| Default theme            | [[https://github.com/alphapapa/prism.el][Prism]]  theme          |
+|--------------------------+-----------------------|
+| [[images/default-theme.png]] | [[images/screenshot.png]] |
 
-In the default Emacs theme:
+The configuration used to generate the prism theme screenshot is the following: 
 
-[[images/default-theme.png]]
+#+begin_src emacs-lisp
+  (use-package sbuffer
+    :quelpa
+    (sbuffer :fetcher github :repo "alphapapa/sbuffer.el")
+    :general
+    (:keymaps 'sbuffer-mode-map
+              "TAB" #'magit-section-cycle
+              "C-tab" nil)
+    (ap/general-def
+     "bf" #'sbuffer)
+    :custom
+    (sbuffer-groups
+     (sbuffer-defgroups
+       (group (group-not "*Special*" (auto-file))
+              (group (group-or "*Help/Info*"
+                               (mode-match "*Help*" (rx bos "help-"))
+                               (mode-match "*Info*" (rx bos "info-"))))
+              (group (mode-match "*Magit*" (rx bos "magit-"))
+                     (auto-directory))
+              (mode-match "*Helm*" (rx bos "helm-"))
+              (auto-mode))
+       (group (dir "~/org")
+              (mode-match "Magit" (rx bos "magit-"))
+              (group (auto-indirect) (auto-file)))
+       (group (dir "~/.emacs.d") (auto-directory))
+       (group (dir "~/.bin"))
+       (group (dir '("~/.config" "~/.homesick/repos/main/home/.config"))
+              (auto-mode))
+       (group (dir "~/src/emacs" 1))
+       (dir "/usr/share" 1)
+       (auto-directory) (auto-mode)))
+    (sbuffer-reverse t)
+    (sbuffer-face-prefix "prism-level-"))
+#+end_src
+
+
 
 # * Contents                                                         :noexport:
 # :PROPERTIES:
@@ -197,4 +234,3 @@ GPLv3
 # org-export-with-properties: ()
 # org-export-with-title: t
 # End:
-
