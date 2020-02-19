@@ -5,7 +5,7 @@
 ;; Author: Adam Porter <adam@alphapapa.net>
 ;; URL: https://github.com/alphapapa/sbuffer.el
 ;; Package-Version: 0.1-pre
-;; Package-Requires: ((emacs "26.3") (dash "2.17") (dash-functional "2.17") (f "0.17") (magit-section "0.1") (magit "2.90.1"))
+;; Package-Requires: ((emacs "26.3") (dash "2.17") (dash-functional "2.17") (f "0.17") (magit-section "0.1"))
 ;; Keywords: convenience
 
 ;;; License:
@@ -49,9 +49,6 @@
 (require 'dash-functional)
 (require 'f)
 (require 'magit-section)
-
-;; FIXME: Require Magit due to <https://github.com/magit/magit/issues/4052>.
-(require 'magit)
 
 ;;;; Variables
 
