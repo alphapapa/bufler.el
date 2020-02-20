@@ -470,7 +470,8 @@ NAME, okay, `checkdoc'?"
 ;; This seems to work better than I expected.
 
 (defmacro sbuffer-defgroups (&rest groups)
-  "FIXME: Docstring."
+  "Expand GROUPS into a group definition suitable for `sbuffer-groups'.
+See documentation for details."
   (declare (indent defun))
   `(cl-macrolet ((group (&rest groups) `(list ,@groups))
                  (group-and (name &rest groups)
