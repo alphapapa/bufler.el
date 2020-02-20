@@ -499,34 +499,63 @@ NAME, okay, `checkdoc'?"
 
 (defcustom sbuffer-groups
   (sbuffer-defgroups
-    (group (group-or "*Help/Info*"
-                     (mode-match "*Help*" (rx bos "help-"))
-                     (mode-match "*Info*" (rx bos "info-"))))
-    (group (group-and "*Special*"
-                      ;; magit-status buffers are excluded from this group so they will
-                      ;; be grouped with their project buffers.
-                      (lambda (buffer)
-                        (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
-                                             buffer)
-                                    (funcall (auto-file) buffer))
-                          "*Special*")))
-           (group (name-match "**Special**" (rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
-           (group (mode-match "*Magit* (non-status)" (rx bos (or "magit" "forge") "-"))
-                  (auto-directory))
-           (mode-match "*Helm*" (rx bos "helm-"))
-           (auto-mode))
+    (group
+     ;; Subgroup collecting all `help-mode' and `info-mode' buffers.
+     (group-or "*Help/Info*"
+               (mode-match "*Help*" (rx bos "help-"))
+               (mode-match "*Info*" (rx bos "info-"))))
+    (group
+     ;; Subgroup collecting all special buffers (i.e. ones that are not
+     ;; file-backed), except `magit-status-mode' buffers (which are allowed to fall
+     ;; through to other groups, so they end up grouped with their project buffers).
+     (group-and "*Special*"
+                (lambda (buffer)
+                  (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
+                                       buffer)
+                              (funcall (auto-file) buffer))
+                    "*Special*")))
+     (group
+      ;; Subgroup collecting these "special special" buffers
+      ;; separately for convenience.
+      (name-match "**Special**"
+                  (rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
+     (group
+      ;; Subgroup collecting all other Magit buffers, grouped by directory.
+      (mode-match "*Magit* (non-status)" (rx bos (or "magit" "forge") "-"))
+      (auto-directory))
+     ;; Subgroup for Helm buffers.
+     (mode-match "*Helm*" (rx bos "helm-"))
+     ;; Remaining special buffers are grouped automatically by mode.
+     (auto-mode))
+    ;; All buffers under "~/.emacs.d".
     (dir "~/.emacs.d")
-    (group (dir (if (bound-and-true-p org-directory)
-                    org-directory
-                  "~/org"))
-           (group (auto-indirect)
-                  (auto-file))
-           (group-not "*special*" (auto-file))
-           (auto-mode))
-    (group (auto-project) (auto-mode))
+    (group
+     ;; Subgroup collecting buffers in `org-directory' (or "~/org" if
+     ;; `org-directory' is not yet defined).
+     (dir (if (bound-and-true-p org-directory)
+              org-directory
+            "~/org"))
+     (group
+      ;; Subgroup collecting indirect Org buffers, grouping them by file.
+      ;; This is very useful when used with `org-tree-to-indirect-buffer'.
+      (auto-indirect)
+      (auto-file))
+     ;; Group remaining buffers by whether they're file backed, then by mode.
+     (group-not "*special*" (auto-file))
+     (auto-mode))
+    (group
+     ;; Subgroup collecting buffers in a version-control project,
+     ;; grouping them by directory and then major mode.
+     (auto-project) (auto-mode))
+    ;; Group remaining buffers by directory, then major mode.
     (auto-directory)
     (auto-mode))
   "List of grouping functions recursively applied to buffers.
+Note that this is likely to look very ugly in the customization
+UI due to lambdas being byte-compiled.  Please see the source
+code for this option's definition to see the human-readable group
+definitions.
+
 Each item may be an Sbuffer grouping function or a list of
 grouping functions (each element of which may also be a list, and
 so forth, spiraling into infinity...oh, hello, Alice).
