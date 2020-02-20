@@ -202,8 +202,6 @@ get correct results."
         (sbuffer-mode)
         (erase-buffer)
         (magit-insert-section (sbuffer-root)
-          (magit-insert-heading
-            (propertize "sbuffer" 'face (sbuffer-level-face 1)))
           (--each groups
             (insert-thing it 0)))
         (setf buffer-read-only t)
