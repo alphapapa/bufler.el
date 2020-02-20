@@ -8,8 +8,6 @@
 
 # [[https://melpa.org/#/package-name][file:https://melpa.org/packages/sbuffer-badge.svg]] [[https://stable.melpa.org/#/package-name][file:https://stable.melpa.org/packages/sbuffer-badge.svg]]
 
-*This is a work-in-progress.  It is not published as a package yet.  Please feel free to use it and offer feedback.*
-
 Sbuffer is like Ibuffer, but using [[https://github.com/magit/magit][magit-section]] to group buffers in a very flexible way.
 
 * Screenshots
@@ -169,6 +167,12 @@ The following group types are available in =sbuffer-defgroups=.  Note that each 
      -  ~mode-match (NAME REGEXP)~ Match a regular expression against the buffer's major-mode.
 +  Other types ::
      -  ~dir (DIRS DEPTH)~  Groups buffers which match one of the given DIRS.  DIRS may be one or a list of directory paths.  DEPTH may be nil or a depth above which to produce subdirectory groups (a feature probably broken at the moment).  See example above.
+
+* Changelog
+
+** 0.1
+
+First tagged release.
 
 * Credits
 
