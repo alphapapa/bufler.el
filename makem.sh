@@ -90,14 +90,14 @@ Options:
   -C, --no-compile  Don't compile files automatically.
 
 Sandbox options:
-  -s, --sandbox [DIR]    Run Emacs with an empty config in a sandbox DIR.
-                         If DIR does not exist, make it.  If DIR is not
-                         specified, use a temporary sandbox directory and
-                         delete it afterward, implying --install-deps and
-                         --install-linters.
-  --install-deps         Automatically install package dependencies.
-  --install-linters      Automatically install linters.
-  -i, --install PACKAGE  Install PACKAGE before running rules.
+  -s[DIR], --sandbox[=DIR]  Run Emacs with an empty config in a sandbox DIR.
+                            If DIR does not exist, make it.  If DIR is not
+                            specified, use a temporary sandbox directory and
+                            delete it afterward, implying --install-deps and
+                            --install-linters.
+  --install-deps            Automatically install package dependencies.
+  --install-linters         Automatically install linters.
+  -i, --install PACKAGE     Install PACKAGE before running rules.
 
   An Emacs version-specific subdirectory is automatically made inside
   the sandbox, allowing testing with multiple Emacs versions.  When
@@ -426,6 +426,8 @@ function sandbox {
     # Initialize sandbox.
 
     # *** Sandbox arguments
+
+    # MAYBE: Optionally use branch-specific sandbox?
 
     # Check or make user-emacs-directory.
     if [[ $sandbox_dir ]]
@@ -890,8 +892,8 @@ elisp_org_package_archive="(add-to-list 'package-archives '(\"org\" . \"https://
 # * Args
 
 args=$(getopt -n "$0" \
-              -o dhe:E:i:s:vf:CO \
-              -l exclude:,emacs:,install-deps,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox: \
+              -o dhe:E:i:s::vf:CO \
+              -l exclude:,emacs:,install-deps,install-linters,debug,debug-load-path,help,install:,verbose,file:,no-color,no-compile,no-org-repo,sandbox:: \
               -- "$@") \
     || { usage; exit 1; }
 eval set -- "$args"
@@ -928,33 +930,15 @@ do
             ;;
         -s|--sandbox)
             sandbox=true
-            # Check whether next argument is an option, rule, or a sandbox directory.
-            if [[ $2 ]] && ! [[ $2 =~ ^-- ]] \
-                   && ! rule-p "$2"
+            shift
+            sandbox_dir="$1"
+
+            if ! [[ $sandbox_dir ]]
             then
-                debug "Sandbox dir: $1"
-                shift
-                sandbox_dir="$1"
-            else
                 debug "No sandbox dir: installing dependencies."
                 install_deps=true
-                # HACK: Next argument is another option, so prepend blank arg to the
-                # argument list so it will be processed by next loop iteration.  getopts
-                # doesn't allow options to have optional arguments, so we do this manually.
-                # TODO: Yes it does: use two colons.  Check its man page, silly.
-                if [[ $2 =~ ^- ]]
-                then
-                    # Next argument is an option: process it next.
-                    new_args=("" "$@")
-                else
-                    # Next argument is not an option: put it on the end.
-                    new_arg="$2"
-                    shift
-                    shift
-                    new_args=("" "$@" "$new_arg")
-                fi
-                debug "Setting new args: ${new_args[@]}"
-                set -- "${new_args[@]}"
+            else
+                debug "Sandbox dir: $1"
             fi
             ;;
         -v|--verbose)
