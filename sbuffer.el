@@ -528,8 +528,8 @@ See documentation for details."
      (mode-match "*Helm*" (rx bos "helm-"))
      ;; Remaining special buffers are grouped automatically by mode.
      (auto-mode))
-    ;; All buffers under "~/.emacs.d".
-    (dir "~/.emacs.d")
+    ;; All buffers under "~/.emacs.d" (or wherever it is).
+    (dir user-emacs-directory)
     (group
      ;; Subgroup collecting buffers in `org-directory' (or "~/org" if
      ;; `org-directory' is not yet defined).
