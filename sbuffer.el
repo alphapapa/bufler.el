@@ -205,7 +205,7 @@ get correct results."
           (magit-insert-heading
             (propertize "sbuffer" 'face (sbuffer-level-face 1)))
           (--each groups
-            (insert-thing it 1)))
+            (insert-thing it 0)))
         (setf buffer-read-only t)
         (pop-to-buffer (current-buffer))
         (goto-char pos)))))
