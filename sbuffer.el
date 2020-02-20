@@ -77,6 +77,12 @@ The depth number is appended to the prefix."
   :type '(choice (const :tag "Outline faces" "outline-")
                  (const :tag "Prism faces (requires `prism')" "prism-level-")))
 
+(defcustom sbuffer-initial-face-depth 0
+  "First depth level used for outline faces.
+May be used to skip the first N level faces.  See
+`sbuffer-face-prefix'."
+  :type 'integer)
+
 (defcustom sbuffer-vc-state nil
   "Show buffers' VC state.
 With a lot of file-backed buffers open, this might be slow,
@@ -242,7 +248,7 @@ NAME, okay, `checkdoc'?"
 
 (defun sbuffer-level-face (level)
   "Return face for LEVEL."
-  (intern (format "%s%s" sbuffer-face-prefix level)))
+  (intern (format "%s%s" sbuffer-face-prefix (+ level sbuffer-initial-face-depth))))
 
 (defun sbuffer-format-buffer (buffer depth)
   "Return string for BUFFER to be displayed at DEPTH."
