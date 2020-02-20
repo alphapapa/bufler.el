@@ -77,7 +77,10 @@ The depth number is appended to the prefix."
   :type '(choice (const :tag "Outline faces" "outline-")
                  (const :tag "Prism faces (requires `prism')" "prism-level-")))
 
-(defcustom sbuffer-initial-face-depth 0
+(defcustom sbuffer-initial-face-depth 1
+  ;; Setting it to 1, because in the default Emacs config, it presents
+  ;; better contrast between the first two levels (blue/orange rather than
+  ;; black/blue), and the bold blue is a bit less harsh than the bold black.
   "First depth level used for outline faces.
 May be used to skip the first N level faces.  See
 `sbuffer-face-prefix'."
