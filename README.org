@@ -4,9 +4,7 @@
 
 # Note: This readme works with the org-make-toc <https://github.com/alphapapa/org-make-toc> package, which automatically updates the table of contents.
 
-#+BEGIN_HTML
-<a href=https://alphapapa.github.io/dont-tread-on-emacs/><img src="images/dont-tread-on-emacs-150.png" align="right"></a>
-#+END_HTML
+#+HTML: <a href=https://alphapapa.github.io/dont-tread-on-emacs/><img src="images/dont-tread-on-emacs-150.png" align="right"></a>
 
 # [[https://melpa.org/#/package-name][file:https://melpa.org/packages/sbuffer-badge.svg]] [[https://stable.melpa.org/#/package-name][file:https://stable.melpa.org/packages/sbuffer-badge.svg]]
 
@@ -86,6 +84,8 @@ In the Sbuffer buffer, these keys are available (use =C-h m= to get the most up-
 
 ** Defining groups
 
+/See the =sbuffer= info page to view this information in Emacs./
+
 The Sbuffer groups definition is a list stored in variable =sbuffer-groups=.  Each element of the list is either a lambda function which takes a single argument, a buffer, or a list of such functions.  Each buffer is matched against these functions in order until it does not match any more functions at that level.  A list of functions defines a subgroup which short-circuits other groups at the same level, preventing further grouping outside of the subgroup's functions.  Ultimately, it's lambdas all the way down.
 
 This seems somewhat difficult to explain, so please see the examples.  Once you get the hang of it, it's powerful and flexible.
@@ -152,23 +152,23 @@ For convenience, the macro =sbuffer-defgroups= provides a sort of DSL, a concise
 The following group types are available in =sbuffer-defgroups=.  Note that each one is expanded into a lambda, so they may also be called by =funcall= (see example above).
 
 +  Meta types :: These types compose multiple of the other types into a single group.
-     -  =group (TYPE...)= Define a subgroup matching given types, which short-circuits other groups at the same level.
-     -  =group-not (NAME TYPE)= Groups buffers which do /not/ match the given type.
-     -  =group-and (NAME TYPE...)= Groups buffers which match all of the given types.
-     -  =group-or (NAME TYPE...)=  Groups buffers which match any of the given types.
+     -  ~group (TYPE...)~ Define a subgroup matching given types, which short-circuits other groups at the same level.
+     -  ~group-not (NAME TYPE)~ Groups buffers which do /not/ match the given type.
+     -  ~group-and (NAME TYPE...)~ Groups buffers which match all of the given types.
+     -  ~group-or (NAME TYPE...)~  Groups buffers which match any of the given types.
 +  Auto-types :: These types automatically create groups for the buffer's attribute of this type.
-     -  =auto-directory=  Buffer's directory.
-     -  =auto-file=  Buffer's file name.
-     -  =auto-hidden=  Whether the buffer is hidden.
-     -  =auto-indirect=  Whether the buffer is indirect (e.g. a cloned indirect buffer).
-     -  =auto-mode=  Buffer's major mode.
-     -  =auto-project=  Buffer's version-control project directory according to =project.el=.
-     -  =auto-special=  Whether the buffer is special (i.e. whether its name starts with =*=).
+     -  ~auto-directory~  Buffer's directory.
+     -  ~auto-file~  Buffer's file name.
+     -  ~auto-hidden~  Whether the buffer is hidden.
+     -  ~auto-indirect~  Whether the buffer is indirect (e.g. a cloned indirect buffer).
+     -  ~auto-mode~  Buffer's major mode.
+     -  ~auto-project~  Buffer's version-control project directory according to ~project.el~.
+     -  ~auto-special~  Whether the buffer is special (i.e. whether its name starts with ~*~).
 +  Regexp types :: These types match a value against a buffer's attribute and group buffers which match.
-     -  =name-match (NAME REGEXP)= Match a regular expression against the buffer's name.
-     -  =mode-match (NAME REGEXP)= Match a regular expression against the buffer's major-mode.
+     -  ~name-match (NAME REGEXP)~ Match a regular expression against the buffer's name.
+     -  ~mode-match (NAME REGEXP)~ Match a regular expression against the buffer's major-mode.
 +  Other types ::
-     -  =dir (DIRS DEPTH)=  Groups buffers which match one of the given DIRS.  DIRS may be one or a list of directory paths.  DEPTH may be nil or a depth above which to produce subdirectory groups (a feature probably broken at the moment).  See example above.
+     -  ~dir (DIRS DEPTH)~  Groups buffers which match one of the given DIRS.  DIRS may be one or a list of directory paths.  DEPTH may be nil or a depth above which to produce subdirectory groups (a feature probably broken at the moment).  See example above.
 
 * Credits
 
@@ -184,15 +184,33 @@ Bug reports, feature requests, suggestions — /oh my/!
 
 GPLv3
 
-* COMMENT Footer
+* COMMENT Export Setup                                             :noexport:
+:PROPERTIES:
+:TOC:      :ignore (this descendants)
+:END:
 
-#+BEGIN_SRC elisp
-# eval: (require 'org-make-toc)
-# before-save-hook: org-make-toc
-#+END_SRC
+# Much borrowed from Org's =org-manual.org=.
+
+#+OPTIONS: broken-links:t *:t
+
+** Info export options
+
+#+TEXINFO_DIR_CATEGORY: Emacs
+#+TEXINFO_DIR_TITLE: Sbuffer: (sbuffer)
+#+TEXINFO_DIR_DESC: Like Ibuffer, with flexible grouping in hierarchical sections
+
+# NOTE: We could use these, but that causes a pointless error, "org-compile-file: File "..README.info" wasn't produced...", so we just rename the files in the after-save-hook instead.
+# #+TEXINFO_FILENAME: sbuffer.info
+# #+EXPORT_FILE_NAME: sbuffer.texi
+
+** File-local variables
+
+# NOTE: Setting org-comment-string buffer-locally is a nasty hack to work around GitHub's org-ruby's HTML rendering, which does not respect noexport tags.  The only way to hide this tree from its output is to use the COMMENT keyword, but that prevents Org from processing the export options declared in it.  So since these file-local variables don't affect org-ruby, wet set org-comment-string to an unused keyword, which prevents Org from deleting this tree from the export buffer, which allows it to find the export options in it.  And since org-export does respect the noexport tag, the tree is excluded from the info page.
 
 # Local Variables:
-# org-export-with-properties: ()
-# org-export-with-title: t
+# before-save-hook: org-make-toc
+# after-save-hook: (lambda nil (when (and (require 'ox-texinfo nil t) (org-texinfo-export-to-info)) (delete-file "README.texi") (rename-file "README.info" "sbuffer.info" t)))
+# org-export-initial-scope: buffer
+# org-comment-string: "NOTCOMMENT"
 # End:
 
