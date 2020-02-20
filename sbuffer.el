@@ -502,10 +502,17 @@ NAME, okay, `checkdoc'?"
     (group (group-or "*Help/Info*"
                      (mode-match "*Help*" (rx bos "help-"))
                      (mode-match "*Info*" (rx bos "info-"))))
-    (group (mode-match "*Magit*" (rx bos (or "magit" "forge") "-"))
-           (auto-directory))
-    (group (group-not "*Special*" (auto-file))
+    (group (group-and "*Special*"
+                      ;; magit-status buffers are excluded from this group so they will
+                      ;; be grouped with their project buffers.
+                      (lambda (buffer)
+                        (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
+                                             buffer)
+                                    (funcall (auto-file) buffer))
+                          "*Special*")))
            (group (name-match "**Special**" (rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
+           (group (mode-match "*Magit* (non-status)" (rx bos (or "magit" "forge") "-"))
+                  (auto-directory))
            (mode-match "*Helm*" (rx bos "helm-"))
            (auto-mode))
     (dir "~/.emacs.d")
@@ -516,6 +523,7 @@ NAME, okay, `checkdoc'?"
                   (auto-file))
            (group-not "*special*" (auto-file))
            (auto-mode))
+    (group (auto-project) (auto-mode))
     (auto-directory)
     (auto-mode))
   "List of grouping functions recursively applied to buffers.
