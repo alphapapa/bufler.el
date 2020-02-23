@@ -343,7 +343,7 @@ The resulting group is named NAME."
   "Return a grouping function that groups buffers which do not match PRED.
 The resulting group is named NAME."
   (byte-compile (lambda (x)
-                  (when (not (funcall pred x))
+                  (unless (funcall pred x)
                     name))))
 
 ;;;;;; Grouping predicates
