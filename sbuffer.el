@@ -64,7 +64,7 @@
 
 (defgroup sbuffer nil
   "Like Ibuffer, but using Magit-Section sections."
-  :link '(url-link "http://github.com/alphapapa/sbuffer.el")
+  :link '(url-link "https://github.com/alphapapa/sbuffer.el")
   :group 'convenience)
 
 (defcustom sbuffer-reverse nil
