@@ -465,6 +465,11 @@ NAME, okay, `checkdoc'?"
               (project-root (car (project-roots project))))
     (concat "Project: " project-root)))
 
+(sbuffer-defauto-group tramp
+  (when-let* ((hostname (with-current-buffer buffer (
+                          file-remote-p default-directory 'host))))
+    (concat "Tramp: " hostname)))
+
 ;;;;;; Group-defining macro
 
 ;; This seems to work better than I expected.
@@ -490,7 +495,8 @@ See documentation for details."
                  (auto-file () `(sbuffer-group 'auto-file))
                  (auto-indirect () `(sbuffer-group 'auto-indirect))
                  (auto-mode () `(sbuffer-group 'auto-mode))
-                 (auto-project () `(sbuffer-group 'auto-project)))
+                 (auto-project () `(sbuffer-group 'auto-project))
+                 (auto-tramp () `(sbuffer-group 'auto-tramp)))
      (list ,@groups)))
 
 ;;;; Additional customization
