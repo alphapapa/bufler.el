@@ -204,6 +204,7 @@ funcall (see example above).
           according to ‘project.el’.
         • ‘auto-special’ Whether the buffer is special (i.e.  whether
           its name starts with ‘*’).
+        • ‘auto-tramp’ Whether the buffer is opened via Tramp.
 ‘Regexp types’
      These types match a value against a buffer’s attribute and group
      buffers which match.
@@ -275,11 +276,11 @@ Node: Installation913
 Node: Usage1211
 Node: Bindings1431
 Node: Defining groups1878
-Node: Changelog7564
-Node: 017690
-Node: Credits7778
-Node: Development8323
-Node: License8492
+Node: Changelog7633
+Node: 017759
+Node: Credits7847
+Node: Development8392
+Node: License8561
 
 End Tag Table
 

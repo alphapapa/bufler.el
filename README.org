@@ -162,7 +162,7 @@ The following group types are available in =sbuffer-defgroups=.  Note that each 
      -  ~auto-mode~  Buffer's major mode.
      -  ~auto-project~  Buffer's version-control project directory according to ~project.el~.
      -  ~auto-special~  Whether the buffer is special (i.e. whether its name starts with ~*~).
-     -  ~auto-tramp~  Whether the buffer is opened via trump
+     -  ~auto-tramp~  Whether the buffer is opened via Tramp.
 +  Regexp types :: These types match a value against a buffer's attribute and group buffers which match.
      -  ~name-match (NAME REGEXP)~ Match a regular expression against the buffer's name.
      -  ~mode-match (NAME REGEXP)~ Match a regular expression against the buffer's major-mode.
