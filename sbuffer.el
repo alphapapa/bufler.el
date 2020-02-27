@@ -466,9 +466,9 @@ NAME, okay, `checkdoc'?"
     (concat "Project: " project-root)))
 
 (sbuffer-defauto-group tramp
-  (when-let* ((hostname (with-current-buffer buffer (
-                          file-remote-p default-directory 'host))))
-    (concat "Tramp: " hostname)))
+  (when-let* ((host (file-remote-p (buffer-local-value 'default-directory buffer)
+                                   'host)))
+    (concat "Tramp: " host)))
 
 ;;;;;; Group-defining macro
 
