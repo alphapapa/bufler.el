@@ -469,6 +469,7 @@ NAME, okay, `checkdoc'?"
 
 ;; This seems to work better than I expected.
 
+;;;###autoload
 (defmacro sbuffer-defgroups (&rest groups)
   "Expand GROUPS into a group definition suitable for `sbuffer-groups'.
 See documentation for details."
