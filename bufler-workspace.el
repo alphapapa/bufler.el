@@ -84,18 +84,15 @@ If ALL-P (interactively, with prefix) or if there is no current
 group, select from buffers in all groups and set current group."
   (interactive "P")
   (let* ((bufler-vc-state nil)
-         (group-path (frame-parameter nil 'bufler-workspace-path))
-         (buffer-names (when group-path
-                         (mapcar #'buffer-name (bufler-group-tree-at group-path (bufler-buffers))))))
-    (if (or all-p (not buffer-names))
-        (bufler-workspace-switch-buffer-all)
-      (switch-to-buffer (completing-read "Buffer: " buffer-names)))))
+         (path (unless all-p
+                 (frame-parameter nil 'bufler-workspace-path))))
+    (bufler-workspace-switch-buffer-all path)))
 
 ;;;###autoload
 (defalias 'bufler-switch-buffer #'bufler-workspace-switch-buffer)
 
 ;;;###autoload
-(defun bufler-workspace-switch-buffer-all ()
+(defun bufler-workspace-switch-buffer-all (&optional path)
   "Switch to another buffer and set current group, choosing from all buffers.
 Selects a buffer with completion from among all buffers, shown by
 group path."
@@ -113,7 +110,7 @@ group path."
               (path-cons
                (path) (cons (format-path (-non-nil path)) (-last-item path))))
     (let* ((bufler-vc-state nil)
-           (grouped-buffers (bufler-buffers))
+           (grouped-buffers (bufler-buffers :path path))
            (paths (bufler-group-tree-paths grouped-buffers))
            (buffers (mapcar #'path-cons paths))
            (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers))

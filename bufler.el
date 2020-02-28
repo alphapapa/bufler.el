@@ -273,20 +273,24 @@ NAME, okay, `checkdoc'?"
 
 ;;;; Functions
 
-(cl-defun bufler-buffers (&optional (groups bufler-groups))
-  "Return buffers grouped by GROUPS."
+(cl-defun bufler-buffers (&key (groups bufler-groups) path)
+  "Return buffers grouped by GROUPS.
+If PATH, return only buffers from the group at PATH."
   (cl-flet ((buffers
              () (bufler-group-tree groups
                                    (cl-loop with buffers = (buffer-list)
                                             for fn in bufler-filter-fns
                                             do (setf buffers (cl-remove-if fn buffers))
                                             finally return buffers))))
-    (if bufler-use-cache
-        (let ((hash (sxhash (buffer-list))))
-          (if (equal hash (car bufler-cache))
-              (cdr bufler-cache)
-            (cdr (setf bufler-cache (cons hash (buffers))))))
-      (buffers))))
+    (let ((buffers (if bufler-use-cache
+                       (let ((hash (sxhash (buffer-list))))
+                         (if (equal hash (car bufler-cache))
+                             (cdr bufler-cache)
+                           (cdr (setf bufler-cache (cons hash (buffers))))))
+                     (buffers))))
+      (if path
+          (bufler-group-tree-at path buffers)
+        buffers))))
 
 (defun bufler-level-face (level)
   "Return face for LEVEL."
