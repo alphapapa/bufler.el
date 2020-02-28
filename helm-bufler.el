@@ -28,6 +28,8 @@
 
 (require 'bufler-workspace)
 
+(declare-function helm-make-source "helm-source" t t)
+
 (when (require 'helm nil 'noerror)
 
   (defvar helm-bufler-source

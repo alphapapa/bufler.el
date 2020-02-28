@@ -276,6 +276,7 @@ NAME, okay, `checkdoc'?"
       (with-current-buffer buffer
         (save-buffer)))))
 
+(declare-function bufler-buffer-workspace "bufler-workspace")
 (bufler-define-buffer-command workspace
   "Set buffer's workspace name.
 With prefix, unset it."
