@@ -39,6 +39,10 @@
   "Options for Mr. Buffer's workspaces."
   :group 'bufler)
 
+(defcustom bufler-workspace-switch-buffer-sets-workspace t
+  "Whether to set the workspace when using `bufler-switch-buffer'."
+  :type 'boolean)
+
 (defcustom bufler-workspace-set-hook
   (list #'bufler-workspace-set-frame-name)
   "Functions called when the workspace is set."
@@ -105,7 +109,8 @@ group, select from buffers in all groups and set current group."
                                        buffers nil nil #'string=)))
       (unless path
         ;; Selected from all buffers: change the workspace.
-        (bufler-workspace-set (butlast (bufler-group-tree-leaf-path grouped-buffers selected-buffer))))
+        (when bufler-workspace-switch-buffer-sets-workspace
+          (bufler-workspace-set (butlast (bufler-group-tree-leaf-path grouped-buffers selected-buffer)))))
       (switch-to-buffer selected-buffer))))
 
 ;;;###autoload
@@ -154,8 +159,7 @@ group, select from buffers in all groups and set current group."
 
 (defun bufler-workspace-set-frame-name (path)
   "Set current frame's name according to PATH."
-  (let ((name (format "Workspace: %s" (bufler-format-path path))))
-    (set-frame-name name)))
+  (set-frame-name (format "Workspace: %s" (bufler-format-path path))))
 
 (cl-defun bufler-workspace-read-item (tree &key (leaf-key #'identity))
   "Return a leaf read from TREE with completion.
