@@ -1,4 +1,4 @@
-;;; mr-buffer.el --- Mr. Buffer helps manage your buffers  -*- lexical-binding: t; -*-
+;;; mr-buffer.el --- Mr. Buffer, the buffer and workspace manager  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  Adam Porter
 

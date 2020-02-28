@@ -1,4 +1,4 @@
-;;; mr-buffer-workspace.el --- Group buffers automatically with rules  -*- lexical-binding: t; -*-
+;;; mr-buffer-workspace.el --- Mr. Buffer's workspaces  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  Adam Porter
 
@@ -36,7 +36,7 @@
 ;;;; Customization
 
 (defgroup mr-buffer-workspace nil
-  "FIXME"
+  "Options for Mr. Buffer's workspaces."
   :group 'mr-buffer)
 
 (defcustom mr-buffer-workspace-set-hook
