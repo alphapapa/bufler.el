@@ -29,6 +29,7 @@
 
 ;; Built-in.
 (require 'cl-lib)
+(require 'map)
 (require 'seq)
 
 ;;;; Functions
@@ -62,6 +63,44 @@
                          (group-tree (cdr fns)
                                      (cl-remove-if (caar fns) sequence))
                        (cl-remove-if (caar fns) sequence))))))))
+
+(defun group-tree-path (tree leaf)
+  "Return path to LEAF in TREE."
+  (cl-labels ((leaf-path
+               (leaf path tree) (pcase-let* ((`(,name . ,nodes) tree))
+                                  (dolist (node nodes)
+                                    (if (equal leaf node)
+                                        (throw :found (append path (list name leaf)))
+                                      (when (listp node)
+                                        (leaf-path leaf (append path (list name))
+                                                   node)))))))
+    (catch :found
+      (dolist (node tree)
+        (leaf-path leaf nil node)))))
+
+(cl-defun group-tree-paths (tree)
+  "Return list of paths to nodes in TREE.
+If OMIT-NULLS, remove nil elements from paths."
+  (let (paths)
+    (cl-labels ((collect-paths
+                 (path node) (pcase-let* ((`(,name . ,nodes) node))
+                               (dolist (node nodes)
+                                 (cl-typecase node
+                                   (list (collect-paths (append path (list name)) node))
+                                   (buffer (push (append path (list name node))
+                                                 paths)))))))
+      (collect-paths nil tree)
+      (nreverse paths))))
+
+(defun group-tree-at (path group)
+  "Return item at PATH in GROUP."
+  (cl-letf* ((alist-get-orig (symbol-function 'alist-get))
+             ((symbol-function 'alist-get)
+              (lambda (key alist &optional default remove _testfn)
+                (funcall alist-get-orig key alist default remove #'string=))))
+    ;; `map-nested-elt' uses `alist-get', but it does not permit its TESTFN
+    ;; to be set, so we have to rebind it to one that uses `string='.
+    (map-nested-elt group path)))
 
 ;;;;; Applicators
 

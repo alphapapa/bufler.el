@@ -28,19 +28,19 @@
 
 ;;;; Requirements
 
-(require 'helm)
-
-(require 'buffer-groups)
-
-;;;; Variables
-
-(defvar helm-buffer-groups-source
-  (helm-make-source "Buffer Groups buffers" 'helm-source-sync
-    :candidates (lambda ()
-                  (cl-loop for buffer in (buffer-groups-buffers)
-                           collect (cons (buffer-name buffer) buffer)))
-    :action 'helm-type-buffer-actions)
-  "Helm source for `buffer-groups'.")
+;; (require 'helm)
+;;
+;; (require 'buffer-groups)
+;;
+;; ;;;; Variables
+;;
+;; (defvar helm-buffer-groups-source
+;;   (helm-make-source "Buffer Groups buffers" 'helm-source-sync
+;;     :candidates (lambda ()
+;;                   (cl-loop for buffer in (buffer-groups-buffers)
+;;                            collect (cons (buffer-name buffer) buffer)))
+;;     :action 'helm-type-buffer-actions)
+;;   "Helm source for `buffer-groups'.")
 
 ;;;; Customization
 
