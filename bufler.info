@@ -49,11 +49,12 @@ File: README.info,  Node: Screenshots,  Next: Installation,  Prev: Top,  Up: Top
 1 Screenshots
 *************
 
-This screenshot shows group faces themed by prism
-(https://github.com/alphapapa/prism.el), which Bufler optionally
-supports.
+In the default Emacs theme:
 
-   In the default Emacs theme:
+   This screenshot shows group faces themed by prism
+(https://github.com/alphapapa/prism.el), which Bufler optionally
+supports.  (*Note:* This screenshot is of an older version of the
+package, but is still accurate except for the name.)
 
 
 File: README.info,  Node: Installation,  Next: Usage,  Prev: Screenshots,  Up: Top
@@ -301,16 +302,16 @@ GPLv3
 Tag Table:
 Node: Top224
 Node: Screenshots888
-Node: Installation1159
-Node: Usage1454
-Node: Bindings2363
-Node: Defining groups2813
-Node: Changelog8657
-Node: 02-pre8803
-Node: 018945
-Node: Credits9048
-Node: Development9593
-Node: License9762
+Node: Installation1268
+Node: Usage1563
+Node: Bindings2472
+Node: Defining groups2922
+Node: Changelog8766
+Node: 02-pre8912
+Node: 019054
+Node: Credits9157
+Node: Development9702
+Node: License9871
 
 End Tag Table
 

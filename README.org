@@ -12,13 +12,13 @@ Bufler is like a butler for your buffers, presenting them to you in an organized
 
 * Screenshots
 
-This screenshot shows group faces themed by [[https://github.com/alphapapa/prism.el][prism]], which Bufler optionally supports.
-
-[[images/screenshot.png]]
-
 In the default Emacs theme:
 
 [[images/default-theme.png]]
+
+This screenshot shows group faces themed by [[https://github.com/alphapapa/prism.el][prism]], which Bufler optionally supports.  (*Note:* This screenshot is of an older version of the package, but is still accurate except for the name.)
+
+[[images/screenshot.png]]
 
 # * Contents                                                         :noexport:
 # :PROPERTIES:
