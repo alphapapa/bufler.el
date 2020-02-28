@@ -76,6 +76,9 @@ Usually this will be something like \"/usr/share/emacs/VERSION\".")
 (defvar bufler-cache nil
   "Cache of computed buffer groups.")
 
+(defvar bufler-workspace-name nil
+  "The buffer's named workspace, if any.")
+
 ;;;; Customization
 
 (defgroup bufler nil
@@ -528,6 +531,10 @@ NAME, okay, `checkdoc'?"
                                    'host)))
     (concat "Tramp: " host)))
 
+(bufler-defauto-group workspace
+  (when-let* ((name (buffer-local-value 'bufler-workspace-name buffer)))
+    (concat "Workspace: " name)))
+
 ;;;;;; Group-defining macro
 
 ;; This seems to work better than I expected.
@@ -555,7 +562,8 @@ See documentation for details."
                  (auto-indirect () `(bufler-group 'auto-indirect))
                  (auto-mode () `(bufler-group 'auto-mode))
                  (auto-project () `(bufler-group 'auto-project))
-                 (auto-tramp () `(bufler-group 'auto-tramp)))
+                 (auto-tramp () `(bufler-group 'auto-tramp))
+                 (auto-workspace () `(bufler-group 'auto-workspace)))
      (list ,@groups)))
 
 ;;;; Additional customization
@@ -565,6 +573,9 @@ See documentation for details."
 
 (defcustom bufler-groups
   (bufler-defgroups
+    (group
+     ;; Subgroup collecting all named workspaces.
+     (auto-workspace))
     (group
      ;; Subgroup collecting all `help-mode' and `info-mode' buffers.
      (group-or "*Help/Info*"
