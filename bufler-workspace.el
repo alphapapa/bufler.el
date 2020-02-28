@@ -55,7 +55,7 @@ path."
   (interactive
    (list
     (let* ((grouped-buffers (bufler-buffers))
-           (buffer-paths (group-tree-paths grouped-buffers))
+           (buffer-paths (bufler-group-tree-paths grouped-buffers))
            group-paths alist)
       (cl-labels ((push-subpaths
                    (path) (when path
@@ -74,6 +74,9 @@ path."
   path)
 
 ;;;###autoload
+(defalias 'bufler-set-workspace #'bufler-workspace-set)
+
+;;;###autoload
 (defun bufler-workspace-switch-buffer (&optional all-p)
   "Switch to another buffer in the current group.
 If ALL-P (interactively, with prefix) or if there is no current
@@ -81,10 +84,13 @@ group, select from buffers in all groups and set current group."
   (interactive "P")
   (let* ((group-path (frame-parameter nil 'bufler-workspace-path))
          (buffer-names (when group-path
-                         (mapcar #'buffer-name (group-tree-at group-path (bufler-buffers))))))
+                         (mapcar #'buffer-name (bufler-group-tree-at group-path (bufler-buffers))))))
     (if (or all-p (not buffer-names))
         (bufler-workspace-switch-buffer-all)
       (switch-to-buffer (completing-read "Buffer: " buffer-names)))))
+
+;;;###autoload
+(defalias 'bufler-switch-buffer #'bufler-workspace-switch-buffer)
 
 ;;;###autoload
 (defun bufler-workspace-switch-buffer-all ()
@@ -105,24 +111,30 @@ group path."
               (path-cons
                (path) (cons (format-path (-non-nil path)) (-last-item path))))
     (let* ((grouped-buffers (bufler-buffers))
-           (paths (group-tree-paths grouped-buffers))
+           (paths (bufler-group-tree-paths grouped-buffers))
            (buffers (mapcar #'path-cons paths))
            (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers))
                                        buffers nil nil #'string=)))
-      (bufler-workspace-set (butlast (group-tree-path grouped-buffers selected-buffer)))
+      (bufler-workspace-set (butlast (bufler-group-tree-leaf-path grouped-buffers selected-buffer)))
       (switch-to-buffer selected-buffer))))
 
 ;;;###autoload
-(define-minor-mode bufler-workspace-mode
+(defalias 'bufler-switch-buffer-all #'bufler-workspace-switch-buffer-all)
+
+;;;###autoload
+(define-minor-mode bufler-mode
   "When active, set the frame title according to current Mr. Buffer group."
   :global t
-  (if bufler-workspace-mode
+  (if bufler-mode
       (setq-default mode-line-format
                     (append mode-line-format
-                            (list '(bufler-workspace-mode (:eval (bufler-lighter))))))
+                            (list '(bufler-mode (:eval (bufler-lighter))))))
     (setq-default mode-line-format
-                  (delete '(bufler-workspace-mode (:eval (bufler-lighter)))
+                  (delete '(bufler-mode (:eval (bufler-lighter)))
                           (default-value 'mode-line-format)))))
+
+;;;###autoload
+(defalias 'bufler-workspace-mode #'bufler-mode)
 
 ;;;; Functions
 

@@ -51,11 +51,11 @@
 (require 'f)
 (require 'magit-section)
 
-(require 'group-tree)
+(require 'bufler-group-tree)
 
 ;;;; Variables
 
-(defvar bufler-mode-map
+(defvar bufler-list-mode-map
   (let ((map (copy-keymap magit-section-mode-map)))
     (define-key map (kbd "g") #'bufler)
     (define-key map (kbd "k") #'bufler-kill)
@@ -153,7 +153,7 @@ string, not in group headers.")
 
 ;;;; Commands
 
-(define-derived-mode bufler-mode magit-section-mode "Bufler")
+(define-derived-mode bufler-list-mode magit-section-mode "Bufler")
 
 ;;;###autoload
 (defun bufler ()
@@ -212,7 +212,7 @@ string, not in group headers.")
         (setf groups (nreverse (-sort #'format< groups))))
       (with-current-buffer (get-buffer-create "*Bufler*")
         (setf pos (point))
-        (bufler-mode)
+        (bufler-list-mode)
         (erase-buffer)
         (magit-insert-section (bufler-root)
           (--each groups
@@ -259,10 +259,10 @@ NAME, okay, `checkdoc'?"
 
 (cl-defun bufler-buffers (&optional (groups bufler-groups))
   "Return buffers grouped by GROUPS."
-  (group-tree groups (cl-loop with buffers = (buffer-list)
-                              for fn in bufler-filter-fns
-                              do (setf buffers (cl-remove-if fn buffers))
-                              finally return buffers)))
+  (bufler-group-tree groups (cl-loop with buffers = (buffer-list)
+                                     for fn in bufler-filter-fns
+                                     do (setf buffers (cl-remove-if fn buffers))
+                                     finally return buffers)))
 
 (defun bufler-level-face (level)
   "Return face for LEVEL."
@@ -538,59 +538,59 @@ See documentation for details."
 
 (defcustom bufler-groups
   (bufler-defgroups
-   (group
-    ;; Subgroup collecting all `help-mode' and `info-mode' buffers.
-    (group-or "*Help/Info*"
-              (mode-match "*Help*" (rx bos "help-"))
-              (mode-match "*Info*" (rx bos "info-"))))
-   (group
-    ;; Subgroup collecting all special buffers (i.e. ones that are not
-    ;; file-backed), except `magit-status-mode' buffers (which are allowed to fall
-    ;; through to other groups, so they end up grouped with their project buffers).
-    (group-and "*Special*"
-               (lambda (buffer)
-                 (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
-                                      buffer)
-                             (funcall (mode-match "Dired" (rx bos "dired"))
-                                      buffer)
-                             (funcall (auto-file) buffer))
-                   "*Special*")))
     (group
-     ;; Subgroup collecting these "special special" buffers
-     ;; separately for convenience.
-     (name-match "**Special**"
-                 (rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
+     ;; Subgroup collecting all `help-mode' and `info-mode' buffers.
+     (group-or "*Help/Info*"
+               (mode-match "*Help*" (rx bos "help-"))
+               (mode-match "*Info*" (rx bos "info-"))))
     (group
-     ;; Subgroup collecting all other Magit buffers, grouped by directory.
-     (mode-match "*Magit* (non-status)" (rx bos (or "magit" "forge") "-"))
-     (auto-directory))
-    ;; Subgroup for Helm buffers.
-    (mode-match "*Helm*" (rx bos "helm-"))
-    ;; Remaining special buffers are grouped automatically by mode.
+     ;; Subgroup collecting all special buffers (i.e. ones that are not
+     ;; file-backed), except `magit-status-mode' buffers (which are allowed to fall
+     ;; through to other groups, so they end up grouped with their project buffers).
+     (group-and "*Special*"
+                (lambda (buffer)
+                  (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
+                                       buffer)
+                              (funcall (mode-match "Dired" (rx bos "dired"))
+                                       buffer)
+                              (funcall (auto-file) buffer))
+                    "*Special*")))
+     (group
+      ;; Subgroup collecting these "special special" buffers
+      ;; separately for convenience.
+      (name-match "**Special**"
+                  (rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
+     (group
+      ;; Subgroup collecting all other Magit buffers, grouped by directory.
+      (mode-match "*Magit* (non-status)" (rx bos (or "magit" "forge") "-"))
+      (auto-directory))
+     ;; Subgroup for Helm buffers.
+     (mode-match "*Helm*" (rx bos "helm-"))
+     ;; Remaining special buffers are grouped automatically by mode.
+     (auto-mode))
+    ;; All buffers under "~/.emacs.d" (or wherever it is).
+    (dir user-emacs-directory)
+    (group
+     ;; Subgroup collecting buffers in `org-directory' (or "~/org" if
+     ;; `org-directory' is not yet defined).
+     (dir (if (bound-and-true-p org-directory)
+              org-directory
+            "~/org"))
+     (group
+      ;; Subgroup collecting indirect Org buffers, grouping them by file.
+      ;; This is very useful when used with `org-tree-to-indirect-buffer'.
+      (auto-indirect)
+      (auto-file))
+     ;; Group remaining buffers by whether they're file backed, then by mode.
+     (group-not "*special*" (auto-file))
+     (auto-mode))
+    (group
+     ;; Subgroup collecting buffers in a version-control project,
+     ;; grouping them by directory.
+     (auto-project))
+    ;; Group remaining buffers by directory, then major mode.
+    (auto-directory)
     (auto-mode))
-   ;; All buffers under "~/.emacs.d" (or wherever it is).
-   (dir user-emacs-directory)
-   (group
-    ;; Subgroup collecting buffers in `org-directory' (or "~/org" if
-    ;; `org-directory' is not yet defined).
-    (dir (if (bound-and-true-p org-directory)
-             org-directory
-           "~/org"))
-    (group
-     ;; Subgroup collecting indirect Org buffers, grouping them by file.
-     ;; This is very useful when used with `org-tree-to-indirect-buffer'.
-     (auto-indirect)
-     (auto-file))
-    ;; Group remaining buffers by whether they're file backed, then by mode.
-    (group-not "*special*" (auto-file))
-    (auto-mode))
-   (group
-    ;; Subgroup collecting buffers in a version-control project,
-    ;; grouping them by directory.
-    (auto-project))
-   ;; Group remaining buffers by directory, then major mode.
-   (auto-directory)
-   (auto-mode))
   "List of grouping functions recursively applied to buffers.
 Note that this is likely to look very ugly in the customization
 UI due to lambdas being byte-compiled.  Please see the source
