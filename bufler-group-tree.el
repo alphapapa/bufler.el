@@ -94,7 +94,7 @@
           (list (collect-paths nil node))))
       (nreverse paths))))
 
-(defun bufler-group-tree-at (path group)
+(defun bufler-group-tree-at (path tree)
   "Return item at PATH in GROUP."
   (cl-letf* ((alist-get-orig (symbol-function 'alist-get))
              ((symbol-function 'alist-get)
@@ -102,7 +102,7 @@
                 (funcall alist-get-orig key alist default remove #'string=))))
     ;; `map-nested-elt' uses `alist-get', but it does not permit its TESTFN
     ;; to be set, so we have to rebind it to one that uses `string='.
-    (map-nested-elt group path)))
+    (map-nested-elt tree path)))
 
 ;;;;; Applicators
 

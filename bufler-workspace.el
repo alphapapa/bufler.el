@@ -70,6 +70,7 @@ path."
               alist (mapcar #'path-cons group-paths))
         (bufler-read-from-alist "Group: " alist)))))
   (set-frame-parameter nil 'bufler-workspace-path path)
+  (set-frame-parameter nil 'bufler-workspace-path-formatted (bufler-format-path path))
   (run-hook-with-args 'bufler-workspace-set-hook path)
   path)
 
@@ -150,7 +151,7 @@ group path."
 (defun bufler-format-path (path)
   "Return PATH formatted as a string."
   (string-join (cl-loop for level from 0
-                        for element in (delq 'nil path)
+                        for element in (remq 'nil path)
                         do (unless element
                              (cl-decf level))
                         collect (cl-typecase element
@@ -161,7 +162,7 @@ group path."
 
 (defun bufler-lighter ()
   "Return lighter string for mode line."
-  (format "Bflr:%s" (cdr (frame-parameter nil 'bufler-workspace-path))))
+  (concat "Bflr:" (frame-parameter nil 'bufler-workspace-path-formatted)))
 
 (defun bufler-workspace-set-frame-name (path)
   "Set current frame's name according to PATH."
