@@ -180,8 +180,7 @@ string, not in group headers.")
   (cl-labels
       ;; This gets a little hairy because we have to wrap `-group-by'
       ;; to implement "chains" of grouping functions.
-      (
-       (insert-thing (thing &optional (level 0))
+      ((insert-thing (thing &optional (level 0))
                      (pcase thing
                        ((pred bufferp) (insert-buffer thing level))
                        (_ (insert-group thing level))))
@@ -243,13 +242,6 @@ string, not in group headers.")
 (defalias 'bufler #'bufler-list)
 
 ;;;;; Buffer commands
-
-(defun bufler-visit ()
-  "Visit buffer at point."
-  (interactive)
-  (when-let* ((section (magit-current-section))
-              (buffer-p (eq 'bufler-buffer (oref section type))))
-    (pop-to-buffer (oref section value))))
 
 (cl-defmacro bufler-define-buffer-command (name docstring command
                                                 &key let* (refresh-p t))
