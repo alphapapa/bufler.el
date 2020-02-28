@@ -110,6 +110,8 @@ For convenience, the macro =bufler-defgroups= provides a sort of DSL, a concise 
                 (lambda (buffer)
                   (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
                                        buffer)
+                              (funcall (mode-match "Dired" (rx bos "dired"))
+                                       buffer)
                               (funcall (auto-file) buffer))
                     "*Special*")))
      (group
@@ -143,8 +145,8 @@ For convenience, the macro =bufler-defgroups= provides a sort of DSL, a concise 
      (auto-mode))
     (group
      ;; Subgroup collecting buffers in a version-control project,
-     ;; grouping them by directory and then major mode.
-     (auto-project) (auto-mode))
+     ;; grouping them by directory.
+     (auto-project))
     ;; Group remaining buffers by directory, then major mode.
     (auto-directory)
     (auto-mode))

@@ -151,6 +151,8 @@ are defined like this:
                    (lambda (buffer)
                      (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
                                           buffer)
+                                 (funcall (mode-match "Dired" (rx bos "dired"))
+                                          buffer)
                                  (funcall (auto-file) buffer))
                        "*Special*")))
         (group
@@ -184,8 +186,8 @@ are defined like this:
         (auto-mode))
        (group
         ;; Subgroup collecting buffers in a version-control project,
-        ;; grouping them by directory and then major mode.
-        (auto-project) (auto-mode))
+        ;; grouping them by directory.
+        (auto-project))
        ;; Group remaining buffers by directory, then major mode.
        (auto-directory)
        (auto-mode))
@@ -303,12 +305,12 @@ Node: Installation1159
 Node: Usage1454
 Node: Bindings2363
 Node: Defining groups2813
-Node: Changelog8559
-Node: 02-pre8705
-Node: 018847
-Node: Credits8950
-Node: Development9495
-Node: License9664
+Node: Changelog8657
+Node: 02-pre8803
+Node: 018945
+Node: Credits9048
+Node: Development9593
+Node: License9762
 
 End Tag Table
 
