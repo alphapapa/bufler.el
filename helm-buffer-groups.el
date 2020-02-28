@@ -28,19 +28,21 @@
 
 ;;;; Requirements
 
-;; (require 'helm)
-;;
-;; (require 'buffer-groups)
-;;
+(require 'helm)
+
+(require 'bufler-workspace)
+
 ;; ;;;; Variables
 ;;
-;; (defvar helm-buffer-groups-source
-;;   (helm-make-source "Buffer Groups buffers" 'helm-source-sync
-;;     :candidates (lambda ()
-;;                   (cl-loop for buffer in (buffer-groups-buffers)
-;;                            collect (cons (buffer-name buffer) buffer)))
-;;     :action 'helm-type-buffer-actions)
-;;   "Helm source for `buffer-groups'.")
+(defvar helm-bufler-source
+  (helm-make-source "Bufler's buffers" 'helm-source-sync
+    :candidates (lambda ()
+                  (let* ((bufler-vc-state nil)
+                         (group-path (frame-parameter nil 'bufler-workspace-path)))
+                    (when group-path
+                      (mapcar #'buffer-name (bufler-group-tree-at group-path (bufler-buffers))))))
+    :action 'helm-type-buffer-actions)
+  "Helm source for `bufler'.")
 
 ;;;; Customization
 

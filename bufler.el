@@ -116,9 +116,9 @@ get correct results."
 
 (defcustom bufler-buffer-mode-annotate-preds
   (list (lambda (buffer)
-          "Return non-nil if BUFFER's major-mode is `dired-mode'."
+          "Return non-nil if BUFFER's is a Dired or Magit Status buffer."
           (member (buffer-local-value 'major-mode buffer)
-                  '(dired-mode))))
+                  '(dired-mode magit-status-mode))))
   "Predicates that determine whether to annotate a buffer with its major mode."
   :type '(repeat function))
 
@@ -298,7 +298,6 @@ NAME, okay, `checkdoc'?"
                          "")))
          (mode-annotation (when (cl-loop for fn in bufler-buffer-mode-annotate-preds
                                          thereis (funcall fn buffer))
-
                             (propertize (replace-regexp-in-string
                                          (rx "-mode" eos) ""
                                          (format " %s" (buffer-local-value 'major-mode buffer))

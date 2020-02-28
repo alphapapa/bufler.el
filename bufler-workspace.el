@@ -54,7 +54,8 @@ Interactively, choose workspace path with completion.  Return the
 path."
   (interactive
    (list
-    (let* ((grouped-buffers (bufler-buffers))
+    (let* ((bufler-vc-state nil)
+           (grouped-buffers (bufler-buffers))
            (buffer-paths (bufler-group-tree-paths grouped-buffers))
            group-paths alist)
       (cl-labels ((push-subpaths
@@ -82,7 +83,8 @@ path."
 If ALL-P (interactively, with prefix) or if there is no current
 group, select from buffers in all groups and set current group."
   (interactive "P")
-  (let* ((group-path (frame-parameter nil 'bufler-workspace-path))
+  (let* ((bufler-vc-state nil)
+         (group-path (frame-parameter nil 'bufler-workspace-path))
          (buffer-names (when group-path
                          (mapcar #'buffer-name (bufler-group-tree-at group-path (bufler-buffers))))))
     (if (or all-p (not buffer-names))
@@ -110,7 +112,8 @@ group path."
                                    bufler-group-path-separator))
               (path-cons
                (path) (cons (format-path (-non-nil path)) (-last-item path))))
-    (let* ((grouped-buffers (bufler-buffers))
+    (let* ((bufler-vc-state nil)
+           (grouped-buffers (bufler-buffers))
            (paths (bufler-group-tree-paths grouped-buffers))
            (buffers (mapcar #'path-cons paths))
            (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers))
