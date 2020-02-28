@@ -60,6 +60,7 @@ Rules:
   lint-checkdoc  Run checkdoc.
   lint-compile   Byte-compile source files with warnings as errors.
   lint-declare   Run check-declare.
+  lint-elsa      Run Elsa (not included in "lint" rule).
   lint-indent    Lint indentation.
   lint-package   Run package-lint.
   lint-regexps   Run relint.
@@ -400,7 +401,7 @@ function dependencies {
     # Echo list of package dependencies.
 
     # Search package headers.
-    egrep '^;; Package-Requires: ' $(files-project-feature) $(files-project-test) \
+    egrep -i '^;; Package-Requires: ' $(files-project-feature) $(files-project-test) \
         | egrep -o '\([^([:space:]][^)]*\)' \
         | egrep -o '^[^[:space:])]+' \
         | sed -r 's/\(//g' \
@@ -423,7 +424,7 @@ function dependencies {
 # ** Sandbox
 
 function sandbox {
-    # Initialize sandbox.
+    verbose 2 "Initializing sandbox..."
 
     # *** Sandbox arguments
 
@@ -478,8 +479,10 @@ function sandbox {
     then
         debug "Installing linters: package-lint relint"
 
-        args_sandbox_package_install+=(--eval "(package-install 'package-lint)"
-                                       --eval "(package-install 'relint)")
+        args_sandbox_package_install+=(
+            --eval "(package-install 'elsa)"
+            --eval "(package-install 'package-lint)"
+            --eval "(package-install 'relint)")
     fi
 
     # *** Install packages into sandbox
@@ -487,15 +490,16 @@ function sandbox {
     if [[ ${args_sandbox_package_install[@]} ]]
     then
         # Initialize the sandbox (installs packages once rather than for every rule).
-        debug "Initializing sandbox..."
+        verbose 1 "Installing packages into sandbox..."
 
         run_emacs \
             --eval "(package-refresh-contents)" \
             "${args_sandbox_package_install[@]}" \
-            || die "Unable to initialize sandbox."
+            && success "Packages installed." \
+                || die "Unable to initialize sandbox."
     fi
 
-    debug "Sandbox initialized."
+    verbose 2 "Sandbox initialized."
 }
 
 # ** Utility
@@ -670,8 +674,9 @@ function compile {
 }
 
 function batch {
-    # Run Emacs with $args_batch and with project source and test files loaded.
-    verbose 1 "Executing Emacs with arguments: ${args_batch[@]}"
+    # Run Emacs in batch mode with ${args_batch_interactive[@]} and
+    # with project source and test files loaded.
+    verbose 1 "Executing Emacs with arguments: ${args_batch_interactive[@]}"
 
     run_emacs \
         $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}") \
@@ -680,6 +685,9 @@ function batch {
 
 function interactive {
     # Run Emacs interactively.  Most useful with --sandbox and --install-deps.
+    verbose 1 "Running Emacs interactively..."
+    verbose 2 "Loading files:" "${files_project_feature[@]}" "${files_project_test[@]}"
+
     unset arg_batch
     run_emacs \
         $(args-load-files "${files_project_feature[@]}" "${files_project_test[@]}") \
@@ -734,6 +742,20 @@ function lint-declare {
         "${files_project_feature[@]}" \
         && success "Linting declarations finished without errors." \
             || error "Linting declarations failed."
+}
+
+function lint-elsa {
+    verbose 1 "Linting with Elsa..."
+
+    # MAYBE: Install Elsa here rather than in sandbox init, to avoid installing
+    # it when not needed.  However, we should be careful to be clear about when
+    # packages are installed, because installing them does execute code.
+    run_emacs \
+        --load elsa \
+        -f elsa-run-files-and-exit \
+        "${files_project_feature[@]}" \
+        && success "Linting with Elsa finished without errors." \
+            || error "Linting with Elsa failed."
 }
 
 function lint-indent {
@@ -827,7 +849,7 @@ function test-ert {
 
 # * Defaults
 
-test_files_regexp='^((tests?|t)/)|-test.el$|^test-'
+test_files_regexp='^((tests?|t)/)|-tests?.el$|^test-'
 
 emacs_command=("emacs")
 errors=0
