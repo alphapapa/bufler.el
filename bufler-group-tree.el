@@ -1,4 +1,4 @@
-;;; group-tree.el --- Group trees according to recursive grouping definitions  -*- lexical-binding: t; -*-
+;;; bufler-group-tree.el --- Group trees according to recursive grouping definitions  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  Adam Porter
 
@@ -34,7 +34,7 @@
 
 ;;;; Functions
 
-(defun group-tree (fns sequence)
+(defun bufler-group-tree (fns sequence)
   "Return SEQUENCE grouped according to FNS."
   ;; Modeled on grouping from `sbuffer'.
   (cl-typecase fns
@@ -45,10 +45,10 @@
             (function
              ;; "Regular" subgroups (naming things is hard).
              (if (cdr fns)
-                 (let ((groups (group-tree (car fns) sequence)))
+                 (let ((groups (bufler-group-tree (car fns) sequence)))
                    (mapcar (lambda (it)
                              (cons (car it)
-                                   (group-tree (cdr fns) (cdr it))))
+                                   (bufler-group-tree (cdr fns) (cdr it))))
                            groups))
                (seq-group-by (car fns) sequence)))
             (list
@@ -57,14 +57,14 @@
              ;; first function.  Then group them recursively with
              ;; their subgrouping.  Then group the buffers that
              ;; don't match the first function, and append them.
-             (append (group-tree (car fns)
+             (append (bufler-group-tree (car fns)
                                  (cl-remove-if-not (caar fns) sequence))
                      (if (cdr fns)
-                         (group-tree (cdr fns)
+                         (bufler-group-tree (cdr fns)
                                      (cl-remove-if (caar fns) sequence))
                        (cl-remove-if (caar fns) sequence))))))))
 
-(defun group-tree-path (tree leaf)
+(defun bufler-group-tree-path (tree leaf)
   "Return path to LEAF in TREE."
   (cl-labels ((leaf-path
                (leaf path tree) (pcase-let* ((`(,name . ,nodes) tree))
@@ -78,7 +78,7 @@
       (dolist (node tree)
         (leaf-path leaf nil node)))))
 
-(cl-defun group-tree-paths (tree)
+(cl-defun bufler-group-tree-paths (tree)
   "Return list of paths to nodes in TREE."
   (let (paths)
     (cl-labels ((collect-paths
@@ -92,7 +92,7 @@
         (collect-paths nil node))
       (nreverse paths))))
 
-(defun group-tree-at (path group)
+(defun bufler-group-tree-at (path group)
   "Return item at PATH in GROUP."
   (cl-letf* ((alist-get-orig (symbol-function 'alist-get))
              ((symbol-function 'alist-get)
@@ -106,16 +106,16 @@
 
 ;; These functions are used to partially apply arguments to the
 ;; predicates defined below, and they're intended to be used to define
-;; groups in `group-tree-groups'.
+;; groups in `bufler-group-tree-groups'.
 
-(defun group-tree-group (fn &rest args)
+(defun bufler-group-tree-group (fn &rest args)
   "Return a grouping function applying ARGS to FN."
   (apply #'apply-partially fn args))
 
 ;; NOTE: We use `byte-compile' explicitly because uncompiled closures
 ;; don't work in `-select', or something like that.
 
-(defun group-tree-and (name &rest preds)
+(defun bufler-group-tree-and (name &rest preds)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups items matching all of PREDS.
 The resulting group is named NAME.  This can also be used with a
@@ -126,7 +126,7 @@ single predicate to apply a name to a group."
                                   preds)
                     name))))
 
-(defun group-tree-or (name &rest preds)
+(defun bufler-group-tree-or (name &rest preds)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups items matching any of PREDS.
 The resulting group is named NAME."
@@ -136,7 +136,7 @@ The resulting group is named NAME."
                                  preds)
                     name))))
 
-(defun group-tree-not (name pred)
+(defun bufler-group-tree-not (name pred)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups items which do not match PRED.
 The resulting group is named NAME."
@@ -149,14 +149,14 @@ The resulting group is named NAME."
 ;; This macro provides a concise vocabulary for defining a
 ;; group-defining macro.
 
-(defmacro group-tree-defmacro (name &optional vocabulary)
+(defmacro bufler-group-tree-defmacro (name &optional vocabulary)
   "Define a macro, NAME.
 If VOCABULARY, it is added to the `cl-macrolet' form in the
 defined macro."
   ;; FIXME: Mention applicators/base groups in docstring.
   (declare (indent defun))
   `(defmacro ,name (&rest groups)
-     "Expand GROUPS into a group definition suitable for `group-tree-groups'.
+     "Expand GROUPS into a group definition suitable for `bufler-group-tree'.
 See documentation for details."
      (declare (indent defun))
      `(cl-macrolet ((group (&rest groups) `(list ,@groups))
@@ -172,6 +172,6 @@ See documentation for details."
 
 ;;;; Footer
 
-(provide 'group-tree)
+(provide 'bufler-group-tree)
 
-;;; group-tree.el ends here
+;;; bufler-group-tree.el ends here

@@ -1,4 +1,4 @@
-;;; mr-buffer-workspace.el --- Mr. Buffer's workspaces  -*- lexical-binding: t; -*-
+;;; bufler-workspace.el --- Bufler workspaces  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  Adam Porter
 
@@ -28,33 +28,33 @@
 
 ;;;; Requirements
 
-(require 'mr-buffer)
+(require 'bufler)
 
 ;;;; Variables
 
 
 ;;;; Customization
 
-(defgroup mr-buffer-workspace nil
+(defgroup bufler-workspace nil
   "Options for Mr. Buffer's workspaces."
-  :group 'mr-buffer)
+  :group 'bufler)
 
-(defcustom mr-buffer-workspace-set-hook
-  (list #'mr-buffer-workspace-set-frame-name
-        #'mr-buffer-workspace-set-mode-line)
+(defcustom bufler-workspace-set-hook
+  (list #'bufler-workspace-set-frame-name
+        #'bufler-workspace-set-mode-line)
   "Functions called when the workspace is set."
   :type 'hook)
 
 ;;;; Commands
 
 ;;;###autoload
-(defun mr-buffer-workspace-set (path)
+(defun bufler-workspace-set (path)
   "Set active workspace for the current frame to the one at PATH.
 Interactively, choose workspace path with completion.  Return the
 path."
   (interactive
    (list
-    (let* ((grouped-buffers (mr-buffer-buffers))
+    (let* ((grouped-buffers (bufler-buffers))
            (buffer-paths (group-tree-paths grouped-buffers))
            group-paths alist)
       (cl-labels ((push-subpaths
@@ -62,71 +62,71 @@ path."
                             (push path group-paths)
                             (push-subpaths (butlast path))))
                   (path-cons
-                   (path) (cons (mr-buffer-format-path path) path)))
+                   (path) (cons (bufler-format-path path) path)))
         (thread-last buffer-paths
           (mapcar #'butlast)
           (mapc #'push-subpaths))
         (setf group-paths (seq-uniq group-paths)
               alist (mapcar #'path-cons group-paths))
-        (mr-buffer-read-from-alist "Group: " alist)))))
-  (set-frame-parameter nil 'mr-buffer-workspace-path path)
-  (run-hook-with-args 'mr-buffer-workspace-set-hook path)
+        (bufler-read-from-alist "Group: " alist)))))
+  (set-frame-parameter nil 'bufler-workspace-path path)
+  (run-hook-with-args 'bufler-workspace-set-hook path)
   path)
 
 ;;;###autoload
-(defun mr-buffer-workspace-switch-buffer (&optional all-p)
+(defun bufler-workspace-switch-buffer (&optional all-p)
   "Switch to another buffer in the current group.
 If ALL-P (interactively, with prefix) or if there is no current
 group, select from buffers in all groups and set current group."
   (interactive "P")
-  (let* ((group-path (frame-parameter nil 'mr-buffer-workspace-path))
+  (let* ((group-path (frame-parameter nil 'bufler-workspace-path))
          (buffer-names (when group-path
-                         (mapcar #'buffer-name (group-tree-at group-path (mr-buffer-buffers))))))
+                         (mapcar #'buffer-name (group-tree-at group-path (bufler-buffers))))))
     (if (or all-p (not buffer-names))
-        (mr-buffer-workspace-switch-buffer-all)
+        (bufler-workspace-switch-buffer-all)
       (switch-to-buffer (completing-read "Buffer: " buffer-names)))))
 
 ;;;###autoload
-(defun mr-buffer-workspace-switch-buffer-all ()
+(defun bufler-workspace-switch-buffer-all ()
   "Switch to another buffer and set current group, choosing from all buffers.
 Selects a buffer with completion from among all buffers, shown by
 group path."
   (interactive)
   (cl-labels ((format-heading
                (heading level) (propertize heading
-                                           'face (mr-buffer-level-face level)))
+                                           'face (bufler-level-face level)))
               (format-path
                (path) (string-join (cl-loop for level from 0
                                             for element in path
                                             collect (cl-typecase element
                                                       (string (format-heading element level))
                                                       (buffer (buffer-name element))))
-                                   mr-buffer-group-path-separator))
+                                   bufler-group-path-separator))
               (path-cons
                (path) (cons (format-path (-non-nil path)) (-last-item path))))
-    (let* ((grouped-buffers (mr-buffer-buffers))
+    (let* ((grouped-buffers (bufler-buffers))
            (paths (group-tree-paths grouped-buffers))
            (buffers (mapcar #'path-cons paths))
            (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers))
                                        buffers nil nil #'string=)))
-      (mr-buffer-workspace-set (butlast (group-tree-path grouped-buffers selected-buffer)))
+      (bufler-workspace-set (butlast (group-tree-path grouped-buffers selected-buffer)))
       (switch-to-buffer selected-buffer))))
 
 ;;;###autoload
-(define-minor-mode mr-buffer-workspace-mode
+(define-minor-mode bufler-workspace-mode
   "When active, set the frame title according to current Mr. Buffer group."
   :global t
-  (if mr-buffer-workspace-mode
+  (if bufler-workspace-mode
       (setq-default mode-line-format
                     (append mode-line-format
-                            (list '(mr-buffer-workspace-mode (:eval (mr-buffer-lighter))))))
+                            (list '(bufler-workspace-mode (:eval (bufler-lighter))))))
     (setq-default mode-line-format
-                  (delete '(mr-buffer-workspace-mode (:eval (mr-buffer-lighter)))
+                  (delete '(bufler-workspace-mode (:eval (bufler-lighter)))
                           (default-value 'mode-line-format)))))
 
 ;;;; Functions
 
-(cl-defun mr-buffer-read-from-alist (prompt alist &key (keyfn #'identity) (testfn #'equal))
+(cl-defun bufler-read-from-alist (prompt alist &key (keyfn #'identity) (testfn #'equal))
   "Return a value from ALIST by reading a key with completion."
   ;; This should really be a standard function in Emacs.
   (let ((key (completing-read prompt (mapcar (lambda (l)
@@ -134,7 +134,7 @@ group path."
                                              alist) nil t)))
     (alist-get key alist nil nil testfn)))
 
-(defun mr-buffer-format-path (path)
+(defun bufler-format-path (path)
   "Return PATH formatted as a string."
   (string-join (cl-loop for level from 0
                         for element in (delq 'nil path)
@@ -142,25 +142,25 @@ group path."
                              (cl-decf level))
                         collect (cl-typecase element
                                   (string (propertize element
-                                                      'face (mr-buffer-level-face level)))
+                                                      'face (bufler-level-face level)))
                                   (buffer (buffer-name element))))
-               mr-buffer-group-path-separator))
+               bufler-group-path-separator))
 
-(defun mr-buffer-lighter ()
+(defun bufler-lighter ()
   "Return lighter string for mode line."
-  (format "Mr.B:%s" (cdr (frame-parameter nil 'mr-buffer-workspace-path))))
+  (format "Bflr:%s" (cdr (frame-parameter nil 'bufler-workspace-path))))
 
-(defun mr-buffer-workspace-set-frame-name (path)
+(defun bufler-workspace-set-frame-name (path)
   "Set current frame's name according to PATH."
   (let ((name (format "Workspace: %s" path)))
     (set-frame-name name)))
 
-(defun mr-buffer-workspace-set-mode-line (path)
+(defun bufler-workspace-set-mode-line (path)
   "Set current frame's name according to PATH."
   (let ((name (format "Workspace: %s" path)))
     (set-frame-name name)))
 
-(cl-defun mr-buffer-workspace-read-item (tree &key (leaf-key #'identity))
+(cl-defun bufler-workspace-read-item (tree &key (leaf-key #'identity))
   "Return a leaf read from TREE with completion.
 Completion is done in steps when descending into branches."
   (cl-labels ((read-item
@@ -170,7 +170,7 @@ Completion is done in steps when descending into branches."
                         (atom (completing-read "Buffer: " (mapcar leaf-key tree))))))
     (read-item tree)))
 
-(defun mr-buffer-workspace-read-group-path (groups)
+(defun bufler-workspace-read-group-path (groups)
   "Return a path to a group in GROUPS read with completion."
   (cl-labels ((read-group
                (items last-key)
@@ -185,7 +185,7 @@ Completion is done in steps when descending into branches."
         (atom (list path))))))
 
 ;; This was an aborted WIP, but the logic in the labeled functions may be useful later.
-;; (defun mr-buffer-workspace-switch-buffer-all ()
+;; (defun bufler-workspace-switch-buffer-all ()
 ;;   "Switch to another buffer."
 ;;   (interactive "P")
 ;;   (cl-labels ((path-cons
@@ -206,10 +206,10 @@ Completion is done in steps when descending into branches."
 ;;                                         (throw :found (append path (list name leaf))))
 ;;                                     (cl-typecase node
 ;;                                       (list (search-node leaf (append path (list name)) node)))))))
-;;     (leaf-path (current-buffer) (mr-buffer-workspace-grouped))))
+;;     (leaf-path (current-buffer) (bufler-workspace-grouped))))
 
 ;;;; Footer
 
-(provide 'mr-buffer-workspace)
+(provide 'bufler-workspace)
 
-;;; mr-buffer-workspace.el ends here
+;;; bufler-workspace.el ends here

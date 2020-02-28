@@ -1,9 +1,9 @@
-;;; mr-buffer.el --- Mr. Buffer, the buffer and workspace manager  -*- lexical-binding: t; -*-
+;;; bufler.el --- Bufler, the buffer and workspace manager  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  Adam Porter
 
 ;; Author: Adam Porter <adam@alphapapa.net>
-;; URL: https://github.com/alphapapa/mr-buffer.el
+;; URL: https://github.com/alphapapa/bufler.el
 ;; Package-Version: 0.2-pre
 ;; Package-Requires: ((emacs "26.3") (dash "2.17") (dash-functional "2.17") (f "0.17") (magit-section "0.1"))
 ;; Keywords: convenience
@@ -28,7 +28,7 @@
 ;; This is a work-in-progress.  It is not published as a package yet.
 ;; Please feel free to use it and offer feedback.
 
-;; Mr-Buffer is like Ibuffer, but using
+;; Bufler is like Ibuffer, but using
 ;; [[https://github.com/magit/magit][magit-section]] to group buffers
 ;; in a very flexible way.
 
@@ -55,15 +55,15 @@
 
 ;;;; Variables
 
-(defvar mr-buffer-mode-map
+(defvar bufler-mode-map
   (let ((map (copy-keymap magit-section-mode-map)))
-    (define-key map (kbd "g") #'mr-buffer)
-    (define-key map (kbd "k") #'mr-buffer-kill)
-    (define-key map (kbd "s") #'mr-buffer-save)
-    (define-key map (kbd "RET") #'mr-buffer-pop)
+    (define-key map (kbd "g") #'bufler)
+    (define-key map (kbd "k") #'bufler-kill)
+    (define-key map (kbd "s") #'bufler-save)
+    (define-key map (kbd "RET") #'bufler-pop)
     map))
 
-(defvar mr-buffer-emacs-source-directory
+(defvar bufler-emacs-source-directory
   (cl-reduce (lambda (val fn)
                (funcall fn val))
              ;; I feel like Emacs needs a function like `f-parent'.
@@ -75,46 +75,46 @@ Usually this will be something like \"/usr/share/emacs/VERSION\".")
 
 ;;;; Customization
 
-(defgroup mr-buffer nil
+(defgroup bufler nil
   "Like Ibuffer, but using Magit-Section sections."
-  :link '(url-link "https://github.com/alphapapa/mr-buffer.el")
+  :link '(url-link "https://github.com/alphapapa/bufler.el")
   :group 'convenience)
 
-(defcustom mr-buffer-reverse nil
+(defcustom bufler-reverse nil
   "Reverse group order after grouping buffers."
   :type 'boolean)
 
-(defcustom mr-buffer-face-prefix "outline-"
+(defcustom bufler-face-prefix "outline-"
   "Prefix used to look up faces.
 The depth number is appended to the prefix."
   :type '(choice (const :tag "Outline faces" "outline-")
                  (const :tag "Prism faces (requires `prism')" "prism-level-")))
 
-(defcustom mr-buffer-initial-face-depth 1
+(defcustom bufler-initial-face-depth 1
   ;; Setting it to 1, because in the default Emacs config, it presents
   ;; better contrast between the first two levels (blue/orange rather than
   ;; black/blue), and the bold blue is a bit less harsh than the bold black.
   "First depth level used for outline faces.
 May be used to skip the first N level faces.  See
-`mr-buffer-face-prefix'."
+`bufler-face-prefix'."
   :type 'integer)
 
-(defcustom mr-buffer-vc-state nil
+(defcustom bufler-vc-state nil
   "Show buffers' VC state.
 With a lot of file-backed buffers open, this might be slow,
 because `vc-registered' and `vc-refresh-state' must be called to
 get correct results."
   :type 'boolean)
 
-(defcustom mr-buffer-filter-fns (list #'mr-buffer-hidden-buffer-p)
+(defcustom bufler-filter-fns (list #'bufler-hidden-buffer-p)
   "Buffers that match these functions are not shown."
   :type '(repeat function))
 
-(defcustom mr-buffer-group-path-separator " ► "
+(defcustom bufler-group-path-separator " ► "
   "Separator shown between path elements."
   :type 'string)
 
-(defcustom mr-buffer-buffer-mode-annotate-preds
+(defcustom bufler-buffer-mode-annotate-preds
   (list (lambda (buffer)
           "Return non-nil if BUFFER's major-mode is `dired-mode'."
           (member (buffer-local-value 'major-mode buffer)
@@ -122,42 +122,42 @@ get correct results."
   "Predicates that determine whether to annotate a buffer with its major mode."
   :type '(repeat function))
 
-(defface mr-buffer-group
+(defface bufler-group
   '((t (:underline nil :weight bold)))
-  "Face for Mr-Buffer groups.")
+  "Face for Bufler groups.")
 
-(defface mr-buffer-buffer
+(defface bufler-buffer
   '((t (:inherit default)))
   "Face for normal (i.e. file-backed) buffers.")
 
-(defface mr-buffer-buffer-special
+(defface bufler-buffer-special
   '((t (:inherit default :slant italic)))
   "Face for special buffers.")
 
-(defface mr-buffer-mode
+(defface bufler-mode
   '((t (:inherit font-lock-type-face)))
   "Face for the mode of buffers and groups.
 Only used in the mode annotation in each buffer's formatted
 string, not in group headers.")
 
-(defface mr-buffer-size
+(defface bufler-size
   '((t (:inherit font-lock-comment-face)))
   "Face for the size of buffers and groups.")
 
-(defface mr-buffer-vc
+(defface bufler-vc
   '((t (:inherit font-lock-warning-face)))
   "Face for the VC status of buffers.")
 
 ;; Silence byte-compiler.  This is defined later in the file.
-(defvar mr-buffer-groups)
+(defvar bufler-groups)
 
 ;;;; Commands
 
-(define-derived-mode mr-buffer-mode magit-section-mode "Mr-Buffer")
+(define-derived-mode bufler-mode magit-section-mode "Bufler")
 
 ;;;###autoload
-(defun mr-buffer ()
-  "Show Mr-Buffer."
+(defun bufler ()
+  "Show Bufler."
   (interactive)
   (cl-labels
       ;; This gets a little hairy because we have to wrap `-group-by'
@@ -168,8 +168,8 @@ string, not in group headers.")
                        ((pred bufferp) (insert-buffer thing level))
                        (_ (insert-group thing level))))
        (insert-buffer
-        (buffer level) (magit-insert-section nil (mr-buffer-buffer buffer)
-                         (insert (make-string (* 2 level) ? ) (mr-buffer-format-buffer buffer level) "\n")))
+        (buffer level) (magit-insert-section nil (bufler-buffer buffer)
+                         (insert (make-string (* 2 level) ? ) (bufler-format-buffer buffer level) "\n")))
        (insert-group
         (group level) (pcase (car group)
                         ('nil (pcase-let* ((`(,_type . ,things) group))
@@ -183,18 +183,18 @@ string, not in group headers.")
                              (-tree-map-nodes #'bufferp (lambda (&rest _)
                                                           (cl-incf num-buffers))
                                               group)
-                             (magit-insert-section (mr-buffer-group (cdr things))
+                             (magit-insert-section (bufler-group (cdr things))
                                (magit-insert-heading (make-string (* 2 level) ? )
                                  (format-group type level)
                                  (propertize (format " (%s)" num-buffers)
-                                             'face 'mr-buffer-size))
+                                             'face 'bufler-size))
                                (--each things
                                  (insert-thing it (1+ level))))))) )
        (format-group
         (group level) (propertize (cl-typecase group
                                     (string group)
                                     (otherwise (prin1-to-string group)))
-                                  'face (list :inherit (list 'mr-buffer-group (mr-buffer-level-face level)))))
+                                  'face (list :inherit (list 'bufler-group (bufler-level-face level)))))
        (hidden-p (buffer)
                  (string-prefix-p " " (buffer-name buffer)))
        (as-string
@@ -206,15 +206,15 @@ string, not in group headers.")
        (boring-p (buffer)
                  (hidden-p buffer)))
     (let* ((inhibit-read-only t)
-           (groups (mr-buffer-buffers))
+           (groups (bufler-buffers))
            pos)
-      (when mr-buffer-reverse
+      (when bufler-reverse
         (setf groups (nreverse (-sort #'format< groups))))
-      (with-current-buffer (get-buffer-create "*Mr-Buffer*")
+      (with-current-buffer (get-buffer-create "*Bufler*")
         (setf pos (point))
-        (mr-buffer-mode)
+        (bufler-mode)
         (erase-buffer)
-        (magit-insert-section (mr-buffer-root)
+        (magit-insert-section (bufler-root)
           (--each groups
             (insert-thing it 0)))
         (setf buffer-read-only t)
@@ -223,33 +223,33 @@ string, not in group headers.")
 
 ;;;;; Buffer commands
 
-(defun mr-buffer-visit ()
+(defun bufler-visit ()
   "Visit buffer at point."
   (interactive)
   (when-let* ((section (magit-current-section))
-              (buffer-p (eq 'mr-buffer-buffer (oref section type))))
+              (buffer-p (eq 'bufler-buffer (oref section type))))
     (pop-to-buffer (oref section value))))
 
-(defmacro mr-buffer-define-buffer-command (name docstring command)
-  "Define an Mr-Buffer command to call COMMAND on selected buffers.
-It is named `mr-buffer-NAME' and uses DOCSTRING.
+(defmacro bufler-define-buffer-command (name docstring command)
+  "Define an Bufler command to call COMMAND on selected buffers.
+It is named `bufler-NAME' and uses DOCSTRING.
 
 NAME, okay, `checkdoc'?"
   (declare (indent defun))
-  `(defun ,(intern (concat "mr-buffer-" (symbol-name name))) (&rest _args)
+  `(defun ,(intern (concat "bufler-" (symbol-name name))) (&rest _args)
      ,docstring
      (interactive)
      (when-let* ((sections (or (magit-region-sections) (list (magit-current-section)))))
-       (mr-buffer--map-sections ,command sections)
-       (mr-buffer))))
+       (bufler--map-sections ,command sections)
+       (bufler))))
 
-(mr-buffer-define-buffer-command kill "Kill buffer."
+(bufler-define-buffer-command kill "Kill buffer."
   #'kill-buffer)
 
-(mr-buffer-define-buffer-command pop "Pop to buffer."
+(bufler-define-buffer-command pop "Pop to buffer."
   #'pop-to-buffer)
 
-(mr-buffer-define-buffer-command save "Save buffer."
+(bufler-define-buffer-command save "Save buffer."
   (lambda (buffer)
     (when (buffer-file-name buffer)
       (with-current-buffer buffer
@@ -257,32 +257,32 @@ NAME, okay, `checkdoc'?"
 
 ;;;; Functions
 
-(cl-defun mr-buffer-buffers (&optional (groups mr-buffer-groups))
+(cl-defun bufler-buffers (&optional (groups bufler-groups))
   "Return buffers grouped by GROUPS."
   (group-tree groups (cl-loop with buffers = (buffer-list)
-                              for fn in mr-buffer-filter-fns
+                              for fn in bufler-filter-fns
                               do (setf buffers (cl-remove-if fn buffers))
                               finally return buffers)))
 
-(defun mr-buffer-level-face (level)
+(defun bufler-level-face (level)
   "Return face for LEVEL."
-  (intern (format "%s%s" mr-buffer-face-prefix (+ level mr-buffer-initial-face-depth))))
+  (intern (format "%s%s" bufler-face-prefix (+ level bufler-initial-face-depth))))
 
-(defun mr-buffer-format-buffer (buffer depth)
+(defun bufler-format-buffer (buffer depth)
   "Return string for BUFFER to be displayed at DEPTH."
   (let* ((modified-s (propertize (if (and (buffer-file-name buffer)
                                           (buffer-modified-p buffer))
                                      "*" "")
                                  'face 'font-lock-warning-face))
-         (buffer-face (if (mr-buffer-special-buffer-p buffer)
-                          'mr-buffer-buffer-special 'mr-buffer-buffer))
-         (level-face (mr-buffer-level-face depth))
+         (buffer-face (if (bufler-special-buffer-p buffer)
+                          'bufler-buffer-special 'bufler-buffer))
+         (level-face (bufler-level-face depth))
          (face (list :inherit (list buffer-face level-face)))
          (name (propertize (buffer-name buffer) 'face face))
          (size (propertize (concat "(" (file-size-human-readable (buffer-size buffer)) ")")
-                           'face 'mr-buffer-size))
+                           'face 'bufler-size))
          ;; Getting correct, up-to-date results from vc is harder than it should be.
-         (vc-state (when mr-buffer-vc-state
+         (vc-state (when bufler-vc-state
                      (or (when (and (buffer-file-name buffer)
                                     (vc-registered (buffer-file-name buffer)))
                            (with-current-buffer buffer
@@ -291,19 +291,19 @@ NAME, okay, `checkdoc'?"
                            (pcase (vc-state (buffer-file-name buffer))
                              ((and 'edited it)
                               (propertize (format " %s" it)
-                                          'face 'mr-buffer-vc))))
+                                          'face 'bufler-vc))))
                          "")))
-         (mode-annotation (when (cl-loop for fn in mr-buffer-buffer-mode-annotate-preds
+         (mode-annotation (when (cl-loop for fn in bufler-buffer-mode-annotate-preds
                                          thereis (funcall fn buffer))
 
                             (propertize (replace-regexp-in-string
                                          (rx "-mode" eos) ""
                                          (format " %s" (buffer-local-value 'major-mode buffer))
                                          t t)
-                                        'face 'mr-buffer-mode))))
+                                        'face 'bufler-mode))))
     (concat name modified-s " " size vc-state mode-annotation)))
 
-(defun mr-buffer--map-sections (fn sections)
+(defun bufler--map-sections (fn sections)
   "Map FN across SECTIONS."
   (cl-labels ((do-section
                (section) (if (oref section children)
@@ -323,13 +323,13 @@ NAME, okay, `checkdoc'?"
 ;; These functions take a buffer as their sole argument.  They may be
 ;; used in the grouping predicates defined later.
 
-(defun mr-buffer-special-buffer-p (buffer)
+(defun bufler-special-buffer-p (buffer)
   "Return non-nil if BUFFER is special.
 That is, if its name starts with \"*\"."
   (string-match-p (rx bos (optional (1+ blank)) "*")
                   (buffer-name buffer)))
 
-(defun mr-buffer-hidden-buffer-p (buffer)
+(defun bufler-hidden-buffer-p (buffer)
   "Return non-nil if BUFFER is hidden.
 That is, if its name starts with \" \"."
   (string-match-p (rx bos (1+ blank)) (buffer-name buffer)))
@@ -340,18 +340,18 @@ That is, if its name starts with \" \"."
 
 ;; These functions are used to partially apply arguments to the
 ;; predicates defined below, and they're intended to be used to define
-;; groups in `mr-buffer-groups'.
+;; groups in `bufler-groups'.
 
-(defun mr-buffer-group (type &rest args)
-  "Return a grouping function applying ARGS to `mr-buffer-group-TYPE'.
+(defun bufler-group (type &rest args)
+  "Return a grouping function applying ARGS to `bufler-group-TYPE'.
 TYPE, okay, `checkdoc'?"
-  (let ((fn (intern (concat "mr-buffer-group-" (symbol-name type)))))
+  (let ((fn (intern (concat "bufler-group-" (symbol-name type)))))
     (apply #'apply-partially fn args)))
 
 ;; NOTE: We use `byte-compile' explicitly because uncompiled closures
 ;; don't work in `-select', or something like that.
 
-(defun mr-buffer-and (name &rest preds)
+(defun bufler-and (name &rest preds)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups buffers matching all of PREDS.
 The resulting group is named NAME.  This can also be used with a
@@ -360,7 +360,7 @@ single predicate to apply a name to a group."
                   (when (-all? (-cut funcall <> x) preds)
                     name))))
 
-(defun mr-buffer-or (name &rest preds)
+(defun bufler-or (name &rest preds)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups buffers matching any of PREDS.
 The resulting group is named NAME."
@@ -368,7 +368,7 @@ The resulting group is named NAME."
                   (when (-any? (-cut funcall <> x) preds)
                     name))))
 
-(defun mr-buffer-not (name pred)
+(defun bufler-not (name pred)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups buffers which do not match PRED.
 The resulting group is named NAME."
@@ -383,7 +383,7 @@ The resulting group is named NAME."
 ;; form, should take a buffer as its sole argument and return a key by
 ;; which to group its buffer, or nil if it should not be grouped.
 
-(defun mr-buffer-group-dir (dirs depth buffer)
+(defun bufler-group-dir (dirs depth buffer)
   "Group buffers in DIRS.
 DIRS may be one or a list of strings which are directory paths.
 If the BUFFER's `default-directory' is or is a descendant of
@@ -394,8 +394,8 @@ DEPTH may be an integer specifying a maximum depth of
 subdirectories of DIR, up to which a group is created for the
 subdirectory.  For example, if DIR were \"~/src/emacs\", and
 DEPTH were 1, and a buffer's directory were
-\"~/src/emacs/mr-buffer.el\", a group for
-\"~/src/emacs/mr-buffer.el\" would be created rather than putting
+\"~/src/emacs/bufler.el\", a group for
+\"~/src/emacs/bufler.el\" would be created rather than putting
 the buffer in a group for \"~/src/emacs\".  (NOTE THAT THIS
 FEATURE MAY BE BUGGY AT THE MOMENT.)
 
@@ -423,14 +423,14 @@ e.g. symlinks are resolved."
 ;; These docstrings contain contorted English to satisfy the whims of
 ;; `checkdoc'.
 
-(defun mr-buffer-group-name-match (name regexp buffer)
+(defun bufler-group-name-match (name regexp buffer)
   "Group BUFFERs whose names match REGEXP.
 If it matches, NAME is returned, otherwise nil."
   (cl-check-type name string)
   (when (string-match-p regexp (buffer-name buffer))
     (propertize name 'face 'magit-head)))
 
-(defun mr-buffer-group-mode-match (name regexp buffer)
+(defun bufler-group-mode-match (name regexp buffer)
   "Group buffers whose major modes match REGEXP.
 If BUFFER's mode matches REGEXP, NAME is returned, otherwise
 nil."
@@ -444,59 +444,59 @@ nil."
 ;; These functions automatically create groups for buffers they match,
 ;; keyed by their return value.  However, when one of these functions
 ;; returns nil, the buffer is not grouped into a "nil" group, but is
-;; raised to the next level.  (This is implemented in the `mr-buffer'
+;; raised to the next level.  (This is implemented in the `bufler'
 ;; function.)
 
-(defmacro mr-buffer-defauto-group (name &rest body)
-  "Define a grouping function named `mr-buffer-group-by-NAME'.
+(defmacro bufler-defauto-group (name &rest body)
+  "Define a grouping function named `bufler-group-by-NAME'.
 It takes one argument, a buffer, which is bound to `buffer' in
 BODY.  It should return a key by which to group its buffer, or
 nil if it should not be grouped.
 
 NAME, okay, `checkdoc'?"
   (declare (indent defun))
-  (let* ((fn-name (intern (concat "mr-buffer-group-auto-" (symbol-name name))))
+  (let* ((fn-name (intern (concat "bufler-group-auto-" (symbol-name name))))
          (docstring (format "Group buffers by %s." name)))
     `(defun ,fn-name (buffer)
        ,docstring
        ,@body)))
 
-(mr-buffer-defauto-group file
+(bufler-defauto-group file
   (when-let* ((filename (or (buffer-file-name buffer)
                             (when (buffer-base-buffer buffer)
                               (buffer-file-name (buffer-base-buffer buffer))))))
     (propertize (concat "File: " (file-name-nondirectory filename))
                 'face 'magit-section-heading)))
 
-(mr-buffer-defauto-group directory
+(bufler-defauto-group directory
   (propertize (concat "Dir: " (file-truename (buffer-local-value 'default-directory buffer)))
               'face 'magit-section-heading))
 
-(mr-buffer-defauto-group mode
+(bufler-defauto-group mode
   (propertize (symbol-name (buffer-local-value 'major-mode buffer))
               'face 'magit-head))
 
-(mr-buffer-defauto-group indirect
+(bufler-defauto-group indirect
   (when (buffer-base-buffer buffer)
     "*indirect*"))
 
-(mr-buffer-defauto-group hidden
+(bufler-defauto-group hidden
   (if (string-prefix-p " " (buffer-name buffer))
       "*hidden*"
     "Normal"))
 
-(mr-buffer-defauto-group special
-  (if (mr-buffer-special-buffer-p buffer)
+(bufler-defauto-group special
+  (if (bufler-special-buffer-p buffer)
       "*special*"
     "non-special buffers"))
 
-(mr-buffer-defauto-group project
+(bufler-defauto-group project
   (when-let* ((project (with-current-buffer buffer
                          (project-current)))
               (project-root (car (project-roots project))))
     (concat "Project: " project-root)))
 
-(mr-buffer-defauto-group tramp
+(bufler-defauto-group tramp
   (when-let* ((host (file-remote-p (buffer-local-value 'default-directory buffer)
                                    'host)))
     (concat "Tramp: " host)))
@@ -506,98 +506,98 @@ NAME, okay, `checkdoc'?"
 ;; This seems to work better than I expected.
 
 ;;;###autoload
-(defmacro mr-buffer-defgroups (&rest groups)
-  "Expand GROUPS into a group definition suitable for `mr-buffer-groups'.
+(defmacro bufler-defgroups (&rest groups)
+  "Expand GROUPS into a group definition suitable for `bufler-groups'.
 See documentation for details."
   (declare (indent defun))
   `(cl-macrolet ((group (&rest groups) `(list ,@groups))
                  (group-and (name &rest groups)
-                            `(mr-buffer-and ,name ,@groups))
+                            `(bufler-and ,name ,@groups))
                  (group-or (name &rest groups)
-                           `(mr-buffer-or ,name ,@groups))
+                           `(bufler-or ,name ,@groups))
                  (group-not (name group)
-                            `(mr-buffer-not ,name ,group))
+                            `(bufler-not ,name ,group))
                  (mode-match (name regexp)
-                             `(mr-buffer-group 'mode-match ,name ,regexp))
+                             `(bufler-group 'mode-match ,name ,regexp))
                  (name-match (name regexp)
-                             `(mr-buffer-group 'name-match ,name ,regexp))
+                             `(bufler-group 'name-match ,name ,regexp))
                  (dir (dirs &optional depth)
-                      `(mr-buffer-group 'dir ,dirs ,depth))
-                 (auto-directory () `(mr-buffer-group 'auto-directory))
-                 (auto-file () `(mr-buffer-group 'auto-file))
-                 (auto-indirect () `(mr-buffer-group 'auto-indirect))
-                 (auto-mode () `(mr-buffer-group 'auto-mode))
-                 (auto-project () `(mr-buffer-group 'auto-project))
-                 (auto-tramp () `(mr-buffer-group 'auto-tramp)))
+                      `(bufler-group 'dir ,dirs ,depth))
+                 (auto-directory () `(bufler-group 'auto-directory))
+                 (auto-file () `(bufler-group 'auto-file))
+                 (auto-indirect () `(bufler-group 'auto-indirect))
+                 (auto-mode () `(bufler-group 'auto-mode))
+                 (auto-project () `(bufler-group 'auto-project))
+                 (auto-tramp () `(bufler-group 'auto-tramp)))
      (list ,@groups)))
 
 ;;;; Additional customization
 
 ;; These options must be defined after functions they call in their
-;; values, and after the `mr-buffer-defgroups' macro.
+;; values, and after the `bufler-defgroups' macro.
 
-(defcustom mr-buffer-groups
-  (mr-buffer-defgroups
+(defcustom bufler-groups
+  (bufler-defgroups
+   (group
+    ;; Subgroup collecting all `help-mode' and `info-mode' buffers.
+    (group-or "*Help/Info*"
+              (mode-match "*Help*" (rx bos "help-"))
+              (mode-match "*Info*" (rx bos "info-"))))
+   (group
+    ;; Subgroup collecting all special buffers (i.e. ones that are not
+    ;; file-backed), except `magit-status-mode' buffers (which are allowed to fall
+    ;; through to other groups, so they end up grouped with their project buffers).
+    (group-and "*Special*"
+               (lambda (buffer)
+                 (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
+                                      buffer)
+                             (funcall (mode-match "Dired" (rx bos "dired"))
+                                      buffer)
+                             (funcall (auto-file) buffer))
+                   "*Special*")))
     (group
-     ;; Subgroup collecting all `help-mode' and `info-mode' buffers.
-     (group-or "*Help/Info*"
-               (mode-match "*Help*" (rx bos "help-"))
-               (mode-match "*Info*" (rx bos "info-"))))
+     ;; Subgroup collecting these "special special" buffers
+     ;; separately for convenience.
+     (name-match "**Special**"
+                 (rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
     (group
-     ;; Subgroup collecting all special buffers (i.e. ones that are not
-     ;; file-backed), except `magit-status-mode' buffers (which are allowed to fall
-     ;; through to other groups, so they end up grouped with their project buffers).
-     (group-and "*Special*"
-                (lambda (buffer)
-                  (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
-                                       buffer)
-                              (funcall (mode-match "Dired" (rx bos "dired"))
-                                       buffer)
-                              (funcall (auto-file) buffer))
-                    "*Special*")))
-     (group
-      ;; Subgroup collecting these "special special" buffers
-      ;; separately for convenience.
-      (name-match "**Special**"
-                  (rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
-     (group
-      ;; Subgroup collecting all other Magit buffers, grouped by directory.
-      (mode-match "*Magit* (non-status)" (rx bos (or "magit" "forge") "-"))
-      (auto-directory))
-     ;; Subgroup for Helm buffers.
-     (mode-match "*Helm*" (rx bos "helm-"))
-     ;; Remaining special buffers are grouped automatically by mode.
-     (auto-mode))
-    ;; All buffers under "~/.emacs.d" (or wherever it is).
-    (dir user-emacs-directory)
-    (group
-     ;; Subgroup collecting buffers in `org-directory' (or "~/org" if
-     ;; `org-directory' is not yet defined).
-     (dir (if (bound-and-true-p org-directory)
-              org-directory
-            "~/org"))
-     (group
-      ;; Subgroup collecting indirect Org buffers, grouping them by file.
-      ;; This is very useful when used with `org-tree-to-indirect-buffer'.
-      (auto-indirect)
-      (auto-file))
-     ;; Group remaining buffers by whether they're file backed, then by mode.
-     (group-not "*special*" (auto-file))
-     (auto-mode))
-    (group
-     ;; Subgroup collecting buffers in a version-control project,
-     ;; grouping them by directory.
-     (auto-project))
-    ;; Group remaining buffers by directory, then major mode.
-    (auto-directory)
+     ;; Subgroup collecting all other Magit buffers, grouped by directory.
+     (mode-match "*Magit* (non-status)" (rx bos (or "magit" "forge") "-"))
+     (auto-directory))
+    ;; Subgroup for Helm buffers.
+    (mode-match "*Helm*" (rx bos "helm-"))
+    ;; Remaining special buffers are grouped automatically by mode.
     (auto-mode))
+   ;; All buffers under "~/.emacs.d" (or wherever it is).
+   (dir user-emacs-directory)
+   (group
+    ;; Subgroup collecting buffers in `org-directory' (or "~/org" if
+    ;; `org-directory' is not yet defined).
+    (dir (if (bound-and-true-p org-directory)
+             org-directory
+           "~/org"))
+    (group
+     ;; Subgroup collecting indirect Org buffers, grouping them by file.
+     ;; This is very useful when used with `org-tree-to-indirect-buffer'.
+     (auto-indirect)
+     (auto-file))
+    ;; Group remaining buffers by whether they're file backed, then by mode.
+    (group-not "*special*" (auto-file))
+    (auto-mode))
+   (group
+    ;; Subgroup collecting buffers in a version-control project,
+    ;; grouping them by directory.
+    (auto-project))
+   ;; Group remaining buffers by directory, then major mode.
+   (auto-directory)
+   (auto-mode))
   "List of grouping functions recursively applied to buffers.
 Note that this is likely to look very ugly in the customization
 UI due to lambdas being byte-compiled.  Please see the source
 code for this option's definition to see the human-readable group
 definitions.
 
-Each item may be an Mr-Buffer grouping function or a list of
+Each item may be an Bufler grouping function or a list of
 grouping functions (each element of which may also be a list, and
 so forth, spiraling into infinity...oh, hello, Alice).
 
@@ -615,6 +615,6 @@ resulting output, and you should figure it out quickly enough."
 
 ;;;; Footer
 
-(provide 'mr-buffer)
+(provide 'bufler)
 
-;;; mr-buffer.el ends here
+;;; bufler.el ends here
