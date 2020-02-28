@@ -58,9 +58,10 @@
 (defvar bufler-list-mode-map
   (let ((map (copy-keymap magit-section-mode-map)))
     (define-key map (kbd "g") #'bufler)
-    (define-key map (kbd "k") #'bufler-kill)
-    (define-key map (kbd "s") #'bufler-save)
-    (define-key map (kbd "RET") #'bufler-pop)
+    (define-key map (kbd "k") #'bufler-command-kill)
+    (define-key map (kbd "s") #'bufler-command-save)
+    (define-key map (kbd "w") #'bufler-command-workspace)
+    (define-key map (kbd "RET") #'bufler-command-pop)
     map))
 
 (defvar bufler-emacs-source-directory
@@ -249,18 +250,19 @@ string, not in group headers.")
               (buffer-p (eq 'bufler-buffer (oref section type))))
     (pop-to-buffer (oref section value))))
 
-(defmacro bufler-define-buffer-command (name docstring command)
+(cl-defmacro bufler-define-buffer-command (name docstring command &key let*)
   "Define an Bufler command to call COMMAND on selected buffers.
-It is named `bufler-NAME' and uses DOCSTRING.
+It is named `bufler-command-NAME' and uses DOCSTRING.
 
 NAME, okay, `checkdoc'?"
   (declare (indent defun))
-  `(defun ,(intern (concat "bufler-" (symbol-name name))) (&rest _args)
+  `(defun ,(intern (concat "bufler-command-" (symbol-name name))) (&rest _args)
      ,docstring
      (interactive)
      (when-let* ((sections (or (magit-region-sections) (list (magit-current-section)))))
-       (bufler--map-sections ,command sections)
-       (bufler))))
+       (let* ,let*
+         (bufler--map-sections ,command sections)
+         (bufler)))))
 
 (bufler-define-buffer-command kill "Kill buffer."
   #'kill-buffer)
@@ -273,6 +275,18 @@ NAME, okay, `checkdoc'?"
     (when (buffer-file-name buffer)
       (with-current-buffer buffer
         (save-buffer)))))
+
+(bufler-define-buffer-command workspace
+  "Set buffer's workspace name.
+With prefix, unset it."
+  (lambda (buffer)
+    (with-current-buffer buffer
+      (bufler-buffer-workspace name)))
+  :let* ((name (unless current-prefix-arg
+                 (completing-read "Named workspace: "
+                                  (cl-loop for buffer in (buffer-list)
+                                           when (buffer-local-value 'bufler-workspace-name buffer)
+                                           collect it))))))
 
 ;;;; Functions
 

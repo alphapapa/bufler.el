@@ -114,10 +114,11 @@ section at point.
 
    • 1 – 4 Cycle section levels at point.
    • M-1 – M-4 Cycle top-level sections.
-   • g Refresh Bufler list.
    • RET Pop to buffer.
+   • g Refresh Bufler list.
    • k Kill buffers.
    • s Save buffers.
+   • w Set workspace name.
 
 
 File: README.info,  Node: Defining groups,  Prev: Bindings,  Up: Usage
@@ -311,13 +312,13 @@ Node: Screenshots888
 Node: Installation1268
 Node: Usage1563
 Node: Bindings2740
-Node: Defining groups3190
-Node: Changelog9107
-Node: 02-pre9253
-Node: 019395
-Node: Credits9498
-Node: Development10043
-Node: License10212
+Node: Defining groups3219
+Node: Changelog9136
+Node: 02-pre9282
+Node: 019424
+Node: Credits9527
+Node: Development10072
+Node: License10241
 
 End Tag Table
 

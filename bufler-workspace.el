@@ -128,21 +128,20 @@ group, select from buffers in all groups and set current group."
 ;;;###autoload
 (defalias 'bufler-workspace-mode #'bufler-mode)
 
-(defun bufler-buffer-workspace (&optional unset-p)
-  "Set current buffer's workspace name.
-If UNSET-P (interactively, with prefix), unset the buffer's
+(cl-defun bufler-buffer-workspace (&optional name)
+  "Set current buffer's workspace to NAME.
+If NAME is nil (interactively, with prefix), unset the buffer's
 workspace name.  This sets the buffer-local variable
 `bufler-workspace-name'.  Note that, in order for a buffer to
 appear in a named workspace, the buffer must be matched by an
 `auto-workspace' group before any other group."
-  (interactive "P")
-  (let ((name (unless unset-p
-                (completing-read "Named workspace: "
-                                 (cl-loop for buffer in (buffer-list)
-                                          when (buffer-local-value 'bufler-workspace-name buffer)
-                                          collect it)))))
-    (setf bufler-cache nil)
-    (setq-local bufler-workspace-name name)))
+  (interactive (list (unless current-prefix-arg
+                       (completing-read "Named workspace: "
+                                        (cl-loop for buffer in (buffer-list)
+                                                 when (buffer-local-value 'bufler-workspace-name buffer)
+                                                 collect it)))))
+  (setf bufler-cache nil)
+  (setq-local bufler-workspace-name name))
 
 ;;;; Functions
 

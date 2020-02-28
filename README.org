@@ -81,10 +81,11 @@ In the Bufler buffer list, these keys are available (use =C-h m= to get the most
 
 +  =1= -- =4= Cycle section levels at point.
 +  =M-1= -- =M-4= Cycle top-level sections.
-+  =g=  Refresh Bufler list.
 +  =RET=  Pop to buffer.
++  =g=  Refresh Bufler list.
 +  =k=  Kill buffers.
 +  =s=  Save buffers.
++  =w=  Set workspace name.
 
 ** Defining groups
 
