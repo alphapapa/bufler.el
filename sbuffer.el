@@ -38,6 +38,7 @@
 
 (require 'cl-lib)
 (require 'eieio)
+(require 'map)
 (require 'project)
 (require 'subr-x)
 (require 'vc)
@@ -50,6 +51,8 @@
 (require 'f)
 (require 'magit-section)
 
+(require 'group-tree)
+
 ;;;; Variables
 
 (defvar sbuffer-mode-map
@@ -59,6 +62,16 @@
     (define-key map (kbd "s") #'sbuffer-save)
     (define-key map (kbd "RET") #'sbuffer-pop)
     map))
+
+(defvar sbuffer-emacs-source-directory
+  (cl-reduce (lambda (val fn)
+               (funcall fn val))
+             ;; I feel like Emacs needs a function like `f-parent'.
+             '(file-name-directory directory-file-name file-name-directory
+                                   directory-file-name file-name-directory)
+             :initial-value (locate-library "cl-lib"))
+  "The directory containing the installed source code for this Emacs.
+Usually this will be something like \"/usr/share/emacs/VERSION\".")
 
 ;;;; Customization
 
@@ -93,6 +106,22 @@ because `vc-registered' and `vc-refresh-state' must be called to
 get correct results."
   :type 'boolean)
 
+(defcustom sbuffer-filter-fns (list #'sbuffer-hidden-buffer-p)
+  "Buffers that match these functions are not shown."
+  :type '(repeat function))
+
+(defcustom sbuffer-group-path-separator " ► "
+  "Separator shown between path elements."
+  :type 'string)
+
+(defcustom sbuffer-buffer-mode-annotate-preds
+  (list (lambda (buffer)
+          "Return non-nil if BUFFER's major-mode is `dired-mode'."
+          (member (buffer-local-value 'major-mode buffer)
+                  '(dired-mode))))
+  "Predicates that determine whether to annotate a buffer with its major mode."
+  :type '(repeat function))
+
 (defface sbuffer-group
   '((t (:underline nil :weight bold)))
   "Face for Sbuffer groups.")
@@ -104,6 +133,12 @@ get correct results."
 (defface sbuffer-buffer-special
   '((t (:inherit default :slant italic)))
   "Face for special buffers.")
+
+(defface sbuffer-mode
+  '((t (:inherit font-lock-type-face)))
+  "Face for the mode of buffers and groups.
+Only used in the mode annotation in each buffer's formatted
+string, not in group headers.")
 
 (defface sbuffer-size
   '((t (:inherit font-lock-comment-face)))
@@ -197,8 +232,7 @@ get correct results."
                  (hidden-p buffer)))
     (with-current-buffer (get-buffer-create "*Sbuffer*")
       (let* ((inhibit-read-only t)
-             (groups (->> (buffer-list) (-remove #'boring-p)
-                          (group-by sbuffer-groups)))
+             (groups (sbuffer-buffers))
              (pos (point)))
         (when sbuffer-reverse
           (setf groups (nreverse (-sort #'format< groups))))
@@ -247,6 +281,37 @@ NAME, okay, `checkdoc'?"
 
 ;;;; Functions
 
+(defun sbuffer-buffer-path (grouped-buffers buffer)
+  "Return path to BUFFER in GROUPED-BUFFERS."
+  (cl-labels ((leaf-path
+               (leaf path tree) (pcase-let* ((`(,name . ,nodes) tree))
+                                  (dolist (node nodes)
+                                    (if (equal leaf node)
+                                        (throw :found (append path (list name leaf)))
+                                      (when (listp node)
+                                        (leaf-path leaf (append path (list name))
+                                                   node)))))))
+    (catch :found
+      (dolist (tree grouped-buffers)
+        (leaf-path buffer nil tree)))))
+
+(cl-defun sbuffer-buffers (&optional (groups sbuffer-groups))
+  "Return buffers grouped by GROUPS."
+  (group-tree groups (cl-loop with buffers = (buffer-list)
+                              for fn in sbuffer-filter-fns
+                              do (setf buffers (cl-remove-if fn buffers))
+                              finally return buffers)))
+
+(defun sbuffer-buffers-at (group-path)
+  "Return list of buffers for GROUP-PATH."
+  (cl-letf* ((alist-get-orig (symbol-function 'alist-get))
+             ((symbol-function 'alist-get)
+              (lambda (key alist &optional default remove _testfn)
+                (funcall alist-get-orig key alist default remove #'string=))))
+    ;; `map-nested-elt' uses `alist-get', but it does not permit its TESTFN
+    ;; to be set, so we have to rebind it to one that uses `string='.
+    (map-nested-elt (sbuffer-buffers) group-path)))
+
 (defun sbuffer-level-face (level)
   "Return face for LEVEL."
   (intern (format "%s%s" sbuffer-face-prefix (+ level sbuffer-initial-face-depth))))
@@ -275,8 +340,16 @@ NAME, okay, `checkdoc'?"
                              ((and 'edited it)
                               (propertize (format " %s" it)
                                           'face 'sbuffer-vc))))
-                         ""))))
-    (concat name modified-s " " size vc-state)))
+                         "")))
+         (mode-annotation (when (cl-loop for fn in sbuffer-buffer-mode-annotate-preds
+                                         thereis (funcall fn buffer))
+
+                            (propertize (replace-regexp-in-string
+                                         (rx "-mode" eos) ""
+                                         (format " %s" (buffer-local-value 'major-mode buffer))
+                                         t t)
+                                        'face 'sbuffer-mode))))
+    (concat name modified-s " " size vc-state mode-annotation)))
 
 (defun sbuffer--map-sections (fn sections)
   "Map FN across SECTIONS."
@@ -303,6 +376,11 @@ NAME, okay, `checkdoc'?"
 That is, if its name starts with \"*\"."
   (string-match-p (rx bos (optional (1+ blank)) "*")
                   (buffer-name buffer)))
+
+(defun sbuffer-hidden-buffer-p (buffer)
+  "Return non-nil if BUFFER is hidden.
+That is, if its name starts with \" \"."
+  (string-match-p (rx bos (1+ blank)) (buffer-name buffer)))
 
 ;;;;; Grouping
 
@@ -520,6 +598,8 @@ See documentation for details."
                 (lambda (buffer)
                   (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
                                        buffer)
+                              (funcall (mode-match "Dired" (rx bos "dired"))
+                                       buffer)
                               (funcall (auto-file) buffer))
                     "*Special*")))
      (group
@@ -553,8 +633,8 @@ See documentation for details."
      (auto-mode))
     (group
      ;; Subgroup collecting buffers in a version-control project,
-     ;; grouping them by directory and then major mode.
-     (auto-project) (auto-mode))
+     ;; grouping them by directory.
+     (auto-project))
     ;; Group remaining buffers by directory, then major mode.
     (auto-directory)
     (auto-mode))
