@@ -146,6 +146,9 @@ are defined like this:
 
      (bufler-defgroups
        (group
+        ;; Subgroup collecting all named workspaces.
+        (auto-workspace))
+       (group
         ;; Subgroup collecting all `help-mode' and `info-mode' buffers.
         (group-or "*Help/Info*"
                   (mode-match "*Help*" (rx bos "help-"))
@@ -313,12 +316,12 @@ Node: Installation1268
 Node: Usage1563
 Node: Bindings2740
 Node: Defining groups3219
-Node: Changelog9136
-Node: 02-pre9282
-Node: 019424
-Node: Credits9527
-Node: Development10072
-Node: License10241
+Node: Changelog9229
+Node: 02-pre9375
+Node: 019517
+Node: Credits9620
+Node: Development10165
+Node: License10334
 
 End Tag Table
 

@@ -100,6 +100,9 @@ For convenience, the macro =bufler-defgroups= provides a sort of DSL, a concise 
 #+BEGIN_SRC elisp
   (bufler-defgroups
     (group
+     ;; Subgroup collecting all named workspaces.
+     (auto-workspace))
+    (group
      ;; Subgroup collecting all `help-mode' and `info-mode' buffers.
      (group-or "*Help/Info*"
                (mode-match "*Help*" (rx bos "help-"))
