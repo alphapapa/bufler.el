@@ -39,16 +39,44 @@
   "FIXME"
   :group 'mr-buffer)
 
+(defcustom mr-buffer-workspace-set-hook
+  (list #'mr-buffer-workspace-set-frame-name
+        #'mr-buffer-workspace-set-mode-line)
+  "Functions called when the workspace is set."
+  :type 'hook)
+
 ;;;; Commands
 
+(defun mr-buffer-no-nils (elem)
+  ;; Isn't there a more standard way to do this?
+  (cl-typecase elem
+    (atom elem)
+    (list (delq 'nil (mapcar #'no-nils elem)))))
+
 ;;;###autoload
-(defun mr-buffer-workspace-switch ()
-  "Switch the active workspace for the current frame.
-Return the path."
-  (interactive)
-  (let ((path (mr-buffer-workspace-read-group-path (mr-buffer-buffers))))
-    (set-frame-parameter nil 'mr-buffer-workspace-path path)
-    path))
+(defun mr-buffer-workspace-set (path)
+  "Set active workspace for the current frame to the one at PATH.
+Interactively, choose workspace path with completion.  Return the
+path."
+  (interactive
+   (list
+    ;; This has gotten pretty ugly.
+    (cl-labels ((no-nils
+                 ;; Isn't there a more standard way to do this?
+                 (elem) (cl-typecase elem
+                          (atom elem)
+                          (list (delq '() (mapcar #'no-nils elem))))))
+      (let* ((paths (thread-last (group-tree-paths (mr-buffer-buffers) nil)
+                      (mapcar #'butlast)
+                      seq-uniq)))
+        (mr-buffer-read-from-alist "Group: " paths :keyfn (lambda (k)
+                                                            (setf k (mr-buffer-no-nils k))
+                                                            (cl-typecase k
+                                                              (atom (mr-buffer-format-path (list k)))
+                                                              (list (mr-buffer-format-path k)))))))))
+  (set-frame-parameter nil 'mr-buffer-workspace-path path)
+  (run-hook-with-args 'mr-buffer-workspace-set-hook path)
+  path)
 
 ;;;###autoload
 (defun mr-buffer-workspace-switch-buffer (&optional all-p)
@@ -58,7 +86,7 @@ group, select from buffers in all groups and set current group."
   (interactive "P")
   (let* ((group-path (frame-parameter nil 'mr-buffer-workspace-path))
          (buffer-names (when group-path
-                         (mapcar #'buffer-name (mr-buffer-buffers-at group-path)))))
+                         (mapcar #'buffer-name (group-tree-at group-path (mr-buffer-buffers))))))
     (if (or all-p (not buffer-names))
         (mr-buffer-workspace-switch-buffer-all)
       (switch-to-buffer (completing-read "Buffer: " buffer-names)))))
@@ -86,11 +114,54 @@ group path."
            (buffers (mapcar #'path-cons paths))
            (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers))
                                        buffers nil nil #'string=)))
-      (set-frame-parameter nil 'mr-buffer-workspace-path
-                           (butlast (group-tree-path grouped-buffers selected-buffer)))
+      (mr-buffer-workspace-set (butlast (group-tree-path grouped-buffers selected-buffer)))
       (switch-to-buffer selected-buffer))))
 
+;;;###autoload
+(define-minor-mode mr-buffer-workspace-mode
+  "When active, set the frame title according to current Mr. Buffer group."
+  :global t
+  (if mr-buffer-workspace-mode
+      (setq-default mode-line-format
+                    (append mode-line-format
+                            (list '(mr-buffer-workspace-mode (:eval (mr-buffer-lighter))))))
+    (setq-default mode-line-format
+                  (delete '(mr-buffer-workspace-mode (:eval (mr-buffer-lighter)))
+                          (default-value 'mode-line-format)))))
+
 ;;;; Functions
+
+(cl-defun mr-buffer-read-from-alist (prompt alist &key (keyfn #'identity) (testfn #'equal))
+  "Return a value from ALIST by reading a key with completion."
+  ;; This should really be a standard function in Emacs.
+  (let ((key (completing-read prompt (mapcar (lambda (l)
+                                               (funcall keyfn (car l)))
+                                             alist) nil t)))
+    (alist-get key alist nil nil testfn)))
+
+(defun mr-buffer-format-path (path)
+  "Return PATH formatted as a string."
+  (string-join (cl-loop for level from 0
+                        for element in path
+                        collect (cl-typecase element
+                                  (string (propertize element
+                                                      'face (mr-buffer-level-face level)))
+                                  (buffer (buffer-name element))))
+               mr-buffer-group-path-separator))
+
+(defun mr-buffer-lighter ()
+  "Return lighter string for mode line."
+  (format "Mr.B:%s" (cdr (frame-parameter nil 'mr-buffer-workspace-path))))
+
+(defun mr-buffer-workspace-set-frame-name (path)
+  "Set current frame's name according to PATH."
+  (let ((name (format "Workspace: %s" path)))
+    (set-frame-name name)))
+
+(defun mr-buffer-workspace-set-mode-line (path)
+  "Set current frame's name according to PATH."
+  (let ((name (format "Workspace: %s" path)))
+    (set-frame-name name)))
 
 (cl-defun mr-buffer-workspace-read-item (tree &key (leaf-key #'identity))
   "Return a leaf read from TREE with completion.

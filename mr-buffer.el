@@ -162,32 +162,7 @@ string, not in group headers.")
   (cl-labels
       ;; This gets a little hairy because we have to wrap `-group-by'
       ;; to implement "chains" of grouping functions.
-      ((group-by (fns sequence)
-                 (cl-typecase fns
-                   (function
-                    ;; "Regular" subgroups (naming things is hard).
-                    (-group-by fns sequence))
-                   (list (cl-typecase (car fns)
-                           (function
-                            ;; "Regular" subgroups (naming things is hard).
-                            (group-buffers fns sequence))
-                           (list
-                            ;; "Recursive sub-subgroups" (naming things is hard).
-
-                            ;; First, separate all the buffers that match the
-                            ;; first function.  Then group them recursively with
-                            ;; their subgrouping.  Then group the buffers that
-                            ;; don't match the first function, and append them.
-                            (append (group-by (car fns) (-select (caar fns) sequence))
-                                    (if (cdr fns)
-                                        (group-by (cdr fns) (-select (-not (caar fns)) sequence))
-                                      (-select (-not (caar fns)) sequence))))))))
-       (group-buffers (fns buffers)
-                      (if (cdr fns)
-                          (let ((groups (group-by (car fns) buffers)))
-                            (--map (cons (car it) (group-by (cdr fns) (cdr it)))
-                                   groups))
-                        (-group-by (car fns) buffers)))
+      (
        (insert-thing (thing &optional (level 0))
                      (pcase thing
                        ((pred bufferp) (insert-buffer thing level))
@@ -230,12 +205,13 @@ string, not in group headers.")
                 (string< (as-string test-dir) (as-string buffer-dir)))
        (boring-p (buffer)
                  (hidden-p buffer)))
-    (with-current-buffer (get-buffer-create "*Mr-Buffer*")
-      (let* ((inhibit-read-only t)
-             (groups (mr-buffer-buffers))
-             (pos (point)))
-        (when mr-buffer-reverse
-          (setf groups (nreverse (-sort #'format< groups))))
+    (let* ((inhibit-read-only t)
+           (groups (mr-buffer-buffers))
+           pos)
+      (when mr-buffer-reverse
+        (setf groups (nreverse (-sort #'format< groups))))
+      (with-current-buffer (get-buffer-create "*Mr-Buffer*")
+        (setf pos (point))
         (mr-buffer-mode)
         (erase-buffer)
         (magit-insert-section (mr-buffer-root)
@@ -287,16 +263,6 @@ NAME, okay, `checkdoc'?"
                               for fn in mr-buffer-filter-fns
                               do (setf buffers (cl-remove-if fn buffers))
                               finally return buffers)))
-
-(defun mr-buffer-buffers-at (group-path)
-  "Return list of buffers for GROUP-PATH."
-  (cl-letf* ((alist-get-orig (symbol-function 'alist-get))
-             ((symbol-function 'alist-get)
-              (lambda (key alist &optional default remove _testfn)
-                (funcall alist-get-orig key alist default remove #'string=))))
-    ;; `map-nested-elt' uses `alist-get', but it does not permit its TESTFN
-    ;; to be set, so we have to rebind it to one that uses `string='.
-    (map-nested-elt (mr-buffer-buffers) group-path)))
 
 (defun mr-buffer-level-face (level)
   "Return face for LEVEL."
@@ -497,7 +463,8 @@ NAME, okay, `checkdoc'?"
 
 (mr-buffer-defauto-group file
   (when-let* ((filename (or (buffer-file-name buffer)
-                            (buffer-file-name (buffer-base-buffer buffer)))))
+                            (when (buffer-base-buffer buffer)
+                              (buffer-file-name (buffer-base-buffer buffer))))))
     (propertize (concat "File: " (file-name-nondirectory filename))
                 'face 'magit-section-heading)))
 
@@ -571,59 +538,59 @@ See documentation for details."
 
 (defcustom mr-buffer-groups
   (mr-buffer-defgroups
-   (group
-    ;; Subgroup collecting all `help-mode' and `info-mode' buffers.
-    (group-or "*Help/Info*"
-              (mode-match "*Help*" (rx bos "help-"))
-              (mode-match "*Info*" (rx bos "info-"))))
-   (group
-    ;; Subgroup collecting all special buffers (i.e. ones that are not
-    ;; file-backed), except `magit-status-mode' buffers (which are allowed to fall
-    ;; through to other groups, so they end up grouped with their project buffers).
-    (group-and "*Special*"
-               (lambda (buffer)
-                 (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
-                                      buffer)
-                             (funcall (mode-match "Dired" (rx bos "dired"))
-                                      buffer)
-                             (funcall (auto-file) buffer))
-                   "*Special*")))
     (group
-     ;; Subgroup collecting these "special special" buffers
-     ;; separately for convenience.
-     (name-match "**Special**"
-                 (rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
+     ;; Subgroup collecting all `help-mode' and `info-mode' buffers.
+     (group-or "*Help/Info*"
+               (mode-match "*Help*" (rx bos "help-"))
+               (mode-match "*Info*" (rx bos "info-"))))
     (group
-     ;; Subgroup collecting all other Magit buffers, grouped by directory.
-     (mode-match "*Magit* (non-status)" (rx bos (or "magit" "forge") "-"))
-     (auto-directory))
-    ;; Subgroup for Helm buffers.
-    (mode-match "*Helm*" (rx bos "helm-"))
-    ;; Remaining special buffers are grouped automatically by mode.
+     ;; Subgroup collecting all special buffers (i.e. ones that are not
+     ;; file-backed), except `magit-status-mode' buffers (which are allowed to fall
+     ;; through to other groups, so they end up grouped with their project buffers).
+     (group-and "*Special*"
+                (lambda (buffer)
+                  (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
+                                       buffer)
+                              (funcall (mode-match "Dired" (rx bos "dired"))
+                                       buffer)
+                              (funcall (auto-file) buffer))
+                    "*Special*")))
+     (group
+      ;; Subgroup collecting these "special special" buffers
+      ;; separately for convenience.
+      (name-match "**Special**"
+                  (rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
+     (group
+      ;; Subgroup collecting all other Magit buffers, grouped by directory.
+      (mode-match "*Magit* (non-status)" (rx bos (or "magit" "forge") "-"))
+      (auto-directory))
+     ;; Subgroup for Helm buffers.
+     (mode-match "*Helm*" (rx bos "helm-"))
+     ;; Remaining special buffers are grouped automatically by mode.
+     (auto-mode))
+    ;; All buffers under "~/.emacs.d" (or wherever it is).
+    (dir user-emacs-directory)
+    (group
+     ;; Subgroup collecting buffers in `org-directory' (or "~/org" if
+     ;; `org-directory' is not yet defined).
+     (dir (if (bound-and-true-p org-directory)
+              org-directory
+            "~/org"))
+     (group
+      ;; Subgroup collecting indirect Org buffers, grouping them by file.
+      ;; This is very useful when used with `org-tree-to-indirect-buffer'.
+      (auto-indirect)
+      (auto-file))
+     ;; Group remaining buffers by whether they're file backed, then by mode.
+     (group-not "*special*" (auto-file))
+     (auto-mode))
+    (group
+     ;; Subgroup collecting buffers in a version-control project,
+     ;; grouping them by directory.
+     (auto-project))
+    ;; Group remaining buffers by directory, then major mode.
+    (auto-directory)
     (auto-mode))
-   ;; All buffers under "~/.emacs.d" (or wherever it is).
-   (dir user-emacs-directory)
-   (group
-    ;; Subgroup collecting buffers in `org-directory' (or "~/org" if
-    ;; `org-directory' is not yet defined).
-    (dir (if (bound-and-true-p org-directory)
-             org-directory
-           "~/org"))
-    (group
-     ;; Subgroup collecting indirect Org buffers, grouping them by file.
-     ;; This is very useful when used with `org-tree-to-indirect-buffer'.
-     (auto-indirect)
-     (auto-file))
-    ;; Group remaining buffers by whether they're file backed, then by mode.
-    (group-not "*special*" (auto-file))
-    (auto-mode))
-   (group
-    ;; Subgroup collecting buffers in a version-control project,
-    ;; grouping them by directory.
-    (auto-project))
-   ;; Group remaining buffers by directory, then major mode.
-   (auto-directory)
-   (auto-mode))
   "List of grouping functions recursively applied to buffers.
 Note that this is likely to look very ugly in the customization
 UI due to lambdas being byte-compiled.  Please see the source

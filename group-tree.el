@@ -78,18 +78,22 @@
       (dolist (node tree)
         (leaf-path leaf nil node)))))
 
-(cl-defun group-tree-paths (tree)
+(cl-defun group-tree-paths (tree &optional (leaves-only-p t))
   "Return list of paths to nodes in TREE.
-If OMIT-NULLS, remove nil elements from paths."
+If LEAVES-ONLY-P, omit paths to non-leaf nodes."
   (let (paths)
     (cl-labels ((collect-paths
                  (path node) (pcase-let* ((`(,name . ,nodes) node))
                                (dolist (node nodes)
                                  (cl-typecase node
-                                   (list (collect-paths (append path (list name)) node))
+                                   (list (unless leaves-only-p
+                                           (push (append path (list name))
+                                                 paths))
+                                         (collect-paths (append path (list name)) node))
                                    (buffer (push (append path (list name node))
                                                  paths)))))))
-      (collect-paths nil tree)
+      (dolist (node tree)
+        (collect-paths nil node))
       (nreverse paths))))
 
 (defun group-tree-at (path group)
