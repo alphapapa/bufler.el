@@ -199,30 +199,6 @@ Completion is done in steps when descending into branches."
         (list path)
         (atom (list path))))))
 
-;; This was an aborted WIP, but the logic in the labeled functions may be useful later.
-;; (defun bufler-workspace-switch-buffer-all ()
-;;   "Switch to another buffer."
-;;   (interactive "P")
-;;   (cl-labels ((path-cons
-;;                (path) (cons (format-path path) (-last-item path)))
-;;               (format-path
-;;                (path) (s-join " -> " (--map (cl-typecase it
-;;                                               (string it)
-;;                                               (buffer (buffer-name it)))
-;;                                             path)))
-;;               (leaf-path
-;;                ;; Surely there's a function somewhere that does this, or can be composed to...
-;;                (leaf tree) (--when-let (catch :found (--each tree (search-node leaf nil it)))
-;;                              (path-cons it)))
-;;               (search-node
-;;                (leaf path node) (pcase-let* ((`(,name . ,nodes) node))
-;;                                   (dolist (node nodes)
-;;                                     (if (equal leaf node)
-;;                                         (throw :found (append path (list name leaf))))
-;;                                     (cl-typecase node
-;;                                       (list (search-node leaf (append path (list name)) node)))))))
-;;     (leaf-path (current-buffer) (bufler-workspace-grouped))))
-
 ;;;; Footer
 
 (provide 'bufler-workspace)
