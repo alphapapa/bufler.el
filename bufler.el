@@ -284,9 +284,10 @@ With prefix, unset it."
       (bufler-buffer-workspace name)))
   :let* ((name (unless current-prefix-arg
                  (completing-read "Named workspace: "
-                                  (cl-loop for buffer in (buffer-list)
-                                           when (buffer-local-value 'bufler-workspace-name buffer)
-                                           collect it))))))
+                                  (seq-uniq
+                                   (cl-loop for buffer in (buffer-list)
+                                            when (buffer-local-value 'bufler-workspace-name buffer)
+                                            collect it)))))))
 
 ;;;; Functions
 

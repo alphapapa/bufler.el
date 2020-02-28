@@ -137,9 +137,10 @@ appear in a named workspace, the buffer must be matched by an
 `auto-workspace' group before any other group."
   (interactive (list (unless current-prefix-arg
                        (completing-read "Named workspace: "
-                                        (cl-loop for buffer in (buffer-list)
-                                                 when (buffer-local-value 'bufler-workspace-name buffer)
-                                                 collect it)))))
+                                        (seq-uniq
+                                         (cl-loop for buffer in (buffer-list)
+                                                  when (buffer-local-value 'bufler-workspace-name buffer)
+                                                  collect it))))))
   (setf bufler-cache nil)
   (setq-local bufler-workspace-name name))
 
