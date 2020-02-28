@@ -1,4 +1,4 @@
-#+TITLE: sbuffer
+#+TITLE: Bufler.el
 
 #+PROPERTY: LOGGING nil
 
@@ -8,11 +8,11 @@
 
 # [[https://melpa.org/#/package-name][file:https://melpa.org/packages/sbuffer-badge.svg]] [[https://stable.melpa.org/#/package-name][file:https://stable.melpa.org/packages/sbuffer-badge.svg]]
 
-Sbuffer is like Ibuffer, but using [[https://github.com/magit/magit][magit-section]] to group buffers in a very flexible way.
+Bufler is like a butler for your buffers, presenting them to you in an organized way based on your instructions.  The instructions are written as grouping rules in a simple language, allowing you to customize the way buffers are grouped.  The default instructions are designed to be generally useful, so you don't have to write your own rules.
 
 * Screenshots
 
-This screenshot shows group faces themed by [[https://github.com/alphapapa/prism.el][prism]], which Sbuffer optionally supports.
+This screenshot shows group faces themed by [[https://github.com/alphapapa/prism.el][prism]], which Bufler optionally supports.
 
 [[images/screenshot.png]]
 
@@ -41,8 +41,8 @@ In the default Emacs theme:
 Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like this:
 
 #+BEGIN_SRC elisp
-  (use-package sbuffer
-    :quelpa (sbuffer :fetcher github :repo "alphapapa/sbuffer.el"))
+  (use-package bufler
+    :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"))
 #+END_SRC
 
 # ** MELPA
@@ -59,7 +59,7 @@ Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like t
 #   Then put this file in your load-path, and put this in your init file:
 # 
 #   #+BEGIN_SRC elisp
-# (require 'sbuffer)
+# (require 'bufler)
 #   #+END_SRC
 
 * Usage
@@ -67,31 +67,36 @@ Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like t
 :TOC:      :depth 0
 :END:
 
-  Run the command =sbuffer=.  You can customize settings in the =sbuffer= group.
+  Run one of these commands.  You can customize settings in the =bufler= group.
+
++  =bufler= :: Show the Bufler buffer list.
++  =bufler-mode= :: Enable the Bufler workspace mode, which allows each frame to have a chosen workspace from Bufler's groups.
++  =bufler-switch-buffer= :: Switch to a buffer selected from the frame's workspace.  With prefix, select from all buffers and change the frame's workspace.
++  =bufler-set-workspace= :: Set the frame's workspace.  Setting the workspace is usually handled by =bufler-switch-buffer=, but this command may be used to set the workspace to a group containing other groups.
 
 ** Bindings
 
-In the Sbuffer buffer, these keys are available (use =C-h m= to get the most up-to-date listing).  They operate on all buffers in the section at point.
+In the Bufler buffer list, these keys are available (use =C-h m= to get the most up-to-date listing).  They operate on all buffers in the section at point.
 
 +  =1= -- =4= Cycle section levels at point.
 +  =M-1= -- =M-4= Cycle top-level sections.
-+  =g=  Refresh Sbuffer list.
++  =g=  Refresh Bufler list.
 +  =RET=  Pop to buffer.
 +  =k=  Kill buffers.
 +  =s=  Save buffers.
 
 ** Defining groups
 
-/See the =sbuffer= info page to view this information in Emacs./
+/See the =bufler= info page to view this information in Emacs./
 
-The Sbuffer groups definition is a list stored in variable =sbuffer-groups=.  Each element of the list is either a lambda function which takes a single argument, a buffer, or a list of such functions.  Each buffer is matched against these functions in order until it does not match any more functions at that level.  A list of functions defines a subgroup which short-circuits other groups at the same level, preventing further grouping outside of the subgroup's functions.  Ultimately, it's lambdas all the way down.
+The Bufler groups definition is a list stored in variable =bufler-groups=.  Each element of the list is either a lambda function which takes a single argument, a buffer, or a list of such functions.  Each buffer is matched against these functions in order until it does not match any more functions at that level.  A list of functions defines a subgroup which short-circuits other groups at the same level, preventing further grouping outside of the subgroup's functions.  Ultimately, it's lambdas all the way down.
 
 This seems somewhat difficult to explain, so please see the examples.  Once you get the hang of it, it's powerful and flexible.
 
-For convenience, the macro =sbuffer-defgroups= provides a sort of DSL, a concise vocabulary for defining groups.  For example, the default groups are defined like this:
+For convenience, the macro =bufler-defgroups= provides a sort of DSL, a concise vocabulary for defining groups.  For example, the default groups are defined like this:
 
 #+BEGIN_SRC elisp
-  (sbuffer-defgroups
+  (bufler-defgroups
     (group
      ;; Subgroup collecting all `help-mode' and `info-mode' buffers.
      (group-or "*Help/Info*"
@@ -145,9 +150,9 @@ For convenience, the macro =sbuffer-defgroups= provides a sort of DSL, a concise
     (auto-mode))
 #+END_SRC
 
-*Note* that the macro does not /set/ the variable =sbuffer-groups=, it merely expands a groups form, so you should use, e.g. ~(setf sbuffer-groups (sbuffer-defgroups ...))~ to actually set the groups.
+*Note* that the macro does not /set/ the variable =bufler-groups=, it merely expands a groups form, so you should use, e.g. ~(setf bufler-groups (bufler-defgroups ...))~ to actually set the groups.
 
-The following group types are available in =sbuffer-defgroups=.  Note that each one is expanded into a lambda, so they may also be called by =funcall= (see example above).
+The following group types are available in =bufler-defgroups=.  Note that each one is expanded into a lambda, so they may also be called by =funcall= (see example above).
 
 +  Meta types :: These types compose multiple of the other types into a single group.
      -  ~group (TYPE...)~ Define a subgroup matching given types, which short-circuits other groups at the same level.
@@ -170,6 +175,10 @@ The following group types are available in =sbuffer-defgroups=.  Note that each 
      -  ~dir (DIRS DEPTH)~  Groups buffers which match one of the given DIRS.  DIRS may be one or a list of directory paths.  DEPTH may be nil or a depth above which to produce subdirectory groups (a feature probably broken at the moment).  See example above.
 
 * Changelog
+
+** 0.2-pre
+
+Project expanded and renamed from Sbuffer to Bufler.
 
 ** 0.1
 
@@ -201,12 +210,12 @@ GPLv3
 ** Info export options
 
 #+TEXINFO_DIR_CATEGORY: Emacs
-#+TEXINFO_DIR_TITLE: Sbuffer: (sbuffer)
+#+TEXINFO_DIR_TITLE: Bufler: (bufler)
 #+TEXINFO_DIR_DESC: Like Ibuffer, with flexible grouping in hierarchical sections
 
 # NOTE: We could use these, but that causes a pointless error, "org-compile-file: File "..README.info" wasn't produced...", so we just rename the files in the after-save-hook instead.
-# #+TEXINFO_FILENAME: sbuffer.info
-# #+EXPORT_FILE_NAME: sbuffer.texi
+# #+TEXINFO_FILENAME: bufler.info
+# #+EXPORT_FILE_NAME: bufler.texi
 
 ** File-local variables
 
@@ -214,7 +223,7 @@ GPLv3
 
 # Local Variables:
 # before-save-hook: org-make-toc
-# after-save-hook: (lambda nil (when (and (require 'ox-texinfo nil t) (org-texinfo-export-to-info)) (delete-file "README.texi") (rename-file "README.info" "sbuffer.info" t)))
+# after-save-hook: (lambda nil (when (and (require 'ox-texinfo nil t) (org-texinfo-export-to-info)) (delete-file "README.texi") (rename-file "README.info" "bufler.info" t)))
 # org-export-initial-scope: buffer
 # org-comment-string: "NOTCOMMENT"
 # End:
