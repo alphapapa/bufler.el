@@ -40,8 +40,7 @@
   :group 'bufler)
 
 (defcustom bufler-workspace-set-hook
-  (list #'bufler-workspace-set-frame-name
-        #'bufler-workspace-set-mode-line)
+  (list #'bufler-workspace-set-frame-name)
   "Functions called when the workspace is set."
   :type 'hook)
 
@@ -115,7 +114,9 @@ group path."
            (buffers (mapcar #'path-cons paths))
            (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers))
                                        buffers nil nil #'string=)))
-      (bufler-workspace-set (butlast (bufler-group-tree-leaf-path grouped-buffers selected-buffer)))
+      (unless path
+        ;; Selected from all buffers: change the workspace.
+        (bufler-workspace-set (butlast (bufler-group-tree-leaf-path grouped-buffers selected-buffer))))
       (switch-to-buffer selected-buffer))))
 
 ;;;###autoload
@@ -164,12 +165,7 @@ group path."
 
 (defun bufler-workspace-set-frame-name (path)
   "Set current frame's name according to PATH."
-  (let ((name (format "Workspace: %s" path)))
-    (set-frame-name name)))
-
-(defun bufler-workspace-set-mode-line (path)
-  "Set current frame's name according to PATH."
-  (let ((name (format "Workspace: %s" path)))
+  (let ((name (format "Workspace: %s" (bufler-format-path path))))
     (set-frame-name name)))
 
 (cl-defun bufler-workspace-read-item (tree &key (leaf-key #'identity))

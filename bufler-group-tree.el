@@ -89,7 +89,9 @@
                                    (buffer (push (append path (list name node))
                                                  paths)))))))
       (dolist (node tree)
-        (collect-paths nil node))
+        (cl-typecase node
+          (atom (push (list node) paths))
+          (list (collect-paths nil node))))
       (nreverse paths))))
 
 (defun bufler-group-tree-at (path group)
