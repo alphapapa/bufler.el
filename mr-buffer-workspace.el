@@ -54,7 +54,6 @@ Interactively, choose workspace path with completion.  Return the
 path."
   (interactive
    (list
-    ;; This has gotten pretty ugly.
     (let* ((grouped-buffers (mr-buffer-buffers))
            (buffer-paths (group-tree-paths grouped-buffers))
            group-paths alist)
@@ -63,8 +62,7 @@ path."
                             (push path group-paths)
                             (push-subpaths (butlast path))))
                   (path-cons
-                   (path) (cons (mr-buffer-format-path path) path))
-                  )
+                   (path) (cons (mr-buffer-format-path path) path)))
         (thread-last buffer-paths
           (mapcar #'butlast)
           (mapc #'push-subpaths))

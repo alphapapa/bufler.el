@@ -4,7 +4,7 @@
 
 ;; Author: Adam Porter <adam@alphapapa.net>
 ;; URL: https://github.com/alphapapa/mr-buffer.el
-;; Package-Version: 0.1
+;; Package-Version: 0.2-pre
 ;; Package-Requires: ((emacs "26.3") (dash "2.17") (dash-functional "2.17") (f "0.17") (magit-section "0.1"))
 ;; Keywords: convenience
 
