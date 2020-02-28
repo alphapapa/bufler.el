@@ -1,4 +1,4 @@
-;;; bufler.el --- Bufler, the buffer and workspace manager  -*- lexical-binding: t; -*-
+;;; bufler.el --- Group buffers into workspaces with programmable rules  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  Adam Porter
 
