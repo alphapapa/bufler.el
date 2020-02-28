@@ -554,6 +554,8 @@ NAME, okay, `checkdoc'?"
 
 ;; This seems to work better than I expected.
 
+;; FIXME: Use `bufler-group-tree-defmacro'.
+
 ;;;###autoload
 (defmacro bufler-defgroups (&rest groups)
   "Expand GROUPS into a group definition suitable for `bufler-groups'.
