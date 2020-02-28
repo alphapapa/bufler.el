@@ -156,8 +156,8 @@ string, not in group headers.")
 (define-derived-mode bufler-list-mode magit-section-mode "Bufler")
 
 ;;;###autoload
-(defun bufler ()
-  "Show Bufler."
+(defun bufler-list ()
+  "Show Bufler's list."
   (interactive)
   (cl-labels
       ;; This gets a little hairy because we have to wrap `-group-by'
@@ -220,6 +220,9 @@ string, not in group headers.")
         (setf buffer-read-only t)
         (pop-to-buffer (current-buffer))
         (goto-char pos)))))
+
+;;;###autoload
+(defalias 'bufler #'bufler-list)
 
 ;;;;; Buffer commands
 
