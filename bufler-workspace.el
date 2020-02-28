@@ -189,14 +189,14 @@ Completion is done in steps when descending into branches."
 
 (defun bufler-workspace-read-group-path (groups)
   "Return a path to a group in GROUPS read with completion."
-  (cl-labels ((read-group
-               (items last-key)
+  (cl-labels ((read-path
+               (items &optional last-key)
                (cl-typecase (car items)
                  (list (list last-key
                              (let ((key (completing-read "Group: " (mapcar #'car items))))
-                               (read-group (alist-get key items nil nil #'string=) key))))
+                               (read-path (alist-get key items nil nil #'string=) key))))
                  (atom last-key))))
-    (let ((path (cadr (read-group groups nil))))
+    (let ((path (cadr (read-path groups))))
       (cl-typecase path
         (list path)
         (atom (list path))))))
