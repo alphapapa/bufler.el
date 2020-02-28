@@ -99,15 +99,13 @@ group, select from buffers in all groups and set current group."
     (let* ((bufler-vc-state nil)
            (path (unless all-p
                    (frame-parameter nil 'bufler-workspace-path)))
-           (grouped-buffers (bufler-buffers :path path))
-           (paths (bufler-group-tree-paths grouped-buffers))
-           (buffers (mapcar #'path-cons paths))
+           (buffers (bufler-buffer-alist-at path))
            (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers))
                                        buffers nil nil #'string=)))
       (unless path
         ;; Selected from all buffers: change the workspace.
         (when bufler-workspace-switch-buffer-sets-workspace
-          (bufler-frame-workspace (butlast (bufler-group-tree-leaf-path grouped-buffers selected-buffer)))))
+          (bufler-frame-workspace (butlast (bufler-group-tree-leaf-path (bufler-buffers) selected-buffer)))))
       (switch-to-buffer selected-buffer))))
 
 ;;;###autoload
@@ -144,6 +142,26 @@ appear in a named workspace, the buffer must be matched by an
   (setq-local bufler-workspace-name name))
 
 ;;;; Functions
+
+(cl-defun bufler-buffer-alist-at (path)
+  "Return alist of (display . buffer) cells at PATH.
+Each cell is suitable for completion functions."
+  (interactive "P")
+  (cl-labels ((format-heading
+               (heading level) (propertize heading
+                                           'face (bufler-level-face level)))
+              (format-path
+               (path) (string-join (cl-loop for level from 0
+                                            for element in path
+                                            collect (cl-typecase element
+                                                      (string (format-heading element level))
+                                                      (buffer (buffer-name element))))
+                                   bufler-group-path-separator))
+              (path-cons
+               (path) (cons (format-path (-non-nil path)) (-last-item path))))
+    (let* ((grouped-buffers (bufler-buffers :path path))
+           (paths (bufler-group-tree-paths grouped-buffers)))
+      (mapcar #'path-cons paths))))
 
 (cl-defun bufler-read-from-alist (prompt alist &key (keyfn #'identity) (testfn #'equal))
   "Return a value from ALIST by reading a key with completion."

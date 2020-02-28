@@ -38,7 +38,7 @@
                     (let* ((bufler-vc-state nil)
                            (group-path (frame-parameter nil 'bufler-workspace-path)))
                       (when group-path
-                        (mapcar #'buffer-name (bufler-group-tree-at group-path (bufler-buffers))))))
+                        (bufler-buffer-alist-at group-path))))
       :action 'helm-type-buffer-actions)
     "Helm source for `bufler'."))
 
