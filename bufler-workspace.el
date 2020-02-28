@@ -51,7 +51,7 @@
 ;;;; Commands
 
 ;;;###autoload
-(defun bufler-workspace-set (path)
+(defun bufler-frame-workspace (path)
   "Set active workspace for the current frame to the one at PATH.
 Interactively, choose workspace path with completion.  Return the
 path."
@@ -77,9 +77,6 @@ path."
   (set-frame-parameter nil 'bufler-workspace-path-formatted (bufler-format-path path))
   (run-hook-with-args 'bufler-workspace-set-hook path)
   path)
-
-;;;###autoload
-(defalias 'bufler-set-workspace #'bufler-workspace-set)
 
 ;;;###autoload
 (defun bufler-workspace-switch-buffer (&optional all-p)
@@ -110,7 +107,7 @@ group, select from buffers in all groups and set current group."
       (unless path
         ;; Selected from all buffers: change the workspace.
         (when bufler-workspace-switch-buffer-sets-workspace
-          (bufler-workspace-set (butlast (bufler-group-tree-leaf-path grouped-buffers selected-buffer)))))
+          (bufler-frame-workspace (butlast (bufler-group-tree-leaf-path grouped-buffers selected-buffer)))))
       (switch-to-buffer selected-buffer))))
 
 ;;;###autoload
@@ -131,7 +128,7 @@ group, select from buffers in all groups and set current group."
 ;;;###autoload
 (defalias 'bufler-workspace-mode #'bufler-mode)
 
-(defun bufler-set-buffer-workspace (&optional unset-p)
+(defun bufler-buffer-workspace (&optional unset-p)
   "Set current buffer's workspace name.
 If UNSET-P (interactively, with prefix), unset the buffer's
 workspace name.  This sets the buffer-local variable

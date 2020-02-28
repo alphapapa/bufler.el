@@ -85,13 +85,13 @@ group.
 ‘bufler-switch-buffer’
      Switch to a buffer selected from the frame’s workspace.  With
      prefix, select from all buffers and change the frame’s workspace.
-‘bufler-set-workspace’
+‘bufler-frame-workspace’
      Set the frame’s workspace.  Setting the workspace is done
      automatically by bufler-switch-buffer, but this command may be used
      to set the workspace to a group containing other groups, after
      which bufler-switch-buffer will present buffers from the selected
      group and its subgroups.
-‘bufler-set-buffer-workspace’
+‘bufler-buffer-workspace’
      Set the current buffer’s workspace name.  With prefix, unset it.
      Note that, in order for a buffer to appear in a named workspace,
      the buffer must be matched by an ‘auto-workspace’ group before any
@@ -310,14 +310,14 @@ Node: Top224
 Node: Screenshots888
 Node: Installation1268
 Node: Usage1563
-Node: Bindings2742
-Node: Defining groups3192
-Node: Changelog9109
-Node: 02-pre9255
-Node: 019397
-Node: Credits9500
-Node: Development10045
-Node: License10214
+Node: Bindings2740
+Node: Defining groups3190
+Node: Changelog9107
+Node: 02-pre9253
+Node: 019395
+Node: Credits9498
+Node: Development10043
+Node: License10212
 
 End Tag Table
 
