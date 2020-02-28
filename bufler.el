@@ -61,7 +61,8 @@
     (define-key map (kbd "k") #'bufler-command-kill)
     (define-key map (kbd "s") #'bufler-command-save)
     (define-key map (kbd "w") #'bufler-command-workspace)
-    (define-key map (kbd "RET") #'bufler-command-pop)
+    (define-key map (kbd "RET") #'bufler-command-switch)
+    (define-key map (kbd "SPC") #'bufler-command-pop)
     map))
 
 (defvar bufler-emacs-source-directory
@@ -250,7 +251,8 @@ string, not in group headers.")
               (buffer-p (eq 'bufler-buffer (oref section type))))
     (pop-to-buffer (oref section value))))
 
-(cl-defmacro bufler-define-buffer-command (name docstring command &key let*)
+(cl-defmacro bufler-define-buffer-command (name docstring command
+                                                &key let* (refresh-p t))
   "Define an Bufler command to call COMMAND on selected buffers.
 It is named `bufler-command-NAME' and uses DOCSTRING.
 
@@ -262,13 +264,19 @@ NAME, okay, `checkdoc'?"
      (when-let* ((sections (or (magit-region-sections) (list (magit-current-section)))))
        (let* ,let*
          (bufler--map-sections ,command sections)
-         (bufler)))))
+         ,(when refresh-p
+            `(bufler))))))
 
 (bufler-define-buffer-command kill "Kill buffer."
   #'kill-buffer)
 
 (bufler-define-buffer-command pop "Pop to buffer."
-  #'pop-to-buffer)
+  #'pop-to-buffer
+  :refresh-p nil)
+
+(bufler-define-buffer-command switch "Switch to buffer."
+  #'switch-to-buffer
+  :refresh-p nil)
 
 (bufler-define-buffer-command save "Save buffer."
   (lambda (buffer)
