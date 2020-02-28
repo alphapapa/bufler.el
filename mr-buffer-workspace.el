@@ -47,12 +47,6 @@
 
 ;;;; Commands
 
-(defun mr-buffer-no-nils (elem)
-  ;; Isn't there a more standard way to do this?
-  (cl-typecase elem
-    (atom elem)
-    (list (delq 'nil (mapcar #'no-nils elem)))))
-
 ;;;###autoload
 (defun mr-buffer-workspace-set (path)
   "Set active workspace for the current frame to the one at PATH.
