@@ -1,4 +1,4 @@
-;;; helm-buffer-groups.el --- Helm for buffer-groups  -*- lexical-binding: t; -*-
+;;; helm-bufler.el --- Helm for bufler  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  Adam Porter
 
@@ -55,6 +55,6 @@
 
 ;;;; Footer
 
-(provide 'helm-buffer-groups)
+(provide 'helm-bufler)
 
-;;; helm-buffer-groups.el ends here
+;;; helm-bufler.el ends here
