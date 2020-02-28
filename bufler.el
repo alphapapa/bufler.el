@@ -73,12 +73,25 @@
   "The directory containing the installed source code for this Emacs.
 Usually this will be something like \"/usr/share/emacs/VERSION\".")
 
+(defvar bufler-cache nil
+  "Cache of computed buffer groups.")
+
 ;;;; Customization
 
 (defgroup bufler nil
   "Like Ibuffer, but using Magit-Section sections."
   :link '(url-link "https://github.com/alphapapa/bufler.el")
   :group 'convenience)
+
+(defcustom bufler-use-cache t
+  "Cache computed buffer groups.
+Since a buffer's directory, mode, project directory, etc. rarely
+change, the computed buffer groups can be reused without loss of
+accuracy, most of the time.  Disable if you want the groups to
+always be recomputed.  Enable if you notice any slowness in
+generating the buffer groups (which is dependent on the number of
+buffers and how complex the `bufler-groups' rules are)."
+  :type 'boolean)
 
 (defcustom bufler-reverse nil
   "Reverse group order after grouping buffers."
@@ -262,10 +275,18 @@ NAME, okay, `checkdoc'?"
 
 (cl-defun bufler-buffers (&optional (groups bufler-groups))
   "Return buffers grouped by GROUPS."
-  (bufler-group-tree groups (cl-loop with buffers = (buffer-list)
-                                     for fn in bufler-filter-fns
-                                     do (setf buffers (cl-remove-if fn buffers))
-                                     finally return buffers)))
+  (cl-flet ((buffers
+             () (bufler-group-tree groups
+                                   (cl-loop with buffers = (buffer-list)
+                                            for fn in bufler-filter-fns
+                                            do (setf buffers (cl-remove-if fn buffers))
+                                            finally return buffers))))
+    (if bufler-use-cache
+        (let ((hash (sxhash (buffer-list))))
+          (if (equal hash (car bufler-cache))
+              (cdr bufler-cache)
+            (cdr (setf bufler-cache (cons hash (buffers))))))
+      (buffers))))
 
 (defun bufler-level-face (level)
   "Return face for LEVEL."
