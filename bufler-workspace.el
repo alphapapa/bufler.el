@@ -117,13 +117,12 @@ group, select from buffers in all groups and set current group."
 (define-minor-mode bufler-mode
   "When active, set the frame title according to current Mr. Buffer group."
   :global t
-  (if bufler-mode
+  (let ((lighter '(bufler-mode (:eval (bufler-lighter)))))
+    (if bufler-mode
+        (setq-default mode-line-format
+                      (append mode-line-format (list lighter)))
       (setq-default mode-line-format
-                    (append mode-line-format
-                            (list '(bufler-mode (:eval (bufler-lighter))))))
-    (setq-default mode-line-format
-                  (delete '(bufler-mode (:eval (bufler-lighter)))
-                          (default-value 'mode-line-format)))))
+                    (delete lighter (default-value 'mode-line-format))))))
 
 ;;;###autoload
 (defalias 'bufler-workspace-mode #'bufler-mode)
