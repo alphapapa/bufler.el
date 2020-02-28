@@ -26,32 +26,19 @@
 
 ;;; Code:
 
-;;;; Requirements
-
-(require 'helm)
-
 (require 'bufler-workspace)
 
-;; ;;;; Variables
-;;
-(defvar helm-bufler-source
-  (helm-make-source "Bufler's buffers" 'helm-source-sync
-    :candidates (lambda ()
-                  (let* ((bufler-vc-state nil)
-                         (group-path (frame-parameter nil 'bufler-workspace-path)))
-                    (when group-path
-                      (mapcar #'buffer-name (bufler-group-tree-at group-path (bufler-buffers))))))
-    :action 'helm-type-buffer-actions)
-  "Helm source for `bufler'.")
+(when (require 'helm nil 'noerror)
 
-;;;; Customization
-
-
-;;;; Commands
-
-
-;;;; Functions
-
+  (defvar helm-bufler-source
+    (helm-make-source "Bufler's buffers" 'helm-source-sync
+      :candidates (lambda ()
+                    (let* ((bufler-vc-state nil)
+                           (group-path (frame-parameter nil 'bufler-workspace-path)))
+                      (when group-path
+                        (mapcar #'buffer-name (bufler-group-tree-at group-path (bufler-buffers))))))
+      :action 'helm-type-buffer-actions)
+    "Helm source for `bufler'."))
 
 ;;;; Footer
 
