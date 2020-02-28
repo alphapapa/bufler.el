@@ -61,19 +61,22 @@ path."
   (interactive
    (list
     ;; This has gotten pretty ugly.
-    (cl-labels ((no-nils
-                 ;; Isn't there a more standard way to do this?
-                 (elem) (cl-typecase elem
-                          (atom elem)
-                          (list (delq '() (mapcar #'no-nils elem))))))
-      (let* ((paths (thread-last (group-tree-paths (mr-buffer-buffers) nil)
-                      (mapcar #'butlast)
-                      seq-uniq)))
-        (mr-buffer-read-from-alist "Group: " paths :keyfn (lambda (k)
-                                                            (setf k (mr-buffer-no-nils k))
-                                                            (cl-typecase k
-                                                              (atom (mr-buffer-format-path (list k)))
-                                                              (list (mr-buffer-format-path k)))))))))
+    (let* ((grouped-buffers (mr-buffer-buffers))
+           (buffer-paths (group-tree-paths grouped-buffers))
+           group-paths alist)
+      (cl-labels ((push-subpaths
+                   (path) (when path
+                            (push path group-paths)
+                            (push-subpaths (butlast path))))
+                  (path-cons
+                   (path) (cons (mr-buffer-format-path path) path))
+                  )
+        (thread-last buffer-paths
+          (mapcar #'butlast)
+          (mapc #'push-subpaths))
+        (setf group-paths (seq-uniq group-paths)
+              alist (mapcar #'path-cons group-paths))
+        (mr-buffer-read-from-alist "Group: " alist)))))
   (set-frame-parameter nil 'mr-buffer-workspace-path path)
   (run-hook-with-args 'mr-buffer-workspace-set-hook path)
   path)
@@ -142,7 +145,9 @@ group path."
 (defun mr-buffer-format-path (path)
   "Return PATH formatted as a string."
   (string-join (cl-loop for level from 0
-                        for element in path
+                        for element in (delq 'nil path)
+                        do (unless element
+                             (cl-decf level))
                         collect (cl-typecase element
                                   (string (propertize element
                                                       'face (mr-buffer-level-face level)))
