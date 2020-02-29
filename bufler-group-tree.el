@@ -86,6 +86,25 @@
       (dolist (node tree)
         (leaf-path leaf nil node)))))
 
+;; Unused, but might be useful someday.
+;; (defun bufler-group-tree-node-path (tree name)
+;;   "Return path to node NAME in TREE."
+;;   ;; Unfortunately, this is subtly different from finding a leaf path
+;;   ;; (or I haven't figured out how to generalize it yet).
+;;   ;; FIXME: This assumes unique node names, which doesn't make sense
+;;   ;; in a hierarchy.
+;;   (cl-labels ((node-path
+;;                (name path tree) (pcase-let* ((`(,this-name . ,nodes) tree))
+;;                                   (if (equal name this-name)
+;;                                       (throw :found (append path (list name))))
+;;                                   (dolist (node nodes)
+;;                                     (when (listp node)
+;;                                       (node-path name (append path (list this-name))
+;;                                                  node))))))
+;;     (catch :found
+;;       (dolist (node tree)
+;;         (node-path name nil node)))))
+
 (cl-defun bufler-group-tree-paths (tree)
   "Return list of paths to nodes in TREE."
   (let (paths)
