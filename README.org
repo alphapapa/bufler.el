@@ -284,7 +284,7 @@ GPLv3
 
 #+TEXINFO_DIR_CATEGORY: Emacs
 #+TEXINFO_DIR_TITLE: Bufler: (bufler)
-#+TEXINFO_DIR_DESC: Like Ibuffer, with flexible grouping in hierarchical sections
+#+TEXINFO_DIR_DESC: Group buffers into workspaces with programmable rules, and easily switch to and manipulate them.
 
 # NOTE: We could use these, but that causes a pointless error, "org-compile-file: File "..README.info" wasn't produced...", so we just rename the files in the after-save-hook instead.
 # #+TEXINFO_FILENAME: bufler.info

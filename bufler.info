@@ -2,7 +2,7 @@ This is README.info, produced by makeinfo version 5.2 from README.texi.
 
 INFO-DIR-SECTION Emacs
 START-INFO-DIR-ENTRY
-* Bufler: (bufler).     Like Ibuffer, with flexible grouping in hierarchical sections.
+* Bufler: (bufler).     Group buffers into workspaces with programmable rules, and easily switch to and manipulate them.
 END-INFO-DIR-ENTRY
 
 
@@ -430,22 +430,22 @@ GPLv3
 
 
 Tag Table:
-Node: Top224
-Node: Screenshots948
-Node: Installation1474
-Node: Usage1769
-Node: Commands1995
-Node: Bindings3122
-Node: Defining groups3668
-Node: Helm support9699
-Node: Prism support10312
-Node: Compared to Ibuffer10741
-Node: Changelog14326
-Node: 02-pre14486
-Node: 0114628
-Node: Credits14731
-Node: Development15276
-Node: License15445
+Node: Top258
+Node: Screenshots982
+Node: Installation1508
+Node: Usage1803
+Node: Commands2029
+Node: Bindings3156
+Node: Defining groups3702
+Node: Helm support9733
+Node: Prism support10346
+Node: Compared to Ibuffer10775
+Node: Changelog14360
+Node: 02-pre14520
+Node: 0114662
+Node: Credits14765
+Node: Development15310
+Node: License15479
 
 End Tag Table
 
