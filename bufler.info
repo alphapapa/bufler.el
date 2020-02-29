@@ -42,8 +42,8 @@ Changelog
 Bufler is like a butler for your buffers, presenting them to you in an
 organized way based on your instructions.  The instructions are written
 as grouping rules in a simple language, allowing you to customize the
-way buffers are grouped.  The default instructions are designed to be
-generally useful, so you don’t have to write your own rules.
+way buffers are grouped.  The default rules are designed to be generally
+useful, so you don’t have to write your own.
 
 
 File: README.info,  Node: Screenshots,  Next: Installation,  Prev: Top,  Up: Top
@@ -390,18 +390,18 @@ GPLv3
 
 Tag Table:
 Node: Top224
-Node: Screenshots913
-Node: Installation1677
-Node: Usage1972
-Node: Bindings3159
-Node: Defining groups3688
-Node: Compared to Ibuffer9698
-Node: Changelog13367
-Node: 02-pre13527
-Node: 0113669
-Node: Credits13772
-Node: Development14317
-Node: License14486
+Node: Screenshots900
+Node: Installation1664
+Node: Usage1959
+Node: Bindings3146
+Node: Defining groups3675
+Node: Compared to Ibuffer9685
+Node: Changelog13354
+Node: 02-pre13514
+Node: 0113656
+Node: Credits13759
+Node: Development14304
+Node: License14473
 
 End Tag Table
 

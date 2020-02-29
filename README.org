@@ -8,7 +8,7 @@
 
 # [[https://melpa.org/#/package-name][file:https://melpa.org/packages/sbuffer-badge.svg]] [[https://stable.melpa.org/#/package-name][file:https://stable.melpa.org/packages/sbuffer-badge.svg]]
 
-Bufler is like a butler for your buffers, presenting them to you in an organized way based on your instructions.  The instructions are written as grouping rules in a simple language, allowing you to customize the way buffers are grouped.  The default instructions are designed to be generally useful, so you don't have to write your own rules.
+Bufler is like a butler for your buffers, presenting them to you in an organized way based on your instructions.  The instructions are written as grouping rules in a simple language, allowing you to customize the way buffers are grouped.  The default rules are designed to be generally useful, so you don't have to write your own.
 
 * Screenshots
 :PROPERTIES:
