@@ -48,7 +48,7 @@
         :header-name (lambda (_name)
                        (concat "Bufler"
                                (unless current-prefix-arg
-                                 (concat ":" (bufler-format-path (frame-parameter nil 'bufler-workspace-path))))))
+                                 (concat ": " (bufler-format-path (frame-parameter nil 'bufler-workspace-path))))))
         :candidates (lambda ()
                       (let* ((bufler-vc-state nil)
                              (group-path (unless current-prefix-arg
