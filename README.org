@@ -23,10 +23,6 @@ This screenshot compares Bufler and Ibuffer showing the same buffers with the de
 
 [[images/vs-ibuffer-doom-one.png]]
 
-This screenshot shows group faces themed by [[https://github.com/alphapapa/prism.el][prism]], which Bufler optionally supports.  (*Note:* This screenshot is of an older version of the package, but is still accurate except for the name.)
-
-[[images/screenshot.png]]
-
 * Contents                                                         :noexport:
 :PROPERTIES:
 :TOC:      :include siblings :depth 1 :force depth
@@ -75,8 +71,9 @@ Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like t
 :CONTENTS:
 - [[#commands][Commands]]
 - [[#bindings][Bindings]]
-- [[#helm-support][Helm support]]
 - [[#defining-groups][Defining groups]]
+- [[#helm-support][Helm support]]
+- [[#prism-support][Prism support]]
 :END:
 
 ** Commands
@@ -101,22 +98,6 @@ In the Bufler buffer list, these keys are available (use =C-h m= to get the most
 +  =k=  Kill buffers.
 +  =s=  Save buffers.
 +  =w=  Set workspace name.
-
-** Helm support
-
-Bufler does not require nor depend on Helm, but it provides optional support for it in =helm-bufler.el= in the form of =helm-bufler-source=, a Helm source that shows buffers in the current workspace (or when the Helm command is called with =C-u=, all buffers).  It looks like this when showing all buffers:
-
-[[images/helm-bufler.png]]
-
-Use it like this:
-
-#+BEGIN_SRC elisp
-  (require 'helm-bufler)
-
-  (helm :sources '(helm-bufler-source))
-#+END_SRC
-
-Or you can use the source in an existing Helm command, like =helm-find-files=.
 
 ** Defining groups
 
@@ -212,6 +193,28 @@ The following group types are available in =bufler-defgroups=.  Note that each o
      -  ~mode-match (NAME REGEXP)~ Match a regular expression against the buffer's major-mode.
 +  Other types ::
      -  ~dir (DIRS DEPTH)~  Groups buffers which match one of the given DIRS.  DIRS may be one or a list of directory paths.  DEPTH may be nil or a depth above which to produce subdirectory groups (a feature probably broken at the moment).  See example above.
+
+** Helm support
+
+Bufler does not require nor depend on Helm, but it provides optional support for it in =helm-bufler.el= in the form of =helm-bufler-source=, a Helm source that shows buffers in the current workspace (or when the Helm command is called with =C-u=, all buffers).  It looks like this when showing all buffers:
+
+[[images/helm-bufler.png]]
+
+Use it like this:
+
+#+BEGIN_SRC elisp
+  (require 'helm-bufler)
+
+  (helm :sources '(helm-bufler-source))
+#+END_SRC
+
+Or you can use the source in an existing Helm command, like =helm-find-files=.
+
+** Prism support
+
+Bufler does not require nor depend on [[https://github.com/alphapapa/prism.el][Prism]], but you can use Prism's level faces with Bufler by using =M-x customize-option RET bufler-face-prefix RET= and choosing the =Prism faces= option.  For example (showing an earlier version of the package, when it was called Sbuffer):
+
+[[images/prism.png]]
 
 * Compared to Ibuffer
 

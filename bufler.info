@@ -30,8 +30,9 @@ Usage
 
 * Commands::
 * Bindings::
-* Helm support::
 * Defining groups::
+* Helm support::
+* Prism support::
 
 
 
@@ -62,11 +63,6 @@ Bufler list would kill all the buffers in the group
 Project: ~/src/emacs/bufler.el (and, of course, since it calls
 kill-buffer, any unsaved ones would ask to be saved first).
 
-   This screenshot shows group faces themed by prism
-(https://github.com/alphapapa/prism.el), which Bufler optionally
-supports.  (*Note:* This screenshot is of an older version of the
-package, but is still accurate except for the name.)
-
 
 File: README.info,  Node: Installation,  Next: Usage,  Prev: Screenshots,  Up: Top
 
@@ -85,13 +81,14 @@ File: README.info,  Node: Usage,  Next: Compared to Ibuffer,  Prev: Installation
 3 Usage
 *******
 
-   • • • • 
+   • • • • • 
 * Menu:
 
 * Commands::
 * Bindings::
-* Helm support::
 * Defining groups::
+* Helm support::
+* Prism support::
 
 
 File: README.info,  Node: Commands,  Next: Bindings,  Up: Usage
@@ -123,7 +120,7 @@ group.
      other group.
 
 
-File: README.info,  Node: Bindings,  Next: Helm support,  Prev: Commands,  Up: Usage
+File: README.info,  Node: Bindings,  Next: Defining groups,  Prev: Commands,  Up: Usage
 
 3.2 Bindings
 ============
@@ -142,30 +139,9 @@ section at point.
    • w Set workspace name.
 
 
-File: README.info,  Node: Helm support,  Next: Defining groups,  Prev: Bindings,  Up: Usage
+File: README.info,  Node: Defining groups,  Next: Helm support,  Prev: Bindings,  Up: Usage
 
-3.3 Helm support
-================
-
-Bufler does not require nor depend on Helm, but it provides optional
-support for it in helm-bufler.el in the form of helm-bufler-source, a
-Helm source that shows buffers in the current workspace (or when the
-Helm command is called with C-u, all buffers).  It looks like this when
-showing all buffers:
-
-   Use it like this:
-
-     (require 'helm-bufler)
-
-     (helm :sources '(helm-bufler-source))
-
-   Or you can use the source in an existing Helm command, like
-helm-find-files.
-
-
-File: README.info,  Node: Defining groups,  Prev: Helm support,  Up: Usage
-
-3.4 Defining groups
+3.3 Defining groups
 ===================
 
 _See the bufler info page to view this information in Emacs._
@@ -290,6 +266,40 @@ funcall (see example above).
           DIRS. DIRS may be one or a list of directory paths.  DEPTH may
           be nil or a depth above which to produce subdirectory groups
           (a feature probably broken at the moment).  See example above.
+
+
+File: README.info,  Node: Helm support,  Next: Prism support,  Prev: Defining groups,  Up: Usage
+
+3.4 Helm support
+================
+
+Bufler does not require nor depend on Helm, but it provides optional
+support for it in helm-bufler.el in the form of helm-bufler-source, a
+Helm source that shows buffers in the current workspace (or when the
+Helm command is called with C-u, all buffers).  It looks like this when
+showing all buffers:
+
+   Use it like this:
+
+     (require 'helm-bufler)
+
+     (helm :sources '(helm-bufler-source))
+
+   Or you can use the source in an existing Helm command, like
+helm-find-files.
+
+
+File: README.info,  Node: Prism support,  Prev: Helm support,  Up: Usage
+
+3.5 Prism support
+=================
+
+Bufler does not require nor depend on Prism
+(https://github.com/alphapapa/prism.el), but you can use Prism’s level
+faces with Bufler by using
+M-x customize-option RET bufler-face-prefix RET and choosing the
+Prism faces option.  For example (showing an earlier version of the
+package, when it was called Sbuffer):
 
 
 File: README.info,  Node: Compared to Ibuffer,  Next: Changelog,  Prev: Usage,  Up: Top
@@ -422,20 +432,21 @@ GPLv3
 
 Tag Table:
 Node: Top224
-Node: Screenshots930
-Node: Installation1694
-Node: Usage1989
-Node: Commands2193
-Node: Bindings3320
-Node: Helm support3863
-Node: Defining groups4471
-Node: Compared to Ibuffer10485
-Node: Changelog14154
-Node: 02-pre14314
-Node: 0114456
-Node: Credits14559
-Node: Development15104
-Node: License15273
+Node: Screenshots948
+Node: Installation1474
+Node: Usage1769
+Node: Commands1995
+Node: Bindings3122
+Node: Defining groups3668
+Node: Helm support9699
+Node: Prism support10312
+Node: Compared to Ibuffer10741
+Node: Changelog14410
+Node: 02-pre14570
+Node: 0114712
+Node: Credits14815
+Node: Development15360
+Node: License15529
 
 End Tag Table
 
