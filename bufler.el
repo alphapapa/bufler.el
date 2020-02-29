@@ -141,6 +141,14 @@ get correct results."
   "Predicates that determine whether to annotate a buffer with its major mode."
   :type '(repeat function))
 
+(defcustom bufler-list-group-separators nil
+  "Strings inserted after groups of certain levels.
+May be used to add extra space between groups in `bufler-list'."
+  :type '(choice (const :tag "No extra space" nil)
+                 (const :tag "Blank line after top-level groups"
+                        ((0 . "\n")))
+                 (alist :key-type (integer :tag "Group level") :value-type (string :tag "Suffix string"))))
+
 ;;;;; Faces
 
 (defface bufler-group
@@ -199,7 +207,8 @@ string, not in group headers.")
                                 (--each things
                                   (insert-thing it level))))
                         (_ (pcase-let* ((`(,type . ,things) group)
-                                        (num-buffers 0))
+                                        (num-buffers 0)
+                                        (suffix (alist-get level bufler-list-group-separators)))
                              ;; This almost seems lazy, using `-tree-map-nodes'
                              ;; with `bufferp', but it works, and it's correct,
                              ;; and since `bufferp' is in C, maybe it's even fast.
@@ -214,12 +223,15 @@ string, not in group headers.")
                                  (propertize (format " (%s)" num-buffers)
                                              'face 'bufler-size))
                                (--each things
-                                 (insert-thing it (1+ level))))))) )
+                                 (insert-thing it (1+ level)))
+                               (when suffix
+                                 (insert suffix)))))) )
        (format-group
-        (group level) (propertize (cl-typecase group
-                                    (string group)
-                                    (otherwise (prin1-to-string group)))
-                                  'face (list :inherit (list 'bufler-group (bufler-level-face level)))))
+        (group level) (let* ((string (cl-typecase group
+                                       (string group)
+                                       (otherwise (prin1-to-string group)))))
+                        (propertize string
+                                    'face (list :inherit (list 'bufler-group (bufler-level-face level))))))
        (hidden-p (buffer)
                  (string-prefix-p " " (buffer-name buffer)))
        (as-string
