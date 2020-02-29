@@ -337,6 +337,7 @@ NAME, okay, `checkdoc'?"
               (path (nreverse
                      (cl-loop with this-section = section
                               while this-section
+			      unless (bufferp (oref this-section value))
                               collect (cl-typecase (oref this-section value)
                                         (bufler-group (bufler-group-type (oref this-section value)))
                                         (otherwise (oref this-section value)))
