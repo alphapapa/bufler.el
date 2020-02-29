@@ -272,8 +272,8 @@ example, to group project A’s buffers into one group, and project B’s
 into another, Ibuffer requires the user to make a group for each
 project.  Bufler provides a set of automatic grouping rules that create
 groups automatically.  For example, auto-project automatically creates
-groups per-project, so the user would only have to specify ‘(group
-(auto-project))’, and Bufler would create one group for project A’s
+groups per-project, so the user would only have to specify
+‘(auto-project)’, and Bufler would create one group for project A’s
 buffers and another for project B’s.  When those projects’ buffers are
 closed, the groups are automatically removed.
 
@@ -390,12 +390,12 @@ Node: Usage1588
 Node: Bindings2775
 Node: Defining groups3304
 Node: Compared to Ibuffer9314
-Node: Changelog13058
-Node: 02-pre13218
-Node: 0113360
-Node: Credits13463
-Node: Development14008
-Node: License14177
+Node: Changelog13050
+Node: 02-pre13210
+Node: 0113352
+Node: Credits13455
+Node: Development14000
+Node: License14169
 
 End Tag Table
 
