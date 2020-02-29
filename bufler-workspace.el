@@ -117,10 +117,10 @@ group, select from buffers in all groups and set current group."
   :global t
   (let ((lighter '(bufler-mode (:eval (bufler-lighter)))))
     (if bufler-mode
-        (setq-default mode-line-format
-                      (append mode-line-format (list lighter)))
-      (setq-default mode-line-format
-                    (delete lighter (default-value 'mode-line-format))))))
+        (setf mode-line-misc-info
+              (append mode-line-misc-info (list lighter)))
+      (setf mode-line-misc-info
+            (delete lighter mode-line-misc-info)))))
 
 ;;;###autoload
 (defalias 'bufler-workspace-mode #'bufler-mode)
