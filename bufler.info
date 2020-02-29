@@ -310,11 +310,10 @@ doesn’t replace it completely.  Bufler is a very young project.
      bufler-switch-buffer to see all buffers.  (Of course, existing
      commands like switch-to-buffer are not affected; Bufler doesn’t
      interfere with other modes or commands.)
-  6. Maybe make a new frame for a different project: use bufler-list to
-     show the list of buffer groups, then select a group and press f to
-     make the frame.  Then in that frame, use
-     C-u M-x bufler-switch-buffer or M-x bufler-frame-workspace to set
-     the frame to a different workspace.
+  6. Make a new frame for a different project by using bufler-list to
+     show the list of buffer groups, then selecting a group and pressing
+     f to make the frame, which will be automatically set to that
+     group’s workspace.
   7. When you need to kill or save a bunch of buffers at once, use
      bufler-list, put the cursor on a group you want to kill or save,
      and press k or s.  If you want to see which buffers have unsaved
@@ -397,12 +396,12 @@ Node: Usage1972
 Node: Bindings3159
 Node: Defining groups3688
 Node: Compared to Ibuffer9698
-Node: Changelog13434
-Node: 02-pre13594
-Node: 0113736
-Node: Credits13839
-Node: Development14384
-Node: License14553
+Node: Changelog13367
+Node: 02-pre13527
+Node: 0113669
+Node: Credits13772
+Node: Development14317
+Node: License14486
 
 End Tag Table
 
