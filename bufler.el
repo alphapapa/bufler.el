@@ -58,6 +58,7 @@
 (defvar bufler-list-mode-map
   (let ((map (copy-keymap magit-section-mode-map)))
     (define-key map (kbd "g") #'bufler)
+    (define-key map (kbd "f") #'bufler-group-command-frame)
     (define-key map (kbd "k") #'bufler-command-kill)
     (define-key map (kbd "s") #'bufler-command-save)
     (define-key map (kbd "w") #'bufler-command-workspace)
@@ -297,6 +298,46 @@ With prefix, unset it."
                                    (cl-loop for buffer in (buffer-list)
                                             when (buffer-local-value 'bufler-workspace-name buffer)
                                             collect it)))))))
+
+;;;;; Group commands
+
+;; These commands act on a group rather than the buffers within them.
+
+(cl-defmacro bufler-define-group-command (name docstring command
+                                               &key let* (refresh-p t))
+  "Define an Bufler command to call COMMAND on the group at point.
+It is named `bufler-group-command-NAME' and uses DOCSTRING.  It's
+called with two argument: the group struct and the path to the
+group (a list of strings or nil).  If REFRESH-P, update the
+Bufler list after the command.  LET* may be a list of `let*'
+binding forms which are bound around the command.
+
+NAME, okay, `checkdoc'?"
+  (declare (indent defun))
+  `(defun ,(intern (concat "bufler-group-command-" (symbol-name name))) (&rest _args)
+     ,docstring
+     (interactive)
+     (when-let* ((section (magit-current-section)))
+       (let* ((group (oref section value))
+              (path (nreverse
+                     (cl-loop with this-section = section
+                              while this-section
+                              collect (cl-typecase (oref this-section value)
+                                        (bufler-group (bufler-group-type (oref this-section value)))
+                                        (otherwise (oref this-section value)))
+                              do (setf this-section (when (oref this-section parent)
+                                                      (oref this-section parent)))))))
+         (let* ,let*
+           (funcall ,command group path)
+           ,(when refresh-p
+              `(bufler-list)))))))
+
+(bufler-define-group-command frame
+  "Make a new frame for the group at point."
+  (lambda (_group path)
+    (with-selected-frame (make-frame)
+      (bufler-frame-workspace path)))
+  :refresh-p nil)
 
 ;;;; Functions
 

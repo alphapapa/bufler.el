@@ -117,6 +117,7 @@ section at point.
    • 1 – 4 Cycle section levels at point.
    • M-1 – M-4 Cycle top-level sections.
    • RET Pop to buffer.
+   • f Make a new frame for the group at point.
    • g Refresh Bufler list.
    • k Kill buffers.
    • s Save buffers.
@@ -302,7 +303,9 @@ doesn’t replace it completely.  Bufler is a very young project.
      bufler-switch-buffer to see all buffers.  (Of course, existing
      commands like switch-to-buffer are not affected; Bufler doesn’t
      interfere with other modes or commands.)
-  6. Maybe make a new frame for a different project, then use
+  6. Maybe make a new frame for a different project: use bufler-list to
+     show the list of buffer groups, then select a group and press f to
+     make the frame.  Then in that frame, use
      C-u M-x bufler-switch-buffer or M-x bufler-frame-workspace to set
      the frame to a different workspace.
   7. When you need to kill or save a bunch of buffers at once, use
@@ -385,14 +388,14 @@ Node: Screenshots913
 Node: Installation1293
 Node: Usage1588
 Node: Bindings2775
-Node: Defining groups3254
-Node: Compared to Ibuffer9264
-Node: Changelog12880
-Node: 02-pre13040
-Node: 0113182
-Node: Credits13285
-Node: Development13830
-Node: License13999
+Node: Defining groups3304
+Node: Compared to Ibuffer9314
+Node: Changelog13058
+Node: 02-pre13218
+Node: 0113360
+Node: Credits13463
+Node: Development14008
+Node: License14177
 
 End Tag Table
 

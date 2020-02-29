@@ -86,6 +86,7 @@ In the Bufler buffer list, these keys are available (use =C-h m= to get the most
 +  =1= -- =4= Cycle section levels at point.
 +  =M-1= -- =M-4= Cycle top-level sections.
 +  =RET=  Pop to buffer.
++  =f=  Make a new frame for the group at point.
 +  =g=  Refresh Bufler list.
 +  =k=  Kill buffers.
 +  =s=  Save buffers.
@@ -203,7 +204,7 @@ A workflow using Bufler could be something like this:
 3.  Open some buffers, find some files, etc.
 4.  When you need to switch buffers, use =M-x bufler-switch-buffer=.  The buffers are presented by group with their "outline paths," which makes it easier to find the buffer you're looking for, since they're organized by project, directory, mode, etc.
 5.  The next time you call =bufler-switch-buffer= in that frame, it will only offer buffers from that frame's buffer group, making it easier to find buffers related to the current project.  Or if you need to select a buffer in a different group, use =C-u= with =bufler-switch-buffer= to see all buffers.  (Of course, existing commands like =switch-to-buffer= are not affected; Bufler doesn't interfere with other modes or commands.)
-6.  Maybe make a new frame for a different project, then use =C-u M-x bufler-switch-buffer= or =M-x bufler-frame-workspace= to set the frame to a different workspace.
+6.  Maybe make a new frame for a different project: use =bufler-list= to show the list of buffer groups, then select a group and press =f= to make the frame.  Then in that frame, use =C-u M-x bufler-switch-buffer= or =M-x bufler-frame-workspace= to set the frame to a different workspace.
 7.  When you need to kill or save a bunch of buffers at once, use =bufler-list=, put the cursor on a group you want to kill or save, and press =k= or =s=.  If you want to see which buffers have unsaved (indicated with =*=) or uncommitted (indicated with =edited=) changes, you can browse through the list of buffers (enable =bufler-vc-state= to show VC state for each buffer; this is disabled by default because getting up-to-date information on a buffer's VC state can be slow).
 
 Then, you can write your own buffer-grouping rules to make them as simple or as complex as you like.  They're just Lisp functions, so you can do anything with them, but the DSL provided by the macro makes simple ones easy to write.
