@@ -247,6 +247,7 @@ string, not in group headers.")
            pos)
       (when bufler-reverse
         (setf groups (nreverse (-sort #'format< groups))))
+      (setf groups (bufler-sort-groups-frame-workspace groups))
       (with-current-buffer (get-buffer-create "*Bufler*")
         (setf pos (point))
         (bufler-list-mode)
@@ -479,6 +480,53 @@ Each cell is suitable for completion functions."
                          ;; FIXME: This clause should be obsolete since adding `bufler-group'.
                          (list (mapc #'do-thing thing)))))
     (mapc #'do-section sections)))
+
+;;;;; Group sorting
+
+(defun bufler-sort-groups (fns groups)
+  "Return GROUPS sorted by FNS."
+  (dolist (fn fns)
+    (setf groups (funcall fn groups))))
+
+;; (defun bufler-sort-groups-frame-workspace (groups)
+;;   "Return GROUPS sorted by the frame's workspace."
+;;   ;; TODO: Predicate that returns whether a subtree matches a path.
+;;   ;; TODO: Probably generalize this and put it in group-tree.
+;;   ;; For now, I'll just do top-level group sorting rather than recursive.
+;;   (cl-labels ((sort-groups (groups)
+;;                            ))
+;;     (let* ((workspace-path (or (car (frame-parameter nil 'bufler-workspace-path))
+;;                                (cadr (frame-parameter nil 'bufler-workspace-path))))
+;;            (sort-fn (lambda (a b)
+;;                       (cond ((equal (car a) workspace-path)
+;;                              (cond ((equal (car b) workspace-path) nil)
+;;                                    (t t)))
+;;                             ((equal (car b) workspace-path) nil)
+;;                             (t nil)))))
+;;       (sort groups sort-fn))))
+
+(defun bufler-sort-groups-frame-workspace (groups)
+  "Return GROUPS sorted by the frame's workspace."
+  ;; TODO: Predicate that returns whether a subtree matches a path.
+  ;; TODO: Probably generalize this and put it in group-tree.
+  ;; For now, I'll just do top-level group sorting rather than recursive.
+  (let* ((workspace-path (frame-parameter nil 'bufler-workspace-path)))
+    (cl-labels ((groups<
+                 (path a b) (cond ((equal (car a) (car path))
+                                   (cond ((equal (car b) (car path)) nil)
+                                         (t t)))
+                                  ((equal (car b) (car path)) nil)
+                                  (t nil)))
+                (sort-group
+                 (path group) (cl-typecase (cadr group)
+                                (buffer group)
+                                (otherwise (cons (car group)
+                                                 (--sort (groups< (cdr path) it other)
+                                                         (--map (sort-group (cdr path) it)
+                                                                (cdr group))))))))
+      (--sort (groups< workspace-path it other)
+              (--map (sort-group workspace-path it)
+                     groups)))))
 
 ;;;;; Buffer predicates
 
