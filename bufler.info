@@ -320,11 +320,10 @@ groups and buffers to be toggled, marked, and operated on with commands.
 example, to group project A’s buffers into one group, and project B’s
 into another, Ibuffer requires the user to make a group for each
 project.  Bufler provides a set of automatic grouping rules that create
-groups automatically.  For example, auto-project automatically creates
-groups per-project, so the user would only have to specify
-‘(auto-project)’, and Bufler would create one group for project A’s
-buffers and another for project B’s.  When those projects’ buffers are
-closed, the groups are automatically removed.
+groups automatically.  For example, with the rule ‘(auto-project)’,
+Bufler would create one group for project A’s buffers and another for
+project B’s.  When those projects’ buffers are closed, the groups are
+automatically removed.
 
    Bufler also provides optional workspace features in the form of
 bufler-mode, which helps focus a frame on a group of buffers.  When it’s
@@ -441,12 +440,12 @@ Node: Defining groups3668
 Node: Helm support9699
 Node: Prism support10312
 Node: Compared to Ibuffer10741
-Node: Changelog14410
-Node: 02-pre14570
-Node: 0114712
-Node: Credits14815
-Node: Development15360
-Node: License15529
+Node: Changelog14326
+Node: 02-pre14486
+Node: 0114628
+Node: Credits14731
+Node: Development15276
+Node: License15445
 
 End Tag Table
 
