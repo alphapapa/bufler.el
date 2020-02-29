@@ -141,6 +141,8 @@ get correct results."
   "Predicates that determine whether to annotate a buffer with its major mode."
   :type '(repeat function))
 
+;;;;; Faces
+
 (defface bufler-group
   '((t (:underline nil :weight bold)))
   "Face for Bufler groups.")
