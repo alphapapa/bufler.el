@@ -173,6 +173,9 @@ string, not in group headers.")
 
 (define-derived-mode bufler-list-mode magit-section-mode "Bufler")
 
+(cl-defstruct bufler-group
+  type elements)
+
 ;;;###autoload
 (defun bufler-list ()
   "Show Bufler's list."
@@ -200,7 +203,9 @@ string, not in group headers.")
                              (-tree-map-nodes #'bufferp (lambda (&rest _)
                                                           (cl-incf num-buffers))
                                               group)
-                             (magit-insert-section (bufler-group (cdr things))
+                             (magit-insert-section (bufler-group (make-bufler-group
+                                                                  :type type
+                                                                  :elements (cdr things)))
                                (magit-insert-heading (make-string (* 2 level) ? )
                                  (format-group type level)
                                  (propertize (format " (%s)" num-buffers)
@@ -350,17 +355,21 @@ If PATH, return only buffers from the group at PATH."
     (concat name modified-s " " size vc-state mode-annotation)))
 
 (defun bufler--map-sections (fn sections)
-  "Map FN across SECTIONS."
+  "Map FN across buffers in SECTIONS."
   (cl-labels ((do-section
                (section) (if (oref section children)
                              (mapc #'do-section (oref section children))
                            (cl-typecase (oref section value)
+                             (bufler-group (mapc #'do-thing (bufler-group-elements (oref section value))))
                              (list (mapc #'do-thing (oref section value)))
+                             ;; FIXME: This clause should be obsolete since adding `bufler-group'.
                              (buffer (funcall fn (oref section value))))))
               (do-thing
                (thing) (cl-typecase thing
+                         (bufler-group (mapc #'do-thing (bufler-group-elements thing)))
                          (buffer (funcall fn thing))
                          (magit-section (do-section thing))
+                         ;; FIXME: This clause should be obsolete since adding `bufler-group'.
                          (list (mapc #'do-thing thing)))))
     (mapc #'do-section sections)))
 
