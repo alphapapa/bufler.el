@@ -58,12 +58,12 @@
 (defvar bufler-list-mode-map
   (let ((map (copy-keymap magit-section-mode-map)))
     (define-key map (kbd "g") #'bufler)
-    (define-key map (kbd "f") #'bufler-group-command-frame)
-    (define-key map (kbd "k") #'bufler-command-kill)
-    (define-key map (kbd "s") #'bufler-command-save)
-    (define-key map (kbd "w") #'bufler-command-workspace)
-    (define-key map (kbd "RET") #'bufler-command-switch)
-    (define-key map (kbd "SPC") #'bufler-command-pop)
+    (define-key map (kbd "f") #'bufler-list-group-frame)
+    (define-key map (kbd "k") #'bufler-list-buffer-kill)
+    (define-key map (kbd "s") #'bufler-list-buffer-save)
+    (define-key map (kbd "w") #'bufler-list-buffer-workspace)
+    (define-key map (kbd "RET") #'bufler-list-buffer-switch)
+    (define-key map (kbd "SPC") #'bufler-list-buffer-pop)
     map))
 
 (defvar bufler-emacs-source-directory
@@ -266,14 +266,14 @@ string, not in group headers.")
 (cl-defmacro bufler-define-buffer-command (name docstring command
                                                 &key let* (refresh-p t))
   "Define an Bufler command to call COMMAND on selected buffers.
-It is named `bufler-command-NAME' and uses DOCSTRING.  If
+It is named `bufler-list-buffer-NAME' and uses DOCSTRING.  If
 REFRESH-P, update the Bufler list after the command.  LET* may be
 a list of `let*' binding forms which are bound around the
 command.
 
 NAME, okay, `checkdoc'?"
   (declare (indent defun))
-  `(defun ,(intern (concat "bufler-command-" (symbol-name name))) (&rest _args)
+  `(defun ,(intern (concat "bufler-list-buffer-" (symbol-name name))) (&rest _args)
      ,docstring
      (interactive)
      (when-let* ((sections (or (magit-region-sections) (list (magit-current-section)))))
@@ -320,7 +320,7 @@ With prefix, unset it."
 (cl-defmacro bufler-define-group-command (name docstring command
                                                &key let* (refresh-p t))
   "Define an Bufler command to call COMMAND on the group at point.
-It is named `bufler-group-command-NAME' and uses DOCSTRING.  It's
+It is named `bufler-list-group-NAME' and uses DOCSTRING.  It's
 called with two argument: the group struct and the path to the
 group (a list of strings or nil).  If REFRESH-P, update the
 Bufler list after the command.  LET* may be a list of `let*'
@@ -328,7 +328,7 @@ binding forms which are bound around the command.
 
 NAME, okay, `checkdoc'?"
   (declare (indent defun))
-  `(defun ,(intern (concat "bufler-group-command-" (symbol-name name))) (&rest _args)
+  `(defun ,(intern (concat "bufler-list-group-" (symbol-name name))) (&rest _args)
      ,docstring
      (interactive)
      (when-let* ((section (magit-current-section)))
