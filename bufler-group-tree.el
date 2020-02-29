@@ -3,6 +3,8 @@
 ;; Copyright (C) 2020  Adam Porter
 
 ;; Author: Adam Porter <adam@alphapapa.net>
+;; URL: https://github.com/alphapapa/bufler.el
+;; Package-Requires: ((emacs "26.3"))
 ;; Keywords: lisp
 
 ;; This program is free software; you can redistribute it and/or modify
@@ -20,8 +22,14 @@
 
 ;;; Commentary:
 
-;; NOTE: When grouping lists (as opposed to other sequences),
-;; `-group-by' from dash.el would be faster.
+;; This file implements recursive, lambda-based sequence-grouping
+;; functions on top of `cl-lib', `map', and `seq'.
+
+;; NOTE: When grouping lists (as opposed to other sequences, but we
+;; only group lists), `-group-by' from dash.el would be somewhat
+;; faster than `seq-group-by'.  However, let's not add more
+;; dependencies than necessary (we already use dash.el in other files,
+;; but let's aim to minimize dependencies).
 
 ;;; Code:
 
@@ -95,7 +103,7 @@
       (nreverse paths))))
 
 (defun bufler-group-tree-at (path tree)
-  "Return item at PATH in GROUP."
+  "Return item at PATH in TREE."
   (cl-letf* ((alist-get-orig (symbol-function 'alist-get))
              ((symbol-function 'alist-get)
               (lambda (key alist &optional default remove _testfn)

@@ -3,6 +3,7 @@
 ;; Copyright (C) 2020  Adam Porter
 
 ;; Author: Adam Porter <adam@alphapapa.net>
+;; Package-Requires: ((emacs "26.3"))
 ;; Keywords: convenience
 
 ;;; License:
@@ -22,7 +23,15 @@
 
 ;;; Commentary:
 
-;;
+;; This file provides a source for Helm commands that shows buffers in
+;; the frame's current Bufler workspace and allows them to be acted
+;; upon using Helm's existing buffer actions list.  You could add it
+;; to an existing Helm command, or use it like this:
+
+;;   (helm :sources '(helm-bufler-source))
+
+;; Note that Bufler does not depend on the Helm package; this support
+;; is optional.
 
 ;;; Code:
 
@@ -30,7 +39,7 @@
 
 (declare-function helm-make-source "helm-source" t t)
 
-(when (require 'helm nil 'noerror)
+(when (require 'helm-source nil 'noerror)
 
   (defvar helm-bufler-source
     (helm-make-source "Bufler's buffers" 'helm-source-sync

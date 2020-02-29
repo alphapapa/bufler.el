@@ -91,7 +91,7 @@ Usually this will be something like \"/usr/share/emacs/VERSION\".")
 
 (defcustom bufler-use-cache t
   "Cache computed buffer groups.
-Since a buffer's directory, mode, project directory, etc. rarely
+Since a buffer's directory, mode, project directory, etc rarely
 change, the computed buffer groups can be reused without loss of
 accuracy, most of the time.  Disable if you want the groups to
 always be recomputed.  Enable if you notice any slowness in
@@ -346,6 +346,7 @@ NAME, okay, `checkdoc'?"
            ,(when refresh-p
               `(bufler-list)))))))
 
+(declare-function bufler-frame-workspace "bufler-workspace")
 (bufler-define-group-command frame
   "Make a new frame for the group at point."
   (lambda (_group path)
@@ -373,6 +374,46 @@ If PATH, return only buffers from the group at PATH."
       (if path
           (bufler-group-tree-at path buffers)
         buffers))))
+
+(cl-defun bufler-buffer-alist-at (path)
+  "Return alist of (display . buffer) cells at PATH.
+Each cell is suitable for completion functions."
+  (interactive "P")
+  (cl-labels ((format-heading
+               (heading level) (propertize heading
+                                           'face (bufler-level-face level)))
+              (format-path
+               (path) (string-join (cl-loop for level from 0
+                                            for element in path
+                                            collect (cl-typecase element
+                                                      (string (format-heading element level))
+                                                      (buffer (buffer-name element))))
+                                   bufler-group-path-separator))
+              (path-cons
+               (path) (cons (format-path (-non-nil path)) (-last-item path))))
+    (let* ((grouped-buffers (bufler-buffers :path path))
+           (paths (bufler-group-tree-paths grouped-buffers)))
+      (mapcar #'path-cons paths))))
+
+(cl-defun bufler-read-from-alist (prompt alist &key (keyfn #'identity) (testfn #'equal))
+  "Return a value from ALIST by reading a key with completion."
+  ;; This should really be a standard function in Emacs.
+  (let ((key (completing-read prompt (mapcar (lambda (l)
+                                               (funcall keyfn (car l)))
+                                             alist) nil t)))
+    (alist-get key alist nil nil testfn)))
+
+(defun bufler-format-path (path)
+  "Return PATH formatted as a string."
+  (string-join (cl-loop for level from 0
+                        for element in (remq 'nil path)
+                        do (unless element
+                             (cl-decf level))
+                        collect (cl-typecase element
+                                  (string (propertize element
+                                                      'face (bufler-level-face level)))
+                                  (buffer (buffer-name element))))
+               bufler-group-path-separator))
 
 (defun bufler-level-face (level)
   "Return face for LEVEL."

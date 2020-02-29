@@ -3,6 +3,8 @@
 ;; Copyright (C) 2020  Adam Porter
 
 ;; Author: Adam Porter <adam@alphapapa.net>
+;; URL: https://github.com/alphapapa/bufler.el
+;; Package-Requires: ((emacs "26.3"))
 ;; Keywords: convenience
 
 ;;; License:
@@ -22,7 +24,7 @@
 
 ;;; Commentary:
 
-
+;; This file implements workspace features using Bufler.
 
 ;;; Code:
 
@@ -112,20 +114,7 @@ group, select from buffers in all groups and set current group."
 (defalias 'bufler-switch-buffer #'bufler-workspace-switch-buffer)
 
 ;;;###autoload
-(define-minor-mode bufler-mode
-  "When active, set the frame title according to current Mr. Buffer group."
-  :global t
-  (let ((lighter '(bufler-mode (:eval (bufler-lighter)))))
-    (if bufler-mode
-        (setf mode-line-misc-info
-              (append mode-line-misc-info (list lighter)))
-      (setf mode-line-misc-info
-            (delete lighter mode-line-misc-info)))))
-
-;;;###autoload
-(defalias 'bufler-workspace-mode #'bufler-mode)
-
-(cl-defun bufler-buffer-workspace (&optional name)
+(defun bufler-buffer-workspace (&optional name)
   "Set current buffer's workspace to NAME.
 If NAME is nil (interactively, with prefix), unset the buffer's
 workspace name.  This sets the buffer-local variable
@@ -141,49 +130,23 @@ appear in a named workspace, the buffer must be matched by an
   (setf bufler-cache nil)
   (setq-local bufler-workspace-name name))
 
+;;;###autoload
+(define-minor-mode bufler-mode
+  "When active, set the frame title according to current Mr. Buffer group."
+  :global t
+  (let ((lighter '(bufler-mode (:eval (bufler-mode-lighter)))))
+    (if bufler-mode
+        (setf mode-line-misc-info
+              (append mode-line-misc-info (list lighter)))
+      (setf mode-line-misc-info
+            (delete lighter mode-line-misc-info)))))
+
+;;;###autoload
+(defalias 'bufler-workspace-mode #'bufler-mode)
+
 ;;;; Functions
 
-(cl-defun bufler-buffer-alist-at (path)
-  "Return alist of (display . buffer) cells at PATH.
-Each cell is suitable for completion functions."
-  (interactive "P")
-  (cl-labels ((format-heading
-               (heading level) (propertize heading
-                                           'face (bufler-level-face level)))
-              (format-path
-               (path) (string-join (cl-loop for level from 0
-                                            for element in path
-                                            collect (cl-typecase element
-                                                      (string (format-heading element level))
-                                                      (buffer (buffer-name element))))
-                                   bufler-group-path-separator))
-              (path-cons
-               (path) (cons (format-path (-non-nil path)) (-last-item path))))
-    (let* ((grouped-buffers (bufler-buffers :path path))
-           (paths (bufler-group-tree-paths grouped-buffers)))
-      (mapcar #'path-cons paths))))
-
-(cl-defun bufler-read-from-alist (prompt alist &key (keyfn #'identity) (testfn #'equal))
-  "Return a value from ALIST by reading a key with completion."
-  ;; This should really be a standard function in Emacs.
-  (let ((key (completing-read prompt (mapcar (lambda (l)
-                                               (funcall keyfn (car l)))
-                                             alist) nil t)))
-    (alist-get key alist nil nil testfn)))
-
-(defun bufler-format-path (path)
-  "Return PATH formatted as a string."
-  (string-join (cl-loop for level from 0
-                        for element in (remq 'nil path)
-                        do (unless element
-                             (cl-decf level))
-                        collect (cl-typecase element
-                                  (string (propertize element
-                                                      'face (bufler-level-face level)))
-                                  (buffer (buffer-name element))))
-               bufler-group-path-separator))
-
-(defun bufler-lighter ()
+(defun bufler-mode-lighter ()
   "Return lighter string for mode line."
   (concat "Bflr:" (frame-parameter nil 'bufler-workspace-path-formatted)))
 
