@@ -251,7 +251,10 @@ string, not in group headers.")
 (cl-defmacro bufler-define-buffer-command (name docstring command
                                                 &key let* (refresh-p t))
   "Define an Bufler command to call COMMAND on selected buffers.
-It is named `bufler-command-NAME' and uses DOCSTRING.
+It is named `bufler-command-NAME' and uses DOCSTRING.  If
+REFRESH-P, update the Bufler list after the command.  LET* may be
+a list of `let*' binding forms which are bound around the
+command.
 
 NAME, okay, `checkdoc'?"
   (declare (indent defun))
@@ -262,7 +265,7 @@ NAME, okay, `checkdoc'?"
        (let* ,let*
          (bufler--map-sections ,command sections)
          ,(when refresh-p
-            `(bufler))))))
+            `(bufler-list))))))
 
 (bufler-define-buffer-command kill "Kill buffer."
   #'kill-buffer)
