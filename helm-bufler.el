@@ -52,7 +52,10 @@
         :candidates (lambda ()
                       (let* ((bufler-vc-state nil)
                              (group-path (unless current-prefix-arg
-                                           (frame-parameter nil 'bufler-workspace-path))))
+                                           ;; FIXME: This initial-nil-skipping logic probably belongs elsewhere.
+                                           (if (car (frame-parameter nil 'bufler-workspace-path))
+                                               (frame-parameter nil 'bufler-workspace-path)
+                                             (cdr (frame-parameter nil 'bufler-workspace-path))))))
                         (bufler-buffer-alist-at group-path)))
         :action 'helm-type-buffer-actions)
       "Helm source for `bufler'.")))

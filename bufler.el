@@ -379,20 +379,28 @@ If PATH, return only buffers from the group at PATH."
   "Return alist of (display . buffer) cells at PATH.
 Each cell is suitable for completion functions."
   (interactive "P")
-  (cl-labels ((format-heading
-               (heading level) (propertize heading
-                                           'face (bufler-level-face level)))
-              (format-path
-               (path) (string-join (cl-loop for level from 0
-                                            for element in path
-                                            collect (cl-typecase element
-                                                      (string (format-heading element level))
-                                                      (buffer (buffer-name element))))
-                                   bufler-group-path-separator))
-              (path-cons
-               (path) (cons (format-path (-non-nil path)) (-last-item path))))
-    (let* ((grouped-buffers (bufler-buffers :path path))
-           (paths (bufler-group-tree-paths grouped-buffers)))
+  (let* ((level-start (pcase path
+                        ;; I don't like this, but it works for now.  It's necessary because a group
+                        ;; can have a nil head, and we have to ignore that when formatting the
+                        ;; path, but we have to keep it to look up groups at the path; and then the
+                        ;; path can be simply nil to get all groups.  So this feels a little messy,
+                        ;; and some of the logic should probably be moved to bufler-group-tree.
+                        ('nil 0)
+                        (_ (1+ (length (-take-while #'null path))))))
+         (grouped-buffers (bufler-buffers :path path))
+         (paths (bufler-group-tree-paths grouped-buffers)))
+    (cl-labels ((format-heading
+                 (heading level) (propertize heading
+                                             'face (bufler-level-face level)))
+                (format-path
+                 (path) (string-join (cl-loop for level from level-start
+                                              for element in path
+                                              collect (cl-typecase element
+                                                        (string (format-heading element level))
+                                                        (buffer (buffer-name element))))
+                                     bufler-group-path-separator))
+                (path-cons
+                 (path) (cons (format-path (-non-nil path)) (-last-item path))))
       (mapcar #'path-cons paths))))
 
 (cl-defun bufler-read-from-alist (prompt alist &key (keyfn #'identity) (testfn #'equal))
