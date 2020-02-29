@@ -16,6 +16,7 @@ Bufler.el
 * Screenshots::
 * Installation::
 * Usage::
+* Compared to Ibuffer::
 * Changelog::
 * Credits::
 * Development::
@@ -29,6 +30,7 @@ Usage
 
 * Bindings::
 * Defining groups::
+
 
 
 
@@ -69,7 +71,7 @@ like this:
        :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"))
 
 
-File: README.info,  Node: Usage,  Next: Changelog,  Prev: Installation,  Up: Top
+File: README.info,  Node: Usage,  Next: Compared to Ibuffer,  Prev: Installation,  Up: Top
 
 3 Usage
 *******
@@ -250,9 +252,77 @@ funcall (see example above).
           (a feature probably broken at the moment).  See example above.
 
 
-File: README.info,  Node: Changelog,  Next: Credits,  Prev: Usage,  Up: Top
+File: README.info,  Node: Compared to Ibuffer,  Next: Changelog,  Prev: Usage,  Up: Top
 
-4 Changelog
+4 Compared to Ibuffer
+*********************
+
+Bufler is primarily about grouping buffers automatically and
+dynamically, using smart, customizeable rules.  While Ibuffer provides
+some powerful grouping features, they are restricted to single-level
+grouping, and they require extensive, manual configuration.  Bufler
+offers recursive, multi-level grouping, and a set of default groups is
+provided which are designed to be generally useful.  Bufler presents
+groups in bufler-list using the magit-section library, which allows
+groups and buffers to be toggled, marked, and operated on with commands.
+
+   Ibuffer groups must be manually and individually specified.  So, for
+example, to group project A’s buffers into one group, and project B’s
+into another, Ibuffer requires the user to make a group for each
+project.  Bufler provides a set of automatic grouping rules that create
+groups automatically.  For example, auto-project automatically creates
+groups per-project, so the user would only have to specify ‘(group
+(auto-project))’, and Bufler would create one group for project A’s
+buffers and another for project B’s.  When those projects’ buffers are
+closed, the groups are automatically removed.
+
+   Bufler also provides optional workspace features in the form of
+bufler-mode, which helps focus a frame on a group of buffers.  When it’s
+active, the command bufler-switch-buffer presents buffers from that
+frame’s selected workspace; when called with a prefix argument, it
+presents all buffers, and then switches the frame’s workspace to the
+selected buffer’s group.
+
+   Of course, Ibuffer is a mature tool with many features, so Bufler
+doesn’t replace it completely.  Bufler is a very young project.
+
+   A workflow using Bufler could be something like this:
+
+  1. Start Emacs.
+  2. Activate bufler-mode.
+  3. Open some buffers, find some files, etc.
+  4. When you need to switch buffers, use M-x bufler-switch-buffer.  The
+     buffers are presented by group with their "outline paths," which
+     makes it easier to find the buffer you’re looking for, since
+     they’re organized by project, directory, mode, etc.
+  5. The next time you call bufler-switch-buffer in that frame, it will
+     only offer buffers from that frame’s buffer group, making it easier
+     to find buffers related to the current project.  Or if you need to
+     select a buffer in a different group, use C-u with
+     bufler-switch-buffer to see all buffers.  (Of course, existing
+     commands like switch-to-buffer are not affected; Bufler doesn’t
+     interfere with other modes or commands.)
+  6. Maybe make a new frame for a different project, then use
+     C-u M-x bufler-switch-buffer or M-x bufler-frame-workspace to set
+     the frame to a different workspace.
+  7. When you need to kill or save a bunch of buffers at once, use
+     bufler-list, put the cursor on a group you want to kill or save,
+     and press k or s.  If you want to see which buffers have unsaved
+     (indicated with *) or uncommitted (indicated with edited) changes,
+     you can browse through the list of buffers (enable bufler-vc-state
+     to show VC state for each buffer; this is disabled by default
+     because getting up-to-date information on a buffer’s VC state can
+     be slow).
+
+   Then, you can write your own buffer-grouping rules to make them as
+simple or as complex as you like.  They’re just Lisp functions, so you
+can do anything with them, but the DSL provided by the macro makes
+simple ones easy to write.
+
+
+File: README.info,  Node: Changelog,  Next: Credits,  Prev: Compared to Ibuffer,  Up: Top
+
+5 Changelog
 ***********
 
 * Menu:
@@ -263,7 +333,7 @@ File: README.info,  Node: Changelog,  Next: Credits,  Prev: Usage,  Up: Top
 
 File: README.info,  Node: 02-pre,  Next: 01,  Up: Changelog
 
-4.1 0.2-pre
+5.1 0.2-pre
 ===========
 
 Project expanded and renamed from Sbuffer to Bufler.
@@ -271,7 +341,7 @@ Project expanded and renamed from Sbuffer to Bufler.
 
 File: README.info,  Node: 01,  Prev: 02-pre,  Up: Changelog
 
-4.2 0.1
+5.2 0.1
 =======
 
 First tagged release.
@@ -279,7 +349,7 @@ First tagged release.
 
 File: README.info,  Node: Credits,  Next: Development,  Prev: Changelog,  Up: Top
 
-5 Credits
+6 Credits
 *********
 
    • Thanks to Jonas Bernoulli (https://github.com/tarsius) for
@@ -294,7 +364,7 @@ File: README.info,  Node: Credits,  Next: Development,  Prev: Changelog,  Up: To
 
 File: README.info,  Node: Development,  Next: License,  Prev: Credits,  Up: Top
 
-6 Development
+7 Development
 *************
 
 Bug reports, feature requests, suggestions — _oh my_!
@@ -302,7 +372,7 @@ Bug reports, feature requests, suggestions — _oh my_!
 
 File: README.info,  Node: License,  Prev: Development,  Up: Top
 
-7 License
+8 License
 *********
 
 GPLv3
@@ -311,17 +381,18 @@ GPLv3
 
 Tag Table:
 Node: Top224
-Node: Screenshots888
-Node: Installation1268
-Node: Usage1563
-Node: Bindings2740
-Node: Defining groups3219
-Node: Changelog9229
-Node: 02-pre9375
-Node: 019517
-Node: Credits9620
-Node: Development10165
-Node: License10334
+Node: Screenshots913
+Node: Installation1293
+Node: Usage1588
+Node: Bindings2775
+Node: Defining groups3254
+Node: Compared to Ibuffer9264
+Node: Changelog12880
+Node: 02-pre13040
+Node: 0113182
+Node: Credits13285
+Node: Development13830
+Node: License13999
 
 End Tag Table
 
