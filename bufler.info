@@ -54,7 +54,10 @@ File: README.info,  Node: Screenshots,  Next: Installation,  Prev: Top,  Up: Top
 1 Screenshots
 *************
 
-In the default Emacs theme:
+This screenshot shows bufler-list in the top window, and
+bufler-switch-buffer reading a buffer with completion in the bottom
+window.  Note how the same, recursively grouped buffers are shown in
+both ways.
 
    This screenshot compares Bufler and Ibuffer showing the same buffers
 with the default settings.  Note how Bufler allows commands to be
@@ -434,20 +437,20 @@ GPLv3
 Tag Table:
 Node: Top258
 Node: Screenshots982
-Node: Installation1508
-Node: Usage1803
-Node: Commands2029
-Node: Bindings3156
-Node: Defining groups3702
-Node: Helm support9865
-Node: Prism support10478
-Node: Compared to Ibuffer10907
-Node: Changelog14492
-Node: 02-pre14652
-Node: 0114794
-Node: Credits14897
-Node: Development15442
-Node: License15611
+Node: Installation1685
+Node: Usage1980
+Node: Commands2206
+Node: Bindings3333
+Node: Defining groups3879
+Node: Helm support10042
+Node: Prism support10655
+Node: Compared to Ibuffer11084
+Node: Changelog14669
+Node: 02-pre14829
+Node: 0114971
+Node: Credits15074
+Node: Development15619
+Node: License15788
 
 End Tag Table
 

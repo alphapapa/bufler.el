@@ -15,7 +15,7 @@ Bufler is like a butler for your buffers, presenting them to you in an organized
 :TOC:      :ignore (this)
 :END:
 
-In the default Emacs theme:
+This screenshot shows =bufler-list= in the top window, and =bufler-switch-buffer= reading a buffer with completion in the bottom window.  Note how the same, recursively grouped buffers are shown in both ways.
 
 [[images/default-theme.png]]
 
