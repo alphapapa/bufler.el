@@ -257,6 +257,8 @@ funcall (see example above).
 ‘Regexp types’
      These types match a value against a buffer’s attribute and group
      buffers which match.
+        • ‘filename-match (NAME REGEXP)’ Match a regular expression
+          against the buffer’s filename, if it has one.
         • ‘name-match (NAME REGEXP)’ Match a regular expression against
           the buffer’s name.
         • ‘mode-match (NAME REGEXP)’ Match a regular expression against
@@ -437,15 +439,15 @@ Node: Usage1803
 Node: Commands2029
 Node: Bindings3156
 Node: Defining groups3702
-Node: Helm support9733
-Node: Prism support10346
-Node: Compared to Ibuffer10775
-Node: Changelog14360
-Node: 02-pre14520
-Node: 0114662
-Node: Credits14765
-Node: Development15310
-Node: License15479
+Node: Helm support9865
+Node: Prism support10478
+Node: Compared to Ibuffer10907
+Node: Changelog14492
+Node: 02-pre14652
+Node: 0114794
+Node: Credits14897
+Node: Development15442
+Node: License15611
 
 End Tag Table
 

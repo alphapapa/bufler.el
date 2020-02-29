@@ -189,6 +189,7 @@ The following group types are available in =bufler-defgroups=.  Note that each o
      -  ~auto-tramp~  Whether the buffer is opened via Tramp.
      -  ~auto-workspace~  The buffer's named workspace, if any.
 +  Regexp types :: These types match a value against a buffer's attribute and group buffers which match.
+     -  ~filename-match (NAME REGEXP)~ Match a regular expression against the buffer's filename, if it has one.
      -  ~name-match (NAME REGEXP)~ Match a regular expression against the buffer's name.
      -  ~mode-match (NAME REGEXP)~ Match a regular expression against the buffer's major-mode.
 +  Other types ::

@@ -584,6 +584,14 @@ e.g. symlinks are resolved."
 
 ;; MAYBE: Is `cl-check-type' needed?
 
+(defun bufler-group-filename-match (name regexp buffer)
+  "Group BUFFERs whose full filenames match REGEXP.
+If it matches, NAME is returned, otherwise nil."
+  (cl-check-type name string)
+  (when (and (buffer-file-name buffer)
+             (string-match-p regexp (buffer-file-name buffer)))
+    (propertize name 'face 'magit-head)))
+
 (defun bufler-group-name-match (name regexp buffer)
   "Group BUFFERs whose names match REGEXP.
 If it matches, NAME is returned, otherwise nil."
@@ -684,6 +692,8 @@ See documentation for details."
                            `(bufler-or ,name ,@groups))
                  (group-not (name group)
                             `(bufler-not ,name ,group))
+                 (filename-match (name regexp)
+                                 `(bufler-group 'filename-match ,name ,regexp))
                  (mode-match (name regexp)
                              `(bufler-group 'mode-match ,name ,regexp))
                  (name-match (name regexp)
