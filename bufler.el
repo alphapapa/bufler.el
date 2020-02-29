@@ -149,6 +149,12 @@ May be used to add extra space between groups in `bufler-list'."
                         ((0 . "\n")))
                  (alist :key-type (integer :tag "Group level") :value-type (string :tag "Suffix string"))))
 
+(defcustom bufler-group-sort-fns
+  '(bufler-sort-groups-frame-workspace)
+  "List of functions by which to sort buffer groups."
+  ;; FIXME: List specific functions.
+  :type '(repeat function))
+
 ;;;;; Faces
 
 (defface bufler-group
@@ -245,9 +251,11 @@ string, not in group headers.")
     (let* ((inhibit-read-only t)
            (groups (bufler-buffers))
            pos)
+      (dolist (fn (reverse bufler-group-sort-fns))
+        (setf groups (funcall fn groups)))
+      ;; FIXME: Add format< back somewhere.
       (when bufler-reverse
-        (setf groups (nreverse (-sort #'format< groups))))
-      (setf groups (bufler-sort-groups-frame-workspace groups))
+        (setf groups (nreverse groups)))
       (with-current-buffer (get-buffer-create "*Bufler*")
         (setf pos (point))
         (bufler-list-mode)
