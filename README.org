@@ -19,6 +19,10 @@ In the default Emacs theme:
 
 [[images/default-theme.png]]
 
+This screenshot compares Bufler and Ibuffer showing the same buffers with the default settings.  Note how Bufler allows commands to be applied to an entire group of buffers: for example, pressing =k= in the Bufler list would kill all the buffers in the group =Project: ~/src/emacs/bufler.el= (and, of course, since it calls =kill-buffer=, any unsaved ones would ask to be saved first).
+
+[[images/vs-ibuffer-doom-one.png]]
+
 This screenshot shows group faces themed by [[https://github.com/alphapapa/prism.el][prism]], which Bufler optionally supports.  (*Note:* This screenshot is of an older version of the package, but is still accurate except for the name.)
 
 [[images/screenshot.png]]

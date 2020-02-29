@@ -53,6 +53,13 @@ File: README.info,  Node: Screenshots,  Next: Installation,  Prev: Top,  Up: Top
 
 In the default Emacs theme:
 
+   This screenshot compares Bufler and Ibuffer showing the same buffers
+with the default settings.  Note how Bufler allows commands to be
+applied to an entire group of buffers: for example, pressing k in the
+Bufler list would kill all the buffers in the group
+Project: ~/src/emacs/bufler.el (and, of course, since it calls
+kill-buffer, any unsaved ones would ask to be saved first).
+
    This screenshot shows group faces themed by prism
 (https://github.com/alphapapa/prism.el), which Bufler optionally
 supports.  (*Note:* This screenshot is of an older version of the
@@ -385,17 +392,17 @@ GPLv3
 Tag Table:
 Node: Top224
 Node: Screenshots913
-Node: Installation1293
-Node: Usage1588
-Node: Bindings2775
-Node: Defining groups3304
-Node: Compared to Ibuffer9314
-Node: Changelog13050
-Node: 02-pre13210
-Node: 0113352
-Node: Credits13455
-Node: Development14000
-Node: License14169
+Node: Installation1677
+Node: Usage1972
+Node: Bindings3159
+Node: Defining groups3688
+Node: Compared to Ibuffer9698
+Node: Changelog13434
+Node: 02-pre13594
+Node: 0113736
+Node: Credits13839
+Node: Development14384
+Node: License14553
 
 End Tag Table
 
