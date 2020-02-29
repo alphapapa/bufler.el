@@ -128,7 +128,7 @@ get correct results."
   "Buffers that match these functions are not shown."
   :type '(repeat function))
 
-(defcustom bufler-group-path-separator " ► "
+(defcustom bufler-group-path-separator " » "
   "Separator shown between path elements."
   :type 'string)
 
