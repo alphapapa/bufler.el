@@ -488,29 +488,17 @@ Each cell is suitable for completion functions."
   (dolist (fn fns)
     (setf groups (funcall fn groups))))
 
-;; (defun bufler-sort-groups-frame-workspace (groups)
-;;   "Return GROUPS sorted by the frame's workspace."
-;;   ;; TODO: Predicate that returns whether a subtree matches a path.
-;;   ;; TODO: Probably generalize this and put it in group-tree.
-;;   ;; For now, I'll just do top-level group sorting rather than recursive.
-;;   (cl-labels ((sort-groups (groups)
-;;                            ))
-;;     (let* ((workspace-path (or (car (frame-parameter nil 'bufler-workspace-path))
-;;                                (cadr (frame-parameter nil 'bufler-workspace-path))))
-;;            (sort-fn (lambda (a b)
-;;                       (cond ((equal (car a) workspace-path)
-;;                              (cond ((equal (car b) workspace-path) nil)
-;;                                    (t t)))
-;;                             ((equal (car b) workspace-path) nil)
-;;                             (t nil)))))
-;;       (sort groups sort-fn))))
-
 (defun bufler-sort-groups-frame-workspace (groups)
   "Return GROUPS sorted by the frame's workspace."
   ;; TODO: Predicate that returns whether a subtree matches a path.
   ;; TODO: Probably generalize this and put it in group-tree.
   ;; For now, I'll just do top-level group sorting rather than recursive.
-  (let* ((workspace-path (frame-parameter nil 'bufler-workspace-path)))
+  (let* ((workspace-path
+          ;; Omit leading nil.  This doesn't feel like the right
+          ;; solution, but I think it works...so far...
+          (if (car (frame-parameter nil 'bufler-workspace-path))
+              (frame-parameter nil 'bufler-workspace-path)
+            (cdr (frame-parameter nil 'bufler-workspace-path)))))
     (cl-labels ((groups<
                  (path a b) (cond ((equal (car a) (car path))
                                    (cond ((equal (car b) (car path)) nil)
