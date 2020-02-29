@@ -59,6 +59,7 @@
   (let ((map (copy-keymap magit-section-mode-map)))
     (define-key map (kbd "g") #'bufler)
     (define-key map (kbd "f") #'bufler-list-group-frame)
+    (define-key map (kbd "F") #'bufler-list-group-make-frame)
     (define-key map (kbd "k") #'bufler-list-buffer-kill)
     (define-key map (kbd "s") #'bufler-list-buffer-save)
     (define-key map (kbd "w") #'bufler-list-buffer-workspace)
@@ -347,7 +348,14 @@ NAME, okay, `checkdoc'?"
               `(bufler-list)))))))
 
 (declare-function bufler-frame-workspace "bufler-workspace")
+
 (bufler-define-group-command frame
+  "Set the current frame's workspace to the group at point."
+  (lambda (_group path)
+    (bufler-frame-workspace path))
+  :refresh-p nil)
+
+(bufler-define-group-command make-frame
   "Make a new frame for the group at point."
   (lambda (_group path)
     (with-selected-frame (make-frame)
