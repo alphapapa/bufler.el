@@ -582,8 +582,7 @@ e.g. symlinks are resolved."
                                          (-take depth (f-split (f-relative buffer-dir dir)))))
                         group-name)))))
 
-;; These docstrings contain contorted English to satisfy the whims of
-;; `checkdoc'.
+;; MAYBE: Is `cl-check-type' needed?
 
 (defun bufler-group-name-match (name regexp buffer)
   "Group BUFFERs whose names match REGEXP.
