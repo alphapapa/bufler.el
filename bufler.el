@@ -186,7 +186,7 @@ string, not in group headers.")
 (define-derived-mode bufler-list-mode magit-section-mode "Bufler")
 
 (cl-defstruct bufler-group
-  type elements)
+  type path elements)
 
 ;;;###autoload
 (defun bufler-list ()
@@ -195,38 +195,38 @@ string, not in group headers.")
   (cl-labels
       ;; This gets a little hairy because we have to wrap `-group-by'
       ;; to implement "chains" of grouping functions.
-      ((insert-thing (thing &optional (level 0))
+      ((insert-thing (thing path &optional (level 0))
                      (pcase thing
                        ((pred bufferp) (insert-buffer thing level))
-                       (_ (insert-group thing level))))
+                       (_ (insert-group thing (append path (list (car thing))) level))))
        (insert-buffer
         (buffer level) (magit-insert-section nil (bufler-buffer buffer)
                          (insert (make-string (* 2 level) ? ) (bufler-format-buffer buffer level) "\n")))
        (insert-group
-        (group level) (pcase (car group)
-                        ('nil (pcase-let* ((`(,_type . ,things) group))
-                                (--each things
-                                  (insert-thing it level))))
-                        (_ (pcase-let* ((`(,type . ,things) group)
-                                        (num-buffers 0)
-                                        (suffix (alist-get level bufler-list-group-separators)))
-                             ;; This almost seems lazy, using `-tree-map-nodes'
-                             ;; with `bufferp', but it works, and it's correct,
-                             ;; and since `bufferp' is in C, maybe it's even fast.
-                             (-tree-map-nodes #'bufferp (lambda (&rest _)
-                                                          (cl-incf num-buffers))
-                                              group)
-                             (magit-insert-section (bufler-group (make-bufler-group
-                                                                  :type type
-                                                                  :elements (cdr things)))
-                               (magit-insert-heading (make-string (* 2 level) ? )
-                                 (format-group type level)
-                                 (propertize (format " (%s)" num-buffers)
-                                             'face 'bufler-size))
-                               (--each things
-                                 (insert-thing it (1+ level)))
-                               (when suffix
-                                 (insert suffix)))))) )
+        (group path level) (pcase (car group)
+                             ('nil (pcase-let* ((`(,_type . ,things) group))
+                                     (--each things
+                                       (insert-thing it path level))))
+                             (_ (pcase-let* ((`(,type . ,things) group)
+                                             (num-buffers 0)
+                                             (suffix (alist-get level bufler-list-group-separators)))
+                                  ;; This almost seems lazy, using `-tree-map-nodes'
+                                  ;; with `bufferp', but it works, and it's correct,
+                                  ;; and since `bufferp' is in C, maybe it's even fast.
+                                  (-tree-map-nodes #'bufferp (lambda (&rest _)
+                                                               (cl-incf num-buffers))
+                                                   group)
+                                  (magit-insert-section (bufler-group (make-bufler-group
+                                                                       :type type :path path
+                                                                       :elements (cdr things)))
+                                    (magit-insert-heading (make-string (* 2 level) ? )
+                                      (format-group type level)
+                                      (propertize (format " (%s)" num-buffers)
+                                                  'face 'bufler-size))
+                                    (--each things
+                                      (insert-thing it path (1+ level)))
+                                    (when suffix
+                                      (insert suffix)))))) )
        (format-group
         (group level) (let* ((string (cl-typecase group
                                        (string group)
@@ -254,7 +254,7 @@ string, not in group headers.")
         (erase-buffer)
         (magit-insert-section (bufler-root)
           (--each groups
-            (insert-thing it 0)))
+            (insert-thing it nil 0)))
         (setf buffer-read-only t)
         (pop-to-buffer (current-buffer))
         (goto-char pos)))))
@@ -336,18 +336,12 @@ NAME, okay, `checkdoc'?"
      ,docstring
      (interactive)
      (when-let* ((section (magit-current-section)))
-       (let* ((group (oref section value))
-              (path (nreverse
-                     (cl-loop with this-section = section
-                              while this-section
-			      unless (bufferp (oref this-section value))
-                              collect (cl-typecase (oref this-section value)
-                                        (bufler-group (bufler-group-type (oref this-section value)))
-                                        (otherwise (oref this-section value)))
-                              do (setf this-section (when (oref this-section parent)
-                                                      (oref this-section parent)))))))
+       (let* ((value (oref section value))
+              (path (cl-typecase value
+                      (bufler-group (bufler-group-path value))
+                      (buffer (bufler-group-path (oref (oref section parent) value))))))
          (let* ,let*
-           (funcall ,command group path)
+           (funcall ,command value path)
            ,(when refresh-p
               `(bufler-list)))))))
 
