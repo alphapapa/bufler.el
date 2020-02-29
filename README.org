@@ -29,13 +29,11 @@ This screenshot shows group faces themed by [[https://github.com/alphapapa/prism
 
 * Contents                                                         :noexport:
 :PROPERTIES:
-:TOC:      :include siblings
+:TOC:      :include siblings :depth 1 :force depth
 :END:
 :CONTENTS:
 - [[#installation][Installation]]
 - [[#usage][Usage]]
-  - [[#bindings][Bindings]]
-  - [[#defining-groups][Defining groups]]
 - [[#compared-to-ibuffer][Compared to Ibuffer]]
 - [[#changelog][Changelog]]
 - [[#credits][Credits]]
@@ -72,8 +70,16 @@ Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like t
 
 * Usage
 :PROPERTIES:
-:TOC:      :depth 1
+:TOC:      :include descendants :depth 1
 :END:
+:CONTENTS:
+- [[#commands][Commands]]
+- [[#bindings][Bindings]]
+- [[#helm-support][Helm support]]
+- [[#defining-groups][Defining groups]]
+:END:
+
+** Commands
 
   Run one of these commands.  You can customize settings in the =bufler= group.
 
@@ -95,6 +101,22 @@ In the Bufler buffer list, these keys are available (use =C-h m= to get the most
 +  =k=  Kill buffers.
 +  =s=  Save buffers.
 +  =w=  Set workspace name.
+
+** Helm support
+
+Bufler does not require nor depend on Helm, but it provides optional support for it in =helm-bufler.el= in the form of =helm-bufler-source=, a Helm source that shows buffers in the current workspace (or when the Helm command is called with =C-u=, all buffers).  It looks like this when showing all buffers:
+
+[[images/helm-bufler.png]]
+
+Use it like this:
+
+#+BEGIN_SRC elisp
+  (require 'helm-bufler)
+
+  (helm :sources '(helm-bufler-source))
+#+END_SRC
+
+Or you can use the source in an existing Helm command, like =helm-find-files=.
 
 ** Defining groups
 

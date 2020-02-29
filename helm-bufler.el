@@ -42,12 +42,16 @@
 (when (require 'helm-source nil 'noerror)
 
   (defvar helm-bufler-source
-    (helm-make-source "Bufler's buffers" 'helm-source-sync
+    (helm-make-source "Bufler's workspace buffers" 'helm-source-sync
+      :header-name (lambda (_name)
+                     (concat "Bufler"
+                             (unless current-prefix-arg
+                               (concat ":" (bufler-format-path (frame-parameter nil 'bufler-workspace-path))))))
       :candidates (lambda ()
                     (let* ((bufler-vc-state nil)
-                           (group-path (frame-parameter nil 'bufler-workspace-path)))
-                      (when group-path
-                        (bufler-buffer-alist-at group-path))))
+                           (group-path (unless current-prefix-arg
+                                         (frame-parameter nil 'bufler-workspace-path))))
+                      (bufler-buffer-alist-at group-path)))
       :action 'helm-type-buffer-actions)
     "Helm source for `bufler'."))
 

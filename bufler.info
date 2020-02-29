@@ -28,7 +28,9 @@ Bufler.el
 
 Usage
 
+* Commands::
 * Bindings::
+* Helm support::
 * Defining groups::
 
 
@@ -83,6 +85,20 @@ File: README.info,  Node: Usage,  Next: Compared to Ibuffer,  Prev: Installation
 3 Usage
 *******
 
+   • • • • 
+* Menu:
+
+* Commands::
+* Bindings::
+* Helm support::
+* Defining groups::
+
+
+File: README.info,  Node: Commands,  Next: Bindings,  Up: Usage
+
+3.1 Commands
+============
+
 Run one of these commands.  You can customize settings in the bufler
 group.
 
@@ -106,15 +122,10 @@ group.
      the buffer must be matched by an ‘auto-workspace’ group before any
      other group.
 
-* Menu:
-
-* Bindings::
-* Defining groups::
-
 
-File: README.info,  Node: Bindings,  Next: Defining groups,  Up: Usage
+File: README.info,  Node: Bindings,  Next: Helm support,  Prev: Commands,  Up: Usage
 
-3.1 Bindings
+3.2 Bindings
 ============
 
 In the Bufler buffer list, these keys are available (use C-h m to get
@@ -131,9 +142,30 @@ section at point.
    • w Set workspace name.
 
 
-File: README.info,  Node: Defining groups,  Prev: Bindings,  Up: Usage
+File: README.info,  Node: Helm support,  Next: Defining groups,  Prev: Bindings,  Up: Usage
 
-3.2 Defining groups
+3.3 Helm support
+================
+
+Bufler does not require nor depend on Helm, but it provides optional
+support for it in helm-bufler.el in the form of helm-bufler-source, a
+Helm source that shows buffers in the current workspace (or when the
+Helm command is called with C-u, all buffers).  It looks like this when
+showing all buffers:
+
+   Use it like this:
+
+     (require 'helm-bufler)
+
+     (helm :sources '(helm-bufler-source))
+
+   Or you can use the source in an existing Helm command, like
+helm-find-files.
+
+
+File: README.info,  Node: Defining groups,  Prev: Helm support,  Up: Usage
+
+3.4 Defining groups
 ===================
 
 _See the bufler info page to view this information in Emacs._
@@ -390,18 +422,20 @@ GPLv3
 
 Tag Table:
 Node: Top224
-Node: Screenshots900
-Node: Installation1664
-Node: Usage1959
-Node: Bindings3146
-Node: Defining groups3675
-Node: Compared to Ibuffer9685
-Node: Changelog13354
-Node: 02-pre13514
-Node: 0113656
-Node: Credits13759
-Node: Development14304
-Node: License14473
+Node: Screenshots930
+Node: Installation1694
+Node: Usage1989
+Node: Commands2193
+Node: Bindings3320
+Node: Helm support3863
+Node: Defining groups4471
+Node: Compared to Ibuffer10485
+Node: Changelog14154
+Node: 02-pre14314
+Node: 0114456
+Node: Credits14559
+Node: Development15104
+Node: License15273
 
 End Tag Table
 
