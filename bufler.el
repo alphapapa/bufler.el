@@ -273,7 +273,10 @@ a list of `let*' binding forms which are bound around the
 command.
 
 NAME, okay, `checkdoc'?"
-  (declare (indent defun))
+  (declare (indent defun)
+	   (debug (symbolp stringp def-form
+                           &rest [&or [":let*" (&rest &or symbolp (gate symbolp &optional def-form))]
+                                      [":refresh-p" booleanp]])))
   `(defun ,(intern (concat "bufler-list-buffer-" (symbol-name name))) (&rest _args)
      ,docstring
      (interactive)
