@@ -41,8 +41,10 @@
   "Options for Mr. Buffer's workspaces."
   :group 'bufler)
 
-(defcustom bufler-workspace-switch-buffer-sets-workspace t
-  "Whether to set the workspace when using `bufler-switch-buffer'."
+(defcustom bufler-workspace-switch-buffer-sets-workspace nil
+  "Whether to always set the workspace when using `bufler-switch-buffer'.
+This setting overrides whether `bufler-switch-buffer' is called
+with prefix arguments."
   :type 'boolean)
 
 (defcustom bufler-workspace-set-hook
@@ -81,11 +83,16 @@ path."
   path)
 
 ;;;###autoload
-(defun bufler-workspace-switch-buffer (&optional all-p)
+(defun bufler-workspace-switch-buffer (&optional all-p set-workspace-p)
   "Switch to another buffer in the current group.
-If ALL-P (interactively, with prefix) or if there is no current
-group, select from buffers in all groups and set current group."
-  (interactive "P")
+If ALL-P (interactively, with universal prefix) or if the frame
+has no workspace, select from all buffers.  If
+SET-WORKSPACE-P (with two universal prefixes), select from all
+buffers and set the frame's workspace.
+
+If `bufler-workspace-switch-buffer-sets-workspace' is non-nil,
+act as if SET-WORKSPACE-P is non-nil."
+  (interactive (list current-prefix-arg (equal '(16) current-prefix-arg)))
   (cl-labels ((format-heading
                (heading level) (propertize heading
                                            'face (bufler-level-face level)))
@@ -104,10 +111,17 @@ group, select from buffers in all groups and set current group."
            (buffers (bufler-buffer-alist-at path))
            (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers))
                                        buffers nil nil #'string=)))
-      (unless path
-        ;; Selected from all buffers: change the workspace.
-        (when bufler-workspace-switch-buffer-sets-workspace
-          (bufler-frame-workspace (butlast (bufler-group-tree-leaf-path (bufler-buffers) selected-buffer)))))
+      (when (or bufler-workspace-switch-buffer-sets-workspace
+		set-workspace-p)
+          (bufler-frame-workspace
+	   ;; FIXME: Ideally we wouldn't call `bufler-buffers' again
+	   ;; here, but `bufler-buffer-alist-at' returns a slightly
+	   ;; different structure, and `bufler-group-tree-leaf-path'
+	   ;; doesn't accept it.  Maybe the issue is related to using
+	   ;; `map-nested-elt' in `bufler-buffer-alist-at'.  Maybe
+	   ;; that difference has been the source of some other
+	   ;; confusion too...
+	   (butlast (bufler-group-tree-leaf-path (bufler-buffers) selected-buffer))))
       (switch-to-buffer selected-buffer))))
 
 ;;;###autoload
