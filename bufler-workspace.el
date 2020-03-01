@@ -42,6 +42,10 @@
   "Options for Mr. Buffer's workspaces."
   :group 'bufler)
 
+(defcustom bufler-workspace-ignore-case t
+  "Ignore case when completing buffer paths and names."
+  :type 'boolean)
+
 (defcustom bufler-workspace-switch-buffer-sets-workspace nil
   "Whether to always set the workspace when using `bufler-switch-buffer'.
 This setting overrides whether `bufler-switch-buffer' is called
@@ -97,6 +101,7 @@ If `bufler-workspace-switch-buffer-sets-workspace' is non-nil,
 act as if SET-WORKSPACE-P is non-nil."
   (interactive (list current-prefix-arg (equal '(16) current-prefix-arg)))
   (let* ((bufler-vc-state nil)
+	 (completion-ignore-case bufler-workspace-ignore-case)
          (path (unless all-p
                  (frame-parameter nil 'bufler-workspace-path)))
          (buffers (bufler-buffer-alist-at path))
