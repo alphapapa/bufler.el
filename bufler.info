@@ -49,6 +49,11 @@ as grouping rules in a simple language, allowing you to customize the
 way buffers are grouped.  The default rules are designed to be generally
 useful, so you don’t have to write your own.
 
+   It also provides a workspace mode which allows frames to focus on
+buffers in certain groups.  Since the groups are created automatically,
+the workspaces are created dynamically, rather than requiring you to put
+buffers in workspaces manually.
+
 
 File: README.info,  Node: Screenshots,  Next: Installation,  Prev: Top,  Up: Top
 
@@ -449,22 +454,22 @@ GPLv3
 
 Tag Table:
 Node: Top258
-Node: Screenshots991
-Node: Installation1694
-Node: Usage1989
-Node: Commands2228
-Node: Bindings3381
-Node: Tips3999
-Node: Defining groups4252
-Node: Helm support10411
-Node: Prism support11024
-Node: Compared to Ibuffer11453
-Node: Changelog15038
-Node: 02-pre15198
-Node: 0115340
-Node: Credits15443
-Node: Development15988
-Node: License16157
+Node: Screenshots1238
+Node: Installation1941
+Node: Usage2236
+Node: Commands2475
+Node: Bindings3628
+Node: Tips4246
+Node: Defining groups4499
+Node: Helm support10658
+Node: Prism support11271
+Node: Compared to Ibuffer11700
+Node: Changelog15285
+Node: 02-pre15445
+Node: 0115587
+Node: Credits15690
+Node: Development16235
+Node: License16404
 
 End Tag Table
 
