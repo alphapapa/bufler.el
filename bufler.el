@@ -262,6 +262,14 @@ string, not in group headers.")
 ;;;###autoload
 (defalias 'bufler #'bufler-list)
 
+(declare-function bufler-workspace-switch-buffer "bufler-workspace")
+;;;###autoload
+(defalias 'bufler-switch-buffer #'bufler-workspace-switch-buffer)
+
+(declare-function bufler-workspace-mode "bufler-workspace")
+;;;###autoload
+(defalias 'bufler-mode #'bufler-workspace-mode)
+
 ;;;;; Buffer commands
 
 (cl-defmacro bufler-define-buffer-command (name docstring command
@@ -310,13 +318,13 @@ NAME, okay, `checkdoc'?"
       (with-current-buffer buffer
         (save-buffer)))))
 
-(declare-function bufler-buffer-workspace "bufler-workspace")
+(declare-function bufler-workspace-buffer-set "bufler-workspace")
 (bufler-define-buffer-command workspace
   "Set buffer's workspace name.
 With prefix, unset it."
   (lambda (buffer)
     (with-current-buffer buffer
-      (bufler-buffer-workspace name)))
+      (bufler-workspace-buffer-set name)))
   :let* ((name (unless current-prefix-arg
                  (completing-read "Named workspace: "
                                   (seq-uniq
@@ -355,19 +363,19 @@ NAME, okay, `checkdoc'?"
            ,(when refresh-p
               `(bufler-list)))))))
 
-(declare-function bufler-frame-workspace "bufler-workspace")
+(declare-function bufler-workspace-frame-set "bufler-workspace")
 
 (bufler-define-group-command frame
   "Set the current frame's workspace to the group at point."
   (lambda (_group path)
-    (bufler-frame-workspace path))
+    (bufler-workspace-frame-set path))
   :refresh-p nil)
 
 (bufler-define-group-command make-frame
   "Make a new frame for the group at point."
   (lambda (_group path)
     (with-selected-frame (make-frame)
-      (bufler-frame-workspace path)))
+      (bufler-workspace-frame-set path)))
   :refresh-p nil)
 
 ;;;; Functions

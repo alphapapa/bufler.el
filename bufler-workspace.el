@@ -34,6 +34,7 @@
 
 ;;;; Variables
 
+(defvar bufler-mode)
 
 ;;;; Customization
 
@@ -55,28 +56,30 @@ with prefix arguments."
 ;;;; Commands
 
 ;;;###autoload
-(defun bufler-frame-workspace (path)
-  "Set active workspace for the current frame to the one at PATH.
-Interactively, choose workspace path with completion.  Return the
-path."
+(defun bufler-workspace-frame-set (&optional path)
+  "Set workspace for the current frame to the one at PATH.
+Interactively, choose workspace path with completion.  If PATH is
+nil (interactively, with prefix), unset the frame's workspace.
+Return the workspace path."
   (interactive
    (list
-    (let* ((bufler-vc-state nil)
-           (grouped-buffers (bufler-buffers))
-           (buffer-paths (bufler-group-tree-paths grouped-buffers))
-           group-paths alist)
-      (cl-labels ((push-subpaths
-                   (path) (when path
-                            (push path group-paths)
-                            (push-subpaths (butlast path))))
-                  (path-cons
-                   (path) (cons (bufler-format-path path) path)))
-        (thread-last buffer-paths
-          (mapcar #'butlast)
-          (mapc #'push-subpaths))
-        (setf group-paths (seq-uniq group-paths)
-              alist (mapcar #'path-cons group-paths))
-        (bufler-read-from-alist "Group: " alist)))))
+    (unless current-prefix-arg
+      (let* ((bufler-vc-state nil)
+	     (grouped-buffers (bufler-buffers))
+	     (buffer-paths (bufler-group-tree-paths grouped-buffers))
+	     group-paths alist)
+	(cl-labels ((push-subpaths
+		     (path) (when path
+			      (push path group-paths)
+			      (push-subpaths (butlast path))))
+		    (path-cons
+		     (path) (cons (bufler-format-path path) path)))
+	  (thread-last buffer-paths
+	    (mapcar #'butlast)
+	    (mapc #'push-subpaths))
+	  (setf group-paths (seq-uniq group-paths)
+		alist (mapcar #'path-cons group-paths))
+	  (bufler-read-from-alist "Group: " alist))))))
   (set-frame-parameter nil 'bufler-workspace-path path)
   (set-frame-parameter nil 'bufler-workspace-path-formatted (bufler-format-path path))
   (run-hook-with-args 'bufler-workspace-set-hook path)
@@ -101,7 +104,7 @@ act as if SET-WORKSPACE-P is non-nil."
                                      buffers nil nil #'string=)))
     (when (or bufler-workspace-switch-buffer-sets-workspace
 	      set-workspace-p)
-      (bufler-frame-workspace
+      (bufler-workspace-frame-set
        ;; FIXME: Ideally we wouldn't call `bufler-buffers' again
        ;; here, but `bufler-buffer-alist-at' returns a slightly
        ;; different structure, and `bufler-group-tree-leaf-path'
@@ -113,10 +116,7 @@ act as if SET-WORKSPACE-P is non-nil."
     (switch-to-buffer selected-buffer)))
 
 ;;;###autoload
-(defalias 'bufler-switch-buffer #'bufler-workspace-switch-buffer)
-
-;;;###autoload
-(defun bufler-buffer-workspace (&optional name)
+(defun bufler-workspace-buffer-set (&optional name)
   "Set current buffer's workspace to NAME.
 If NAME is nil (interactively, with prefix), unset the buffer's
 workspace name.  This sets the buffer-local variable
@@ -133,22 +133,19 @@ appear in a named workspace, the buffer must be matched by an
   (setq-local bufler-workspace-name name))
 
 ;;;###autoload
-(define-minor-mode bufler-mode
+(define-minor-mode bufler-workspace-mode
   "When active, set the frame title according to current Mr. Buffer group."
   :global t
-  (let ((lighter '(bufler-mode (:eval (bufler-mode-lighter)))))
-    (if bufler-mode
+  (let ((lighter '(bufler-workspace-mode (:eval (bufler-workspace-mode-lighter)))))
+    (if bufler-workspace-mode
         (setf mode-line-misc-info
               (append mode-line-misc-info (list lighter)))
       (setf mode-line-misc-info
             (delete lighter mode-line-misc-info)))))
 
-;;;###autoload
-(defalias 'bufler-workspace-mode #'bufler-mode)
-
 ;;;; Functions
 
-(defun bufler-mode-lighter ()
+(defun bufler-workspace-mode-lighter ()
   "Return lighter string for mode line."
   (concat "Bflr:" (frame-parameter nil 'bufler-workspace-path-formatted)))
 
