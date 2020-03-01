@@ -151,7 +151,8 @@ appear in a named workspace, the buffer must be matched by an
 
 (defun bufler-workspace-set-frame-name (path)
   "Set current frame's name according to PATH."
-  (set-frame-name (format "Workspace: %s" (bufler-format-path path))))
+  (set-frame-name (when path
+		    (format "Workspace: %s" (bufler-format-path path)))))
 
 (cl-defun bufler-workspace-read-item (tree &key (leaf-key #'identity))
   "Return a leaf read from TREE with completion.
