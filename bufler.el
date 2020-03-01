@@ -25,12 +25,17 @@
 
 ;;; Commentary:
 
-;; This is a work-in-progress.  It is not published as a package yet.
-;; Please feel free to use it and offer feedback.
+;; Bufler is like a butler for your buffers, presenting them to you in
+;; an organized way based on your instructions.  The instructions are
+;; written as grouping rules in a simple language, allowing you to
+;; customize the way buffers are grouped.  The default rules are
+;; designed to be generally useful, so you don't have to write your
+;; own.
 
-;; Bufler is like Ibuffer, but using
-;; [[https://github.com/magit/magit][magit-section]] to group buffers
-;; in a very flexible way.
+;; It also provides a workspace mode which allows frames to focus on
+;; buffers in certain groups.  Since the groups are created
+;; automatically, the workspaces are created dynamically, rather than
+;; requiring you to put buffers in workspaces manually.
 
 ;;; Code:
 
