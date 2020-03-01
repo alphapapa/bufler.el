@@ -96,12 +96,12 @@ In the Bufler buffer list, these keys are available (use =C-h m= to get the most
 +  =1= -- =4= Cycle section levels at point.
 +  =M-1= -- =M-4= Cycle top-level sections.
 +  =RET=  Pop to buffer.
++  =g=  Refresh Bufler list.
 +  =f=  Set the current frame's workspace to the group at point.
 +  =F=  Make a new frame whose workspace is the group at point.
-+  =g=  Refresh Bufler list.
++  =N=  Add buffers to named workspace (with prefix, remove from it).
 +  =k=  Kill buffers.
 +  =s=  Save buffers.
-+  =w=  Set workspace name.
 
 ** Tips
 

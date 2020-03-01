@@ -116,7 +116,7 @@ act as if SET-WORKSPACE-P is non-nil."
     (switch-to-buffer selected-buffer)))
 
 ;;;###autoload
-(defun bufler-workspace-buffer-set (&optional name)
+(defun bufler-workspace-buffer-name-workspace (&optional name)
   "Set current buffer's workspace to NAME.
 If NAME is nil (interactively, with prefix), unset the buffer's
 workspace name.  This sets the buffer-local variable

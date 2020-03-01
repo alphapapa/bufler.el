@@ -143,12 +143,12 @@ section at point.
    • 1 – 4 Cycle section levels at point.
    • M-1 – M-4 Cycle top-level sections.
    • RET Pop to buffer.
+   • g Refresh Bufler list.
    • f Set the current frame’s workspace to the group at point.
    • F Make a new frame whose workspace is the group at point.
-   • g Refresh Bufler list.
+   • N Add buffers to named workspace (with prefix, remove from it).
    • k Kill buffers.
    • s Save buffers.
-   • w Set workspace name.
 
 
 File: README.info,  Node: Tips,  Next: Defining groups,  Prev: Bindings,  Up: Usage
@@ -459,17 +459,17 @@ Node: Installation1941
 Node: Usage2236
 Node: Commands2475
 Node: Bindings3638
-Node: Tips4256
-Node: Defining groups4509
-Node: Helm support10668
-Node: Prism support11281
-Node: Compared to Ibuffer11710
-Node: Changelog15295
-Node: 02-pre15455
-Node: 0115597
-Node: Credits15700
-Node: Development16245
-Node: License16414
+Node: Tips4298
+Node: Defining groups4551
+Node: Helm support10710
+Node: Prism support11323
+Node: Compared to Ibuffer11752
+Node: Changelog15337
+Node: 02-pre15497
+Node: 0115639
+Node: Credits15742
+Node: Development16287
+Node: License16456
 
 End Tag Table
 

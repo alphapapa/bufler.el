@@ -60,9 +60,9 @@
     (define-key map (kbd "g") #'bufler)
     (define-key map (kbd "f") #'bufler-list-group-frame)
     (define-key map (kbd "F") #'bufler-list-group-make-frame)
+    (define-key map (kbd "N") #'bufler-list-buffer-name-workspace)
     (define-key map (kbd "k") #'bufler-list-buffer-kill)
     (define-key map (kbd "s") #'bufler-list-buffer-save)
-    (define-key map (kbd "w") #'bufler-list-buffer-workspace)
     (define-key map (kbd "RET") #'bufler-list-buffer-switch)
     (define-key map (kbd "SPC") #'bufler-list-buffer-peek)
     map))
@@ -318,13 +318,13 @@ NAME, okay, `checkdoc'?"
       (with-current-buffer buffer
         (save-buffer)))))
 
-(declare-function bufler-workspace-buffer-set "bufler-workspace")
-(bufler-define-buffer-command workspace
+(declare-function bufler-workspace-buffer-name-workspace "bufler-workspace")
+(bufler-define-buffer-command name-workspace
   "Set buffer's workspace name.
 With prefix, unset it."
   (lambda (buffer)
     (with-current-buffer buffer
-      (bufler-workspace-buffer-set name)))
+      (bufler-workspace-buffer-name-workspace name)))
   :let* ((name (unless current-prefix-arg
                  (completing-read "Named workspace: "
                                   (seq-uniq
