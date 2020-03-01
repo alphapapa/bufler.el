@@ -43,6 +43,22 @@
 
   (when (require 'helm nil 'noerror)
 
+    (defun helm-bufler-switch-buffer (buffer)
+      "Switch to BUFFER.
+With two universal prefixes, also set the frame's workspace.
+This mimics `bufler-workspace-switch-buffer'."
+      (when (equal '(16) current-prefix-arg)
+        (bufler-workspace-frame-set
+         ;; FIXME: Ideally we wouldn't call `bufler-buffers' again
+         ;; here, but `bufler-buffer-alist-at' returns a slightly
+         ;; different structure, and `bufler-group-tree-leaf-path'
+         ;; doesn't accept it.  Maybe the issue is related to using
+         ;; `map-nested-elt' in `bufler-buffer-alist-at'.  Maybe
+         ;; that difference has been the source of some other
+         ;; confusion too...
+         (butlast (bufler-group-tree-leaf-path (bufler-buffers) buffer))))
+      (switch-to-buffer buffer))
+
     (defvar helm-bufler-source
       (helm-make-source "Bufler's workspace buffers" 'helm-source-sync
         :header-name (lambda (_name)
@@ -57,7 +73,8 @@
                                                (frame-parameter nil 'bufler-workspace-path)
                                              (cdr (frame-parameter nil 'bufler-workspace-path))))))
                         (bufler-buffer-alist-at group-path)))
-        :action 'helm-type-buffer-actions)
+        :action (cons (cons "Switch to buffer with Bufler" #'helm-bufler-switch-buffer)
+                      helm-type-buffer-actions))
       "Helm source for `bufler'.")))
 
 ;;;; Footer
