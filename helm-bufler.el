@@ -60,8 +60,6 @@
         :action 'helm-type-buffer-actions)
       "Helm source for `bufler'.")))
 
-
-
 ;;;; Footer
 
 (provide 'helm-bufler)
