@@ -39,9 +39,12 @@
 
 (eval-and-compile
   (defvar helm-map)
+  (defvar helm-type-buffer-actions)
   (declare-function helm-make-source "helm-source" t t)
 
   (when (require 'helm nil 'noerror)
+
+    (require 'helm-types)
 
     (defun helm-bufler-switch-buffer (buffer)
       "Switch to BUFFER.
