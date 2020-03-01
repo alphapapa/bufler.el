@@ -71,6 +71,7 @@ Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like t
 :CONTENTS:
 - [[#commands][Commands]]
 - [[#bindings][Bindings]]
+- [[#tips][Tips]]
 - [[#defining-groups][Defining groups]]
 - [[#helm-support][Helm support]]
 - [[#prism-support][Prism support]]
@@ -99,6 +100,10 @@ In the Bufler buffer list, these keys are available (use =C-h m= to get the most
 +  =k=  Kill buffers.
 +  =s=  Save buffers.
 +  =w=  Set workspace name.
+
+** Tips
+
++  =bufler-switch-buffer= works best when =completion-styles= includes the =substring= style.  It also works well with =helm-mode= and =ivy-mode=.
 
 ** Defining groups
 
