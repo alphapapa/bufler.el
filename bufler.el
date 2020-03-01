@@ -64,7 +64,7 @@
     (define-key map (kbd "s") #'bufler-list-buffer-save)
     (define-key map (kbd "w") #'bufler-list-buffer-workspace)
     (define-key map (kbd "RET") #'bufler-list-buffer-switch)
-    (define-key map (kbd "SPC") #'bufler-list-buffer-pop)
+    (define-key map (kbd "SPC") #'bufler-list-buffer-peek)
     map))
 
 (defvar bufler-emacs-source-directory
@@ -289,12 +289,19 @@ NAME, okay, `checkdoc'?"
 (bufler-define-buffer-command kill "Kill buffer."
   #'kill-buffer)
 
-(bufler-define-buffer-command pop "Pop to buffer."
-  #'pop-to-buffer
+(bufler-define-buffer-command switch "Switch to buffer."
+  (lambda (buffer)
+    (let ((bufler-window (selected-window)))
+      (delete-window bufler-window)
+      (pop-to-buffer buffer '((display-buffer-reuse-window
+			       display-buffer-same-window)))))
   :refresh-p nil)
 
-(bufler-define-buffer-command switch "Switch to buffer."
-  #'switch-to-buffer
+(bufler-define-buffer-command peek "Peek at buffer in another window."
+  (lambda (buffer)
+    (display-buffer buffer '((display-buffer-use-some-window
+			     display-buffer-pop-up-window)
+			    (inhibit-same-window . t))))
   :refresh-p nil)
 
 (bufler-define-buffer-command save "Save buffer."
