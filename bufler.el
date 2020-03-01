@@ -300,7 +300,11 @@ NAME, okay, `checkdoc'?"
 (bufler-define-buffer-command switch "Switch to buffer."
   (lambda (buffer)
     (let ((bufler-window (selected-window)))
-      (delete-window bufler-window)
+      (ignore-errors
+	;; Ignoring the error seems like the easiest way to handle
+	;; this.  There are a surprising number of nuances in getting
+	;; this to behave exactly as desired in all cases.
+	(delete-window bufler-window))
       (pop-to-buffer buffer '((display-buffer-reuse-window
 			       display-buffer-same-window)))))
   :refresh-p nil)
