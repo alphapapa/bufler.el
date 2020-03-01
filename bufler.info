@@ -117,7 +117,7 @@ group.
 ‘bufler-switch-buffer’
      Switch to a buffer selected from the frame’s workspace.  With
      prefix, select from all buffers.  With two prefixes, also set the
-     workspace.
+     frame’s workspace.
 ‘bufler-workspace-frame-set’
      Set the frame’s workspace.  Setting the workspace may be done
      automatically by bufler-switch-buffer, but this command may be used
@@ -458,18 +458,18 @@ Node: Screenshots1238
 Node: Installation1941
 Node: Usage2236
 Node: Commands2475
-Node: Bindings3628
-Node: Tips4246
-Node: Defining groups4499
-Node: Helm support10658
-Node: Prism support11271
-Node: Compared to Ibuffer11700
-Node: Changelog15285
-Node: 02-pre15445
-Node: 0115587
-Node: Credits15690
-Node: Development16235
-Node: License16404
+Node: Bindings3638
+Node: Tips4256
+Node: Defining groups4509
+Node: Helm support10668
+Node: Prism support11281
+Node: Compared to Ibuffer11710
+Node: Changelog15295
+Node: 02-pre15455
+Node: 0115597
+Node: Credits15700
+Node: Development16245
+Node: License16414
 
 End Tag Table
 
