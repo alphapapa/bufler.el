@@ -300,8 +300,8 @@ NAME, okay, `checkdoc'?"
 (bufler-define-buffer-command peek "Peek at buffer in another window."
   (lambda (buffer)
     (display-buffer buffer '((display-buffer-use-some-window
-			     display-buffer-pop-up-window)
-			    (inhibit-same-window . t))))
+			      display-buffer-pop-up-window)
+			     (inhibit-same-window . t))))
   :refresh-p nil)
 
 (bufler-define-buffer-command save "Save buffer."
