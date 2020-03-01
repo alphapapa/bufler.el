@@ -368,7 +368,9 @@ NAME, okay, `checkdoc'?"
 (bufler-define-group-command frame
   "Set the current frame's workspace to the group at point."
   (lambda (_group path)
-    (bufler-workspace-frame-set path))
+    (bufler-workspace-frame-set
+     (unless current-prefix-arg
+       path)))
   :refresh-p nil)
 
 (bufler-define-group-command make-frame
