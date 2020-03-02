@@ -88,6 +88,13 @@ Usually this will be something like \"/usr/share/emacs/VERSION\".")
 (defvar bufler-workspace-name nil
   "The buffer's named workspace, if any.")
 
+(defvar bufler-cache-related-dirs (make-hash-table :test #'equal)
+  "Cache of relations between directories.
+See `bufler-cache-related-dirs-p'.")
+
+(defvar bufler-cache-related-dirs-timer nil
+  "Timer used to clear `bufler-dir-related-cache'.")
+
 ;;;; Customization
 
 (defgroup bufler nil
@@ -154,6 +161,27 @@ May be used to add extra space between groups in `bufler-list'."
                  (const :tag "Blank line after top-level groups"
                         ((0 . "\n")))
                  (alist :key-type (integer :tag "Group level") :value-type (string :tag "Suffix string"))))
+
+(defcustom bufler-cache-related-dirs-p t
+  "Whether to cache whether directory pairs are related.
+Computing whether one directory is related to another can be
+surprisingly expensive in terms of consing and function calls
+because of path resolution and splitting paths into strings.
+With a large number of buffers open in a large number of
+directories, the performance impact can be noticable.  This cache
+makes the performance impact virtually unnoticable.
+
+This should always be accurate except in the rare case that a
+path is a symlink whose target is changed.  See
+`bufler-cache-related-dirs-timeout'."
+  :type 'boolean)
+
+(defcustom bufler-cache-related-dirs-timeout 3600
+  "How often to reset the cache, in seconds.
+The cache should not be allowed to grow unbounded, so it's
+cleared with a timer that runs this many seconds after the last
+`bufler-list' command."
+  :type 'boolean)
 
 ;;;;; Faces
 
@@ -251,6 +279,13 @@ string, not in group headers.")
     (let* ((inhibit-read-only t)
            (groups (bufler-buffers))
            pos)
+      ;; Cancel cache-clearing idle timer and start a new one.
+      (when bufler-cache-related-dirs-timer
+        (cancel-timer bufler-cache-related-dirs-timer))
+      (setf bufler-cache-related-dirs-timer
+            (run-with-idle-timer bufler-cache-related-dirs-timeout nil
+                                 (lambda ()
+                                   (setf bufler-cache-related-dirs (make-hash-table :test #'equal)))))
       (when bufler-reverse
         (setf groups (nreverse (-sort #'format< groups))))
       (with-current-buffer (get-buffer-create "*Bufler*")
@@ -601,21 +636,34 @@ e.g. symlinks are resolved."
   (let* ((buffer-dir (buffer-local-value 'default-directory buffer))
          (dirs (if (listp dirs) dirs (list dirs)))
          (group-name (concat "Dir: " (car dirs))))
-    ;; MAYBE: Memoize `f-canonical' here.
-    (cl-labels ((dir-related-p (test-dir buffer-dir)
-                               (let ((test-dir (f-canonical test-dir))
-                                     (buffer-dir (f-canonical buffer-dir)))
-                                 (or (f-equal? test-dir buffer-dir)
-                                     (f-ancestor-of? test-dir buffer-dir)))))
-      (unless (listp dirs)
-        (setf dirs (list dirs)))
-      (cl-loop for dir in dirs
-               when (dir-related-p dir buffer-dir)
-               return (if depth
-                          (concat "Dir: "
-                                  (apply #'f-join dir
-                                         (-take depth (f-split (f-relative buffer-dir dir)))))
-                        group-name)))))
+    (unless (listp dirs)
+      (setf dirs (list dirs)))
+    (cl-loop for dir in dirs
+             when (bufler-dir-related-p dir buffer-dir)
+             return (if depth
+                        (concat "Dir: "
+                                (apply #'f-join dir
+                                       (-take depth (f-split (f-relative buffer-dir dir)))))
+                      group-name))))
+
+(defun bufler-dir-related-p (dir-a dir-b)
+  "Return non-nil if DIR-A is related to DIR-B.
+In other words, if DIR-A is either equal to or an ancestor of
+DIR-B."
+  (cl-labels ((dir-related-p
+               (dir-a dir-b) (let ((test-dir (f-canonical dir-a))
+                                   (buffer-dir (f-canonical dir-b)))
+                               (or (f-equal? test-dir buffer-dir)
+                                   (f-ancestor-of? test-dir buffer-dir)))))
+    (if bufler-cache-related-dirs-p
+        (let ((key (cons dir-a dir-b)))
+          (pcase (gethash key bufler-cache-related-dirs)
+            (:bufler-cache-nil nil)
+            ('nil (let ((value (dir-related-p dir-a dir-b)))
+                    (puthash key (or value :bufler-cache-nil) bufler-cache-related-dirs)
+                    value))
+            (_ t)))
+      (dir-related-p dir-a dir-b))))
 
 ;; MAYBE: Is `cl-check-type' needed?
 
