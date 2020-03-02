@@ -76,7 +76,7 @@ This mimics `bufler-workspace-switch-buffer'."
                                                (frame-parameter nil 'bufler-workspace-path)
                                              (cdr (frame-parameter nil 'bufler-workspace-path))))))
                         (bufler-buffer-alist-at group-path)))
-        :action (cons (cons "Switch to buffer with Bufler" #'helm-bufler-switch-buffer)
+        :action (cons (cons "Switch to buffer with Bufler" 'helm-bufler-switch-buffer)
                       helm-type-buffer-actions))
       "Helm source for `bufler'.")))
 
