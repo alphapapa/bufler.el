@@ -106,9 +106,6 @@ File: README.info,  Node: Commands,  Next: Bindings,  Up: Usage
 3.1 Commands
 ============
 
-Run one of these commands.  You can customize settings in the bufler
-group.
-
 ‘bufler’
      Show the Bufler buffer list.
 ‘bufler-mode’
@@ -144,7 +141,8 @@ section at point.
    • M-1 – M-4 Cycle top-level sections.
    • RET Pop to buffer.
    • g Refresh Bufler list.
-   • f Set the current frame’s workspace to the group at point.
+   • f Set the current frame’s workspace to the group at point (with
+     prefix, unset).
    • F Make a new frame whose workspace is the group at point.
    • N Add buffers to named workspace (with prefix, remove from it).
    • k Kill buffers.
@@ -158,6 +156,7 @@ File: README.info,  Node: Tips,  Next: Defining groups,  Prev: Bindings,  Up: Us
 
    • bufler-switch-buffer works best when completion-styles includes the
      substring style.  It also works well with helm-mode and ivy-mode.
+   • Customize settings in the bufler group.
 
 
 File: README.info,  Node: Defining groups,  Next: Helm support,  Prev: Tips,  Up: Usage
@@ -376,7 +375,7 @@ doesn’t replace it completely.  Bufler is a very young project.
      interfere with other modes or commands.)
   6. Make a new frame for a different project by using bufler-list to
      show the list of buffer groups, then selecting a group and pressing
-     f to make the frame, which will be automatically set to that
+     F to make the frame, which will be automatically set to that
      group’s workspace.
   7. When you need to kill or save a bunch of buffers at once, use
      bufler-list, put the cursor on a group you want to kill or save,
@@ -440,7 +439,7 @@ File: README.info,  Node: Development,  Next: License,  Prev: Credits,  Up: Top
 7 Development
 *************
 
-Bug reports, feature requests, suggestions — _oh my_!
+Bufler bufler bufler bufler bufler bufler bufler bufler.
 
 
 File: README.info,  Node: License,  Prev: Development,  Up: Top
@@ -458,18 +457,18 @@ Node: Screenshots1238
 Node: Installation1941
 Node: Usage2236
 Node: Commands2475
-Node: Bindings3638
-Node: Tips4298
-Node: Defining groups4551
-Node: Helm support10710
-Node: Prism support11323
-Node: Compared to Ibuffer11752
-Node: Changelog15337
-Node: 02-pre15497
-Node: 0115639
-Node: Credits15742
-Node: Development16287
-Node: License16456
+Node: Bindings3561
+Node: Tips4247
+Node: Defining groups4547
+Node: Helm support10706
+Node: Prism support11319
+Node: Compared to Ibuffer11748
+Node: Changelog15333
+Node: 02-pre15493
+Node: 0115635
+Node: Credits15738
+Node: Development16283
+Node: License16453
 
 End Tag Table
 
