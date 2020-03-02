@@ -83,8 +83,6 @@ Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like t
 
 ** Commands
 
-  Run one of these commands.  You can customize settings in the =bufler= group.
-
 +  =bufler= :: Show the Bufler buffer list.
 +  =bufler-mode= :: Enable the Bufler workspace mode, which allows each frame to have a chosen workspace from Bufler's groups.
 +  =bufler-switch-buffer= :: Switch to a buffer selected from the frame's workspace.  With prefix, select from all buffers.  With two prefixes, also set the frame's workspace.
@@ -108,6 +106,7 @@ In the Bufler buffer list, these keys are available (use =C-h m= to get the most
 ** Tips
 
 +  =bufler-switch-buffer= works best when =completion-styles= includes the =substring= style.  It also works well with =helm-mode= and =ivy-mode=.
++  Customize settings in the =bufler= group.
 
 ** Defining groups
 
