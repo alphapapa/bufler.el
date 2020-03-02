@@ -535,7 +535,8 @@ Each cell is suitable for completion functions."
                                     (vc-registered (buffer-file-name buffer)))
                            (with-current-buffer buffer
                              ;; Unfortunately, this seems to be necessary to get the correct state.
-                             (vc-refresh-state))
+                             (vc-state-refresh (buffer-file-name buffer)
+					       (vc-backend (buffer-file-name buffer))))
                            (pcase (vc-state (buffer-file-name buffer))
                              ((and 'edited it)
                               (propertize (format " %s" it)
