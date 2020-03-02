@@ -61,7 +61,8 @@
 ;;;; Variables
 
 (defvar bufler-list-mode-map
-  (let ((map (copy-keymap magit-section-mode-map)))
+  (let ((map (make-sparse-keymap)))
+    (set-keymap-parent map magit-section-mode-map)
     (define-key map (kbd "g") #'bufler)
     (define-key map (kbd "f") #'bufler-list-group-frame)
     (define-key map (kbd "F") #'bufler-list-group-make-frame)
