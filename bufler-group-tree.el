@@ -44,6 +44,7 @@
 
 (defun bufler-group-tree (fns sequence)
   "Return SEQUENCE grouped according to FNS."
+  (declare (indent defun))
   ;; Modeled on grouping from `sbuffer'.
   (cl-typecase fns
     (function
