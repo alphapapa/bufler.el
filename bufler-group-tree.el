@@ -67,10 +67,10 @@
              ;; their subgrouping.  Then group the buffers that
              ;; don't match the first function, and append them.
              (append (bufler-group-tree (car fns)
-                                        (cl-remove-if-not (caar fns) sequence))
+                       (cl-remove-if-not (caar fns) sequence))
                      (if (cdr fns)
                          (bufler-group-tree (cdr fns)
-                                            (cl-remove-if (caar fns) sequence))
+                           (cl-remove-if (caar fns) sequence))
                        (cl-remove-if (caar fns) sequence))))))))
 
 (defun bufler-group-tree-leaf-path (tree leaf)
