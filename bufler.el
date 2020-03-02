@@ -247,20 +247,38 @@ string, not in group headers.")
                                   ;; This almost seems lazy, using `-tree-map-nodes'
                                   ;; with `bufferp', but it works, and it's correct,
                                   ;; and since `bufferp' is in C, maybe it's even fast.
-                                  (-tree-map-nodes #'bufferp (lambda (&rest _)
-                                                               (cl-incf num-buffers))
+
+                                  ;; NOTE: Sometimes killed buffers remain in the list
+                                  ;; of buffers returned by `bufler-buffers'.  I haven't
+                                  ;; figured out why.  Maybe we're keeping a reference
+                                  ;; to them in the list buffer or in the cached groups.
+                                  ;; Anyway, as long as that is the case, we have to
+                                  ;; avoid inserting killed buffers, and we have to
+                                  ;; avoid showing empty sections.  So we only increment
+                                  ;; the number of buffers for live ones, and if there
+                                  ;; aren't any, we cancel the section.
+
+                                  ;; FIXME: Track down what's causing killed buffers to remain in
+                                  ;; `bufler-buffers', even though there don't seem to be any in `buffer-list'.
+                                  (-tree-map-nodes #'bufferp
+                                                   (lambda (buffer)
+                                                     (when (buffer-live-p buffer)
+                                                       (cl-incf num-buffers)))
                                                    group)
                                   (magit-insert-section (bufler-group (make-bufler-group
                                                                        :type type :path path
                                                                        :elements (cdr things)))
-                                    (magit-insert-heading (make-string (* 2 level) ? )
-                                      (format-group type level)
-                                      (propertize (format " (%s)" num-buffers)
-                                                  'face 'bufler-size))
-                                    (--each things
-                                      (insert-thing it path (1+ level)))
-                                    (when suffix
-                                      (insert suffix)))))) )
+                                    (if (> num-buffers 0)
+                                        (progn
+                                          (magit-insert-heading (make-string (* 2 level) ? )
+                                            (format-group type level)
+                                            (propertize (format " (%s)" num-buffers)
+                                                        'face 'bufler-size))
+                                          (--each things
+                                            (insert-thing it path (1+ level)))
+                                          (when suffix
+                                            (insert suffix)))
+                                      (magit-cancel-section)))))) )
        (format-group
         (group level) (let* ((string (cl-typecase group
                                        (string group)
