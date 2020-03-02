@@ -396,10 +396,10 @@ NAME, okay, `checkdoc'?"
 If PATH, return only buffers from the group at PATH."
   (cl-flet ((buffers
              () (bufler-group-tree groups
-                                   (cl-loop with buffers = (buffer-list)
-                                            for fn in bufler-filter-fns
-                                            do (setf buffers (cl-remove-if fn buffers))
-                                            finally return buffers))))
+		  (cl-loop with buffers = (cl-delete-if-not #'buffer-live-p (buffer-list))
+			   for fn in bufler-filter-fns
+			   do (setf buffers (cl-remove-if fn buffers))
+			   finally return buffers))))
     (let ((buffers (if bufler-use-cache
                        (let ((hash (sxhash (buffer-list))))
                          (if (equal hash (car bufler-cache))
