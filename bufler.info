@@ -11,6 +11,17 @@ File: README.info,  Node: Top,  Next: Screenshots,  Up: (dir)
 Bufler.el
 *********
 
+Bufler is like a butler for your buffers, presenting them to you in an
+organized way based on your instructions.  The instructions are written
+as grouping rules in a simple language, allowing you to customize the
+way buffers are grouped.  The default rules are designed to be generally
+useful, so you don’t have to write your own.
+
+   It also provides a workspace mode which allows frames to focus on
+buffers in certain groups.  Since the groups are created automatically,
+the workspaces are created dynamically, rather than requiring you to put
+buffers in workspaces manually.
+
 * Menu:
 
 * Screenshots::
@@ -24,8 +35,6 @@ Bufler.el
 
 — The Detailed Node Listing —
 
-
-
 Usage
 
 * Commands::
@@ -35,24 +44,11 @@ Usage
 * Helm support::
 * Prism support::
 
-
-
-
 Changelog
 
 * 0.2-pre: 02-pre. 
 * 0.1: 01. 
 
-Bufler is like a butler for your buffers, presenting them to you in an
-organized way based on your instructions.  The instructions are written
-as grouping rules in a simple language, allowing you to customize the
-way buffers are grouped.  The default rules are designed to be generally
-useful, so you don’t have to write your own.
-
-   It also provides a workspace mode which allows frames to focus on
-buffers in certain groups.  Since the groups are created automatically,
-the workspaces are created dynamically, rather than requiring you to put
-buffers in workspaces manually.
 
 
 File: README.info,  Node: Screenshots,  Next: Installation,  Prev: Top,  Up: Top
@@ -60,17 +56,17 @@ File: README.info,  Node: Screenshots,  Next: Installation,  Prev: Top,  Up: Top
 1 Screenshots
 *************
 
-This screenshot shows bufler-list in the top window, and
-bufler-switch-buffer reading a buffer with completion in the bottom
+This screenshot shows ‘bufler-list’ in the top window, and
+‘bufler-switch-buffer’ reading a buffer with completion in the bottom
 window.  Note how the same, recursively grouped buffers are shown in
 both ways.
 
    This screenshot compares Bufler and Ibuffer showing the same buffers
 with the default settings.  Note how Bufler allows commands to be
-applied to an entire group of buffers: for example, pressing k in the
-Bufler list would kill all the buffers in the group
-Project: ~/src/emacs/bufler.el (and, of course, since it calls
-kill-buffer, any unsaved ones would ask to be saved first).
+applied to an entire group of buffers: for example, pressing ‘k’ in the
+Bufler list would kill all the buffers in the group ‘Project:
+~/src/emacs/bufler.el’ (and, of course, since it calls ‘kill-buffer’,
+any unsaved ones would ask to be saved first).
 
 
 File: README.info,  Node: Installation,  Next: Usage,  Prev: Screenshots,  Up: Top
@@ -117,9 +113,9 @@ File: README.info,  Node: Commands,  Next: Bindings,  Up: Usage
      frame’s workspace.
 ‘bufler-workspace-frame-set’
      Set the frame’s workspace.  Setting the workspace may be done
-     automatically by bufler-switch-buffer, but this command may be used
-     to set the workspace to a group containing other groups, after
-     which bufler-switch-buffer will present buffers from the selected
+     automatically by ‘bufler-switch-buffer’, but this command may be
+     used to set the workspace to a group containing other groups, after
+     which ‘bufler-switch-buffer’ will present buffers from the selected
      group and its subgroups.
 ‘bufler-workspace-buffer-set’
      Set the current buffer’s workspace name.  With prefix, unset it.
@@ -133,20 +129,21 @@ File: README.info,  Node: Bindings,  Next: Tips,  Prev: Commands,  Up: Usage
 3.2 Bindings
 ============
 
-In the Bufler buffer list, these keys are available (use C-h m to get
+In the Bufler buffer list, these keys are available (use ‘C-h m’ to get
 the most up-to-date listing).  They operate on all buffers in the
 section at point.
 
-   • 1 – 4 Cycle section levels at point.
-   • M-1 – M-4 Cycle top-level sections.
-   • RET Pop to buffer.
-   • g Refresh Bufler list.
-   • f Set the current frame’s workspace to the group at point (with
+   • ‘1’ – ‘4’ Cycle section levels at point.
+   • ‘M-1’ – ‘M-4’ Cycle top-level sections.
+   • ‘RET’ Switch to buffer.
+   • ‘SPC’ Peek at buffer, keeping focus in buffer list.
+   • ‘g’ Refresh Bufler list.
+   • ‘f’ Set the current frame’s workspace to the group at point (with
      prefix, unset).
-   • F Make a new frame whose workspace is the group at point.
-   • N Add buffers to named workspace (with prefix, remove from it).
-   • k Kill buffers.
-   • s Save buffers.
+   • ‘F’ Make a new frame whose workspace is the group at point.
+   • ‘N’ Add buffers to named workspace (with prefix, remove from it).
+   • ‘k’ Kill buffers.
+   • ‘s’ Save buffers.
 
 
 File: README.info,  Node: Tips,  Next: Defining groups,  Prev: Bindings,  Up: Usage
@@ -154,9 +151,10 @@ File: README.info,  Node: Tips,  Next: Defining groups,  Prev: Bindings,  Up: Us
 3.3 Tips
 ========
 
-   • bufler-switch-buffer works best when completion-styles includes the
-     substring style.  It also works well with helm-mode and ivy-mode.
-   • Customize settings in the bufler group.
+   • ‘bufler-switch-buffer’ works best when ‘completion-styles’ includes
+     the ‘substring’ style.  It also works well with ‘helm-mode’ and
+     ‘ivy-mode’.
+   • Customize settings in the ‘bufler’ group.
 
 
 File: README.info,  Node: Defining groups,  Next: Helm support,  Prev: Tips,  Up: Usage
@@ -164,10 +162,10 @@ File: README.info,  Node: Defining groups,  Next: Helm support,  Prev: Tips,  Up
 3.4 Defining groups
 ===================
 
-_See the bufler info page to view this information in Emacs._
+_See the ‘bufler’ info page to view this information in Emacs._
 
    The Bufler groups definition is a list stored in variable
-bufler-groups.  Each element of the list is either a lambda function
+‘bufler-groups’.  Each element of the list is either a lambda function
 which takes a single argument, a buffer, or a list of such functions.
 Each buffer is matched against these functions in order until it does
 not match any more functions at that level.  A list of functions defines
@@ -178,9 +176,9 @@ Ultimately, it’s lambdas all the way down.
    This seems somewhat difficult to explain, so please see the examples.
 Once you get the hang of it, it’s powerful and flexible.
 
-   For convenience, the macro bufler-defgroups provides a sort of DSL, a
-concise vocabulary for defining groups.  For example, the default groups
-are defined like this:
+   For convenience, the macro ‘bufler-defgroups’ provides a sort of DSL,
+a concise vocabulary for defining groups.  For example, the default
+groups are defined like this:
 
      (bufler-defgroups
        (group
@@ -240,15 +238,15 @@ are defined like this:
        (auto-directory)
        (auto-mode))
 
-   *Note* that the macro does not _set_ the variable bufler-groups, it
+   *Note* that the macro does not _set_ the variable ‘bufler-groups’, it
 merely expands a groups form, so you should use, e.g.  ‘(setf
 bufler-groups (bufler-defgroups ...))’ to actually set the groups.
 
-   The following group types are available in bufler-defgroups.  Note
+   The following group types are available in ‘bufler-defgroups’.  Note
 that each one is expanded into a lambda, so they may also be called by
-funcall (see example above).
+‘funcall’ (see example above).
 
-‘Meta types’
+Meta types
      These types compose multiple of the other types into a single
      group.
         • ‘group (TYPE...)’ Define a subgroup matching given types,
@@ -259,7 +257,7 @@ funcall (see example above).
           the given types.
         • ‘group-or (NAME TYPE...)’ Groups buffers which match any of
           the given types.
-‘Auto-types’
+Auto-types
      These types automatically create groups for the buffer’s attribute
      of this type.
         • ‘auto-directory’ Buffer’s directory.
@@ -274,7 +272,7 @@ funcall (see example above).
           its name starts with ‘*’).
         • ‘auto-tramp’ Whether the buffer is opened via Tramp.
         • ‘auto-workspace’ The buffer’s named workspace, if any.
-‘Regexp types’
+Regexp types
      These types match a value against a buffer’s attribute and group
      buffers which match.
         • ‘filename-match (NAME REGEXP)’ Match a regular expression
@@ -283,7 +281,7 @@ funcall (see example above).
           the buffer’s name.
         • ‘mode-match (NAME REGEXP)’ Match a regular expression against
           the buffer’s major-mode.
-‘Other types’
+Other types
         • ‘dir (DIRS DEPTH)’ Groups buffers which match one of the given
           DIRS. DIRS may be one or a list of directory paths.  DEPTH may
           be nil or a depth above which to produce subdirectory groups
@@ -296,10 +294,10 @@ File: README.info,  Node: Helm support,  Next: Prism support,  Prev: Defining gr
 ================
 
 Bufler does not require nor depend on Helm, but it provides optional
-support for it in helm-bufler.el in the form of helm-bufler-source, a
-Helm source that shows buffers in the current workspace (or when the
-Helm command is called with C-u, all buffers).  It looks like this when
-showing all buffers:
+support for it in ‘helm-bufler.el’ in the form of ‘helm-bufler-source’,
+a Helm source that shows buffers in the current workspace (or when the
+Helm command is called with ‘C-u’, all buffers).  It looks like this
+when showing all buffers:
 
    Use it like this:
 
@@ -308,7 +306,7 @@ showing all buffers:
      (helm :sources '(helm-bufler-source))
 
    Or you can use the source in an existing Helm command, like
-helm-find-files.
+‘helm-find-files’.
 
 
 File: README.info,  Node: Prism support,  Prev: Helm support,  Up: Usage
@@ -318,10 +316,9 @@ File: README.info,  Node: Prism support,  Prev: Helm support,  Up: Usage
 
 Bufler does not require nor depend on Prism
 (https://github.com/alphapapa/prism.el), but you can use Prism’s level
-faces with Bufler by using
-M-x customize-option RET bufler-face-prefix RET and choosing the
-Prism faces option.  For example (showing an earlier version of the
-package, when it was called Sbuffer):
+faces with Bufler by using ‘M-x customize-option RET bufler-face-prefix
+RET’ and choosing the ‘Prism faces’ option.  For example (showing an
+earlier version of the package, when it was called Sbuffer):
 
 
 File: README.info,  Node: Compared to Ibuffer,  Next: Changelog,  Prev: Usage,  Up: Top
@@ -335,7 +332,7 @@ some powerful grouping features, they are restricted to single-level
 grouping, and they require extensive, manual configuration.  Bufler
 offers recursive, multi-level grouping, and a set of default groups is
 provided which are designed to be generally useful.  Bufler presents
-groups in bufler-list using the magit-section library, which allows
+groups in ‘bufler-list’ using the ‘magit-section’ library, which allows
 groups and buffers to be toggled, marked, and operated on with commands.
 
    Ibuffer groups must be manually and individually specified.  So, for
@@ -348,9 +345,9 @@ project B’s.  When those projects’ buffers are closed, the groups are
 automatically removed.
 
    Bufler also provides optional workspace features in the form of
-bufler-mode, which helps focus a frame on a group of buffers.  When it’s
-active, the command bufler-switch-buffer presents buffers from that
-frame’s selected workspace; when called with a prefix argument, it
+‘bufler-mode’, which helps focus a frame on a group of buffers.  When
+it’s active, the command ‘bufler-switch-buffer’ presents buffers from
+that frame’s selected workspace; when called with a prefix argument, it
 presents all buffers, and then switches the frame’s workspace to the
 selected buffer’s group.
 
@@ -360,31 +357,31 @@ doesn’t replace it completely.  Bufler is a very young project.
    A workflow using Bufler could be something like this:
 
   1. Start Emacs.
-  2. Activate bufler-mode.
+  2. Activate ‘bufler-mode’.
   3. Open some buffers, find some files, etc.
-  4. When you need to switch buffers, use M-x bufler-switch-buffer.  The
-     buffers are presented by group with their "outline paths," which
-     makes it easier to find the buffer you’re looking for, since
+  4. When you need to switch buffers, use ‘M-x bufler-switch-buffer’.
+     The buffers are presented by group with their "outline paths,"
+     which makes it easier to find the buffer you’re looking for, since
      they’re organized by project, directory, mode, etc.
-  5. The next time you call bufler-switch-buffer in that frame, it will
-     only offer buffers from that frame’s buffer group, making it easier
-     to find buffers related to the current project.  Or if you need to
-     select a buffer in a different group, use C-u with
-     bufler-switch-buffer to see all buffers.  (Of course, existing
-     commands like switch-to-buffer are not affected; Bufler doesn’t
+  5. The next time you call ‘bufler-switch-buffer’ in that frame, it
+     will only offer buffers from that frame’s buffer group, making it
+     easier to find buffers related to the current project.  Or if you
+     need to select a buffer in a different group, use ‘C-u’ with
+     ‘bufler-switch-buffer’ to see all buffers.  (Of course, existing
+     commands like ‘switch-to-buffer’ are not affected; Bufler doesn’t
      interfere with other modes or commands.)
-  6. Make a new frame for a different project by using bufler-list to
+  6. Make a new frame for a different project by using ‘bufler-list’ to
      show the list of buffer groups, then selecting a group and pressing
-     F to make the frame, which will be automatically set to that
+     ‘F’ to make the frame, which will be automatically set to that
      group’s workspace.
   7. When you need to kill or save a bunch of buffers at once, use
-     bufler-list, put the cursor on a group you want to kill or save,
-     and press k or s.  If you want to see which buffers have unsaved
-     (indicated with *) or uncommitted (indicated with edited) changes,
-     you can browse through the list of buffers (enable bufler-vc-state
-     to show VC state for each buffer; this is disabled by default
-     because getting up-to-date information on a buffer’s VC state can
-     be slow).
+     ‘bufler-list’, put the cursor on a group you want to kill or save,
+     and press ‘k’ or ‘s’.  If you want to see which buffers have
+     unsaved (indicated with ‘*’) or uncommitted (indicated with
+     ‘edited’) changes, you can browse through the list of buffers
+     (enable ‘bufler-vc-state’ to show VC state for each buffer; this is
+     disabled by default because getting up-to-date information on a
+     buffer’s VC state can be slow).
 
    Then, you can write your own buffer-grouping rules to make them as
 simple or as complex as you like.  They’re just Lisp functions, so you
@@ -453,22 +450,22 @@ GPLv3
 
 Tag Table:
 Node: Top258
-Node: Screenshots1238
-Node: Installation1941
-Node: Usage2236
-Node: Commands2475
-Node: Bindings3561
-Node: Tips4247
-Node: Defining groups4547
-Node: Helm support10706
-Node: Prism support11319
-Node: Compared to Ibuffer11748
-Node: Changelog15333
-Node: 02-pre15493
-Node: 0115635
-Node: Credits15738
-Node: Development16283
-Node: License16453
+Node: Screenshots1234
+Node: Installation1967
+Node: Usage2262
+Node: Commands2501
+Node: Bindings3599
+Node: Tips4423
+Node: Defining groups4764
+Node: Helm support10935
+Node: Prism support11572
+Node: Compared to Ibuffer12013
+Node: Changelog15705
+Node: 02-pre15865
+Node: 0116007
+Node: Credits16110
+Node: Development16655
+Node: License16825
 
 End Tag Table
 
