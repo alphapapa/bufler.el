@@ -5,7 +5,7 @@
 ;; Author: Adam Porter <adam@alphapapa.net>
 ;; URL: https://github.com/alphapapa/bufler.el
 ;; Package-Version: 0.2-pre
-;; Package-Requires: ((emacs "26.3") (dash "2.17") (dash-functional "2.17") (f "0.17") (magit-section "0.1"))
+;; Package-Requires: ((emacs "26.3") (dash "2.17") (dash-functional "2.17") (f "0.17") (pretty-hydra "0.2.2") (magit-section "0.1"))
 ;; Keywords: convenience
 
 ;;; License:
@@ -63,6 +63,7 @@
 (defvar bufler-list-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map magit-section-mode-map)
+    (define-key map (kbd "?") #'hydra:bufler/body)
     (define-key map (kbd "g") #'bufler)
     (define-key map (kbd "f") #'bufler-list-group-frame)
     (define-key map (kbd "F") #'bufler-list-group-make-frame)
@@ -718,6 +719,27 @@ all the buffers' values for each column."
 			    table))
 		 table)
 	(cons table column-sizes)))))
+
+;;;;; Hydra
+
+(require 'pretty-hydra)
+
+(pretty-hydra-define hydra:bufler
+  (:hint t :foreign-keys run :quit-key "q" :post (progn
+						   (quit-window)))
+  ("Bufler"
+   (("g" #'bufler "Refresh")
+    ("m" #'bufler-mode "Toggle mode")
+    ("q" nil "Quit"))
+   "Buffer"
+   (("SPC" #'bufler-list-buffer-peek "Peek at")
+    ("RET" #'bufler-list-buffer-switch "Switch to")
+    ("k" #'bufler-list-buffer-kill "Kill")
+    ("s" #'bufler-list-buffer-save "Save")
+    ("N" #'bufler-list-buffer-name-workspace "Named workspace"))
+   "Workspace"
+   (("f" #'bufler-list-group-frame "Focus on")
+    ("F" #'bufler-list-group-make-frame "Make frame"))))
 
 ;;;;; Grouping
 

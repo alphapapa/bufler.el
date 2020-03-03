@@ -135,6 +135,7 @@ In the Bufler buffer list, these keys are available (use ‘C-h m’ to get
 the most up-to-date listing).  They operate on all buffers in the
 section at point.
 
+   • ‘?’ Show key bindings Hydra.
    • ‘1’ – ‘4’ Cycle section levels at point.
    • ‘M-1’ – ‘M-4’ Cycle top-level sections.
    • ‘RET’ Switch to buffer.
@@ -431,6 +432,8 @@ File: README.info,  Node: Credits,  Next: Development,  Prev: Changelog,  Up: To
      (https://github.com/magnars/dash.el).
    • Thanks to Johan Andersson (https://github.com/rejeep) for f.el
      (https://github.com/rejeep/f.el).
+   • Thanks to Jerry Peng (https://github.com/jerrypnz) for Pretty Hydra
+     (https://github.com/jerrypnz/major-mode-hydra.el#pretty-hydra).
 
 
 File: README.info,  Node: Development,  Next: License,  Prev: Credits,  Up: Top
@@ -457,17 +460,17 @@ Node: Installation2069
 Node: Usage2364
 Node: Commands2603
 Node: Bindings3701
-Node: Tips4525
-Node: Defining groups4866
-Node: Helm support11037
-Node: Prism support11674
-Node: Compared to Ibuffer12115
-Node: Changelog15807
-Node: 02-pre15967
-Node: 0116109
-Node: Credits16212
-Node: Development16757
-Node: License16927
+Node: Tips4565
+Node: Defining groups4906
+Node: Helm support11077
+Node: Prism support11714
+Node: Compared to Ibuffer12155
+Node: Changelog15847
+Node: 02-pre16007
+Node: 0116149
+Node: Credits16252
+Node: Development16941
+Node: License17111
 
 End Tag Table
 
