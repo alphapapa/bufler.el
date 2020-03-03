@@ -226,97 +226,99 @@ string, not in group headers.")
 (defun bufler-list ()
   "Show Bufler's list."
   (interactive)
-  (cl-labels
-      ;; This gets a little hairy because we have to wrap `-group-by'
-      ;; to implement "chains" of grouping functions.
-      ((insert-thing (thing path &optional (level 0))
-                     (pcase thing
-                       ((pred bufferp) (insert-buffer thing level))
-                       (_ (insert-group thing (append path (list (car thing))) level))))
-       (insert-buffer
-        (buffer level) (magit-insert-section nil (bufler-buffer buffer)
-                         (insert (make-string (* 2 level) ? ) (bufler-format-buffer buffer level) "\n")))
-       (insert-group
-        (group path level) (pcase (car group)
-                             ('nil (pcase-let* ((`(,_type . ,things) group))
-                                     (--each things
-                                       (insert-thing it path level))))
-                             (_ (pcase-let* ((`(,type . ,things) group)
-                                             (num-buffers 0)
-                                             (suffix (alist-get level bufler-list-group-separators)))
-                                  ;; This almost seems lazy, using `-tree-map-nodes'
-                                  ;; with `bufferp', but it works, and it's correct,
-                                  ;; and since `bufferp' is in C, maybe it's even fast.
+  (let (format-table)
+    (cl-labels
+	;; This gets a little hairy because we have to wrap `-group-by'
+	;; to implement "chains" of grouping functions.
+	((insert-thing (thing path &optional (level 0))
+		       (pcase thing
+			 ((pred bufferp) (insert-buffer thing level))
+			 (_ (insert-group thing (append path (list (car thing))) level))))
+	 (insert-buffer
+	  (buffer _level) (magit-insert-section nil (bufler-buffer buffer)
+			   (insert (gethash buffer format-table) "\n")))
+	 (insert-group
+	  (group path level) (pcase (car group)
+			       ('nil (pcase-let* ((`(,_type . ,things) group))
+				       (--each things
+					 (insert-thing it path level))))
+			       (_ (pcase-let* ((`(,type . ,things) group)
+					       (num-buffers 0)
+					       (suffix (alist-get level bufler-list-group-separators)))
+				    ;; This almost seems lazy, using `-tree-map-nodes'
+				    ;; with `bufferp', but it works, and it's correct,
+				    ;; and since `bufferp' is in C, maybe it's even fast.
 
-                                  ;; NOTE: Sometimes killed buffers remain in the list
-                                  ;; of buffers returned by `bufler-buffers'.  I haven't
-                                  ;; figured out why.  Maybe we're keeping a reference
-                                  ;; to them in the list buffer or in the cached groups.
-                                  ;; Anyway, as long as that is the case, we have to
-                                  ;; avoid inserting killed buffers, and we have to
-                                  ;; avoid showing empty sections.  So we only increment
-                                  ;; the number of buffers for live ones, and if there
-                                  ;; aren't any, we cancel the section.
+				    ;; NOTE: Sometimes killed buffers remain in the list
+				    ;; of buffers returned by `bufler-buffers'.  I haven't
+				    ;; figured out why.  Maybe we're keeping a reference
+				    ;; to them in the list buffer or in the cached groups.
+				    ;; Anyway, as long as that is the case, we have to
+				    ;; avoid inserting killed buffers, and we have to
+				    ;; avoid showing empty sections.  So we only increment
+				    ;; the number of buffers for live ones, and if there
+				    ;; aren't any, we cancel the section.
 
-                                  ;; FIXME: Track down what's causing killed buffers to remain in
-                                  ;; `bufler-buffers', even though there don't seem to be any in `buffer-list'.
-                                  (-tree-map-nodes #'bufferp
-                                                   (lambda (buffer)
-                                                     (when (buffer-live-p buffer)
-                                                       (cl-incf num-buffers)))
-                                                   group)
-                                  (magit-insert-section (bufler-group (make-bufler-group
-                                                                       :type type :path path
-                                                                       :elements (cdr things)))
-                                    (if (> num-buffers 0)
-                                        (progn
-                                          (magit-insert-heading (make-string (* 2 level) ? )
-                                            (format-group type level)
-                                            (propertize (format " (%s)" num-buffers)
-                                                        'face 'bufler-size))
-                                          (--each things
-                                            (insert-thing it path (1+ level)))
-                                          (when suffix
-                                            (insert suffix)))
-                                      (magit-cancel-section)))))) )
-       (format-group
-        (group level) (let* ((string (cl-typecase group
-                                       (string group)
-                                       (otherwise (prin1-to-string group)))))
-                        (propertize string
-                                    'face (list :inherit (list 'bufler-group (bufler-level-face level))))))
-       (hidden-p (buffer)
-                 (string-prefix-p " " (buffer-name buffer)))
-       (as-string
-        (arg) (cl-typecase arg
-                (string arg)
-                (otherwise (format "%s" arg))))
-       (format< (test-dir buffer-dir)
-                (string< (as-string test-dir) (as-string buffer-dir)))
-       (boring-p (buffer)
-                 (hidden-p buffer)))
-    (let* ((inhibit-read-only t)
-           (groups (bufler-buffers))
-           pos)
-      ;; Cancel cache-clearing idle timer and start a new one.
-      (when bufler-cache-related-dirs-timer
-        (cancel-timer bufler-cache-related-dirs-timer))
-      (setf bufler-cache-related-dirs-timer
-            (run-with-idle-timer bufler-cache-related-dirs-timeout nil
-                                 (lambda ()
-                                   (setf bufler-cache-related-dirs (make-hash-table :test #'equal)))))
-      (when bufler-reverse
-        (setf groups (nreverse (-sort #'format< groups))))
-      (with-current-buffer (get-buffer-create "*Bufler*")
-        (setf pos (point))
-        (bufler-list-mode)
-        (erase-buffer)
-        (magit-insert-section (bufler-root)
-          (--each groups
-            (insert-thing it nil 0)))
-        (setf buffer-read-only t)
-        (pop-to-buffer (current-buffer))
-        (goto-char pos)))))
+				    ;; FIXME: Track down what's causing killed buffers to remain in
+				    ;; `bufler-buffers', even though there don't seem to be any in `buffer-list'.
+				    (-tree-map-nodes #'bufferp
+						     (lambda (buffer)
+						       (when (buffer-live-p buffer)
+							 (cl-incf num-buffers)))
+						     group)
+				    (magit-insert-section (bufler-group (make-bufler-group
+									 :type type :path path
+									 :elements (cdr things)))
+				      (if (> num-buffers 0)
+					  (progn
+					    (magit-insert-heading (make-string (* 2 level) ? )
+					      (format-group type level)
+					      (propertize (format " (%s)" num-buffers)
+							  'face 'bufler-size))
+					    (--each things
+					      (insert-thing it path (1+ level)))
+					    (when suffix
+					      (insert suffix)))
+					(magit-cancel-section)))))) )
+	 (format-group
+	  (group level) (let* ((string (cl-typecase group
+					 (string group)
+					 (otherwise (prin1-to-string group)))))
+			  (propertize string
+				      'face (list :inherit (list 'bufler-group (bufler-level-face level))))))
+	 (hidden-p (buffer)
+		   (string-prefix-p " " (buffer-name buffer)))
+	 (as-string
+	  (arg) (cl-typecase arg
+		  (string arg)
+		  (otherwise (format "%s" arg))))
+	 (format< (test-dir buffer-dir)
+		  (string< (as-string test-dir) (as-string buffer-dir)))
+	 (boring-p (buffer)
+		   (hidden-p buffer)))
+      (let* ((inhibit-read-only t)
+	     (groups (bufler-buffers))
+	     pos)
+	;; Cancel cache-clearing idle timer and start a new one.
+	(when bufler-cache-related-dirs-timer
+	  (cancel-timer bufler-cache-related-dirs-timer))
+	(setf bufler-cache-related-dirs-timer
+	      (run-with-idle-timer bufler-cache-related-dirs-timeout nil
+				   (lambda ()
+				     (setf bufler-cache-related-dirs (make-hash-table :test #'equal)))))
+	(setf format-table (bufler-format-buffer-groups groups))
+	(when bufler-reverse
+	  (setf groups (nreverse (-sort #'format< groups))))
+	(with-current-buffer (get-buffer-create "*Bufler*")
+	  (setf pos (point))
+	  (bufler-list-mode)
+	  (erase-buffer)
+	  (magit-insert-section (bufler-root)
+	    (--each groups
+	      (insert-thing it nil 0)))
+	  (setf buffer-read-only t)
+	  (pop-to-buffer (current-buffer))
+	  (goto-char pos))))))
 
 ;;;###autoload
 (defalias 'bufler #'bufler-list)
@@ -585,6 +587,67 @@ That is, if its name starts with \"*\"."
   "Return non-nil if BUFFER is hidden.
 That is, if its name starts with \" \"."
   (string-match-p (rx bos (1+ blank)) (buffer-name buffer)))
+
+;;;;; Formatting
+
+;;
+
+(defvar bufler-columns
+  (list (cons "Name" (lambda (buffer depth)
+		       (concat (make-string (* 2 depth) ? )
+			       (buffer-name buffer))))
+        (cons "Size" (lambda (buffer _depth)
+                       (propertize (file-size-human-readable
+				    (buffer-size buffer))
+				   'face 'bufler-size)))
+        (cons "VC" (lambda (buffer _depth)
+                     (or (when (buffer-file-name buffer)
+                           (propertize (symbol-name (vc-state (buffer-file-name buffer)))
+				       'face 'bufler-vc))
+                         "")))))
+
+(defun bufler-format-buffer-groups (groups)
+  "Return a hash table keyed by buffer whose values are display strings.
+Each string is formatted according to `bufler-columns' and takes
+into account the width of all the buffers' values for each
+column."
+  ;; Let's see if this works, and if it's fast enough.
+  (let ((table (make-hash-table))
+        column-sizes)
+    (cl-labels ((format-buffer
+                 (buffer depth) (puthash buffer (--map (format-column buffer depth it)
+						       bufler-columns)
+					 table))
+                (format-column
+                 (buffer depth column)
+                 (pcase-let* ((`(,header . ,fn) column)
+                              (value (funcall fn buffer depth))
+                              (current-column-size (or (map-elt column-sizes header) 0)))
+                   (setf (map-elt column-sizes header)
+                         (max current-column-size (1+ (length (format "%s" value)))))
+                   value))
+                (each-buffer
+                 (fn groups depth) (--each groups
+				     (cl-typecase it
+				       (buffer (format-buffer it depth))
+				       (list (each-buffer fn it
+							  ;; A nil head means same visual depth.
+							  (if (car it)
+							      (1+ depth)
+							    depth)))))))
+      (each-buffer #'format-buffer groups 0)
+      ;; Now format each buffer's string using the column sizes.
+      (let* (;; (name-width (cl-loop for buffer being the hash-values of table
+	     ;; 			  maximize (length (cadr buffer))))
+	     (column-sizes (nreverse column-sizes))
+             (format-string (string-join (--map (format "%%-%ss" (cdr it))
+                                                column-sizes)
+                                         " ")))
+        (maphash (lambda (buffer column-values)
+                   (puthash buffer (apply #'format format-string column-values)
+                            table))
+                 table)
+        table))))
 
 ;;;;; Grouping
 
