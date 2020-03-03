@@ -185,6 +185,11 @@ cleared with a timer that runs this many seconds after the last
 `bufler-list' command."
   :type 'boolean)
 
+(defcustom bufler-list-mode-hook
+  '(hl-line-mode)
+  "Hook run on entering `bufler-list'."
+  :type 'hook)
+
 ;;;;; Faces
 
 (defface bufler-group
