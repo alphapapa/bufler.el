@@ -659,7 +659,9 @@ buffer's depth in the group tree."
 
 (bufler-define-column "Path" 'bufler-path
   (ignore depth)
-  (or (buffer-file-name buffer) ""))
+  (or (buffer-file-name buffer)
+      (buffer-local-value 'list-buffers-directory buffer)
+      ""))
 
 (defcustom bufler-columns
   '("Name" "Size" "VC State" "Path")
