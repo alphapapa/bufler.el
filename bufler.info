@@ -63,10 +63,10 @@ both ways.
 
    This screenshot compares Bufler and Ibuffer showing the same buffers
 with the default settings.  Note how Bufler allows commands to be
-applied to an entire group of buffers: for example, pressing ‘k’ in the
-Bufler list would kill all the buffers in the group ‘Project:
-~/src/emacs/bufler.el’ (and, of course, since it calls ‘kill-buffer’,
-any unsaved ones would ask to be saved first).
+applied to selected sections: for example, pressing ‘k’ in the Bufler
+list would kill the buffers in the groups ‘compilation-mode’ and
+‘completion-list-mode’ (and, of course, since it calls ‘kill-buffer’,
+any unsaved, file-backed buffers would ask to be saved first).
 
 
 File: README.info,  Node: Installation,  Next: Usage,  Prev: Screenshots,  Up: Top
@@ -451,21 +451,21 @@ GPLv3
 Tag Table:
 Node: Top258
 Node: Screenshots1234
-Node: Installation1967
-Node: Usage2262
-Node: Commands2501
-Node: Bindings3599
-Node: Tips4423
-Node: Defining groups4764
-Node: Helm support10935
-Node: Prism support11572
-Node: Compared to Ibuffer12013
-Node: Changelog15705
-Node: 02-pre15865
-Node: 0116007
-Node: Credits16110
-Node: Development16655
-Node: License16825
+Node: Installation1988
+Node: Usage2283
+Node: Commands2522
+Node: Bindings3620
+Node: Tips4444
+Node: Defining groups4785
+Node: Helm support10956
+Node: Prism support11593
+Node: Compared to Ibuffer12034
+Node: Changelog15726
+Node: 02-pre15886
+Node: 0116028
+Node: Credits16131
+Node: Development16676
+Node: License16846
 
 End Tag Table
 

@@ -23,7 +23,7 @@ This screenshot shows =bufler-list= in the top window, and =bufler-switch-buffer
 
 [[images/default-theme.png]]
 
-This screenshot compares Bufler and Ibuffer showing the same buffers with the default settings.  Note how Bufler allows commands to be applied to an entire group of buffers: for example, pressing =k= in the Bufler list would kill all the buffers in the group =Project: ~/src/emacs/bufler.el= (and, of course, since it calls =kill-buffer=, any unsaved ones would ask to be saved first).
+This screenshot compares Bufler and Ibuffer showing the same buffers with the default settings.  Note how Bufler allows commands to be applied to selected sections: for example, pressing =k= in the Bufler list would kill the buffers in the groups =compilation-mode= and =completion-list-mode= (and, of course, since it calls =kill-buffer=, any unsaved, file-backed buffers would ask to be saved first).
 
 [[images/vs-ibuffer-doom-one.png]]
 
