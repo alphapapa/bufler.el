@@ -212,6 +212,10 @@ string, not in group headers.")
   '((t (:inherit font-lock-warning-face)))
   "Face for the VC status of buffers.")
 
+(defface bufler-path
+  '((t (:inherit font-lock-string-face)))
+  "Face for the VC status of buffers.")
+
 ;; Silence byte-compiler.  This is defined later in the file.
 (defvar bufler-groups)
 
@@ -236,12 +240,12 @@ string, not in group headers.")
 			 (_ (insert-group thing (append path (list (car thing))) level))))
 	 (insert-buffer
 	  (buffer _level) (magit-insert-section nil (bufler-buffer buffer)
-			   (insert (gethash buffer format-table) "\n")))
+			    (insert (gethash buffer format-table) "\n")))
 	 (insert-group
 	  (group path level) (pcase (car group)
-			       ('nil (pcase-let* ((`(,_type . ,things) group))
-				       (--each things
-					 (insert-thing it path level))))
+			       ('() (pcase-let* ((`(,_type . ,things) group))
+				      (--each things
+					(insert-thing it path level))))
 			       (_ (pcase-let* ((`(,type . ,things) group)
 					       (num-buffers 0)
 					       (suffix (alist-get level bufler-list-group-separators)))
@@ -279,7 +283,7 @@ string, not in group headers.")
 					      (insert-thing it path (1+ level)))
 					    (when suffix
 					      (insert suffix)))
-					(magit-cancel-section)))))) )
+					(magit-cancel-section)))))))
 	 (format-group
 	  (group level) (let* ((string (cl-typecase group
 					 (string group)
@@ -296,17 +300,16 @@ string, not in group headers.")
 		  (string< (as-string test-dir) (as-string buffer-dir)))
 	 (boring-p (buffer)
 		   (hidden-p buffer)))
-      (let* ((inhibit-read-only t)
-	     (groups (bufler-buffers))
-	     pos)
-	;; Cancel cache-clearing idle timer and start a new one.
-	(when bufler-cache-related-dirs-timer
-	  (cancel-timer bufler-cache-related-dirs-timer))
-	(setf bufler-cache-related-dirs-timer
-	      (run-with-idle-timer bufler-cache-related-dirs-timeout nil
-				   (lambda ()
-				     (setf bufler-cache-related-dirs (make-hash-table :test #'equal)))))
-	(setf format-table (bufler-format-buffer-groups groups))
+      (pcase-let* ((inhibit-read-only t)
+		   (groups (bufler-buffers))
+		   (`(,*format-table . ,column-sizes) (bufler-format-buffer-groups groups))
+		   (header (concat (format (format " %%-%ss" (cdar column-sizes)) (caar column-sizes))
+				   (cl-loop for (name . size) in (cdr column-sizes)
+					    for spec = (format " %%-%ss" size)
+					    concat (format spec name))))
+		   (pos))
+	;; `format-table' is bound around the labeled functions.
+	(setf format-table *format-table)
 	(when bufler-reverse
 	  (setf groups (nreverse (-sort #'format< groups))))
 	(with-current-buffer (get-buffer-create "*Bufler*")
@@ -316,9 +319,17 @@ string, not in group headers.")
 	  (magit-insert-section (bufler-root)
 	    (--each groups
 	      (insert-thing it nil 0)))
+	  (setf header-line-format header)
 	  (setf buffer-read-only t)
 	  (pop-to-buffer (current-buffer))
-	  (goto-char pos))))))
+	  (goto-char pos))
+	;; Cancel cache-clearing idle timer and start a new one.
+	(when bufler-cache-related-dirs-timer
+	  (cancel-timer bufler-cache-related-dirs-timer))
+	(setf bufler-cache-related-dirs-timer
+	      (run-with-idle-timer bufler-cache-related-dirs-timeout nil
+				   (lambda ()
+				     (setf bufler-cache-related-dirs (make-hash-table :test #'equal)))))))))
 
 ;;;###autoload
 (defalias 'bufler #'bufler-list)
@@ -588,46 +599,89 @@ That is, if its name starts with \"*\"."
 That is, if its name starts with \" \"."
   (string-match-p (rx bos (1+ blank)) (buffer-name buffer)))
 
-;;;;; Formatting
+;;;;; Buffer and Column Formatting
 
 ;;
 
-(defvar bufler-columns
-  (list (cons "Name" (lambda (buffer depth)
-		       (concat (make-string (* 2 depth) ? )
-			       (buffer-name buffer))))
-        (cons "Size" (lambda (buffer _depth)
-                       (propertize (file-size-human-readable
-				    (buffer-size buffer))
-				   'face 'bufler-size)))
-        (cons "VC" (lambda (buffer _depth)
-                     (or (when (buffer-file-name buffer)
-                           (propertize (symbol-name (vc-state (buffer-file-name buffer)))
-				       'face 'bufler-vc))
-                         "")))))
+(defvar bufler-column-format-fns nil
+  "Alist mapping column names to formatting functions.
+Each function takes two arguments, the buffer and its depth in
+the group tree, and returns a string as its column value.")
+
+(defmacro bufler-define-column (name face &rest body)
+  "Define a column formatting function with NAME.
+NAME should be a string.  BODY should return a string or nil.
+FACE is applied to the string.  In the BODY, `buffer' is bound to
+the buffer, and `depth' is bound to the buffer's depth in the
+group tree."
+  (declare (indent defun))
+  (cl-check-type name string)
+  (let ((fn-name (intern (concat "bufler-column-format-" (downcase name)))))
+    `(progn
+       (defun ,fn-name (buffer depth)
+	 (if-let ((string (progn ,@body)))
+	     (propertize string 'face ,face)
+	   ""))
+       (setf (map-elt bufler-column-format-fns ,name) #',fn-name))))
+
+(bufler-define-column "Name" nil
+  ;; MAYBE: Move indentation back to `bufler-list'.  But this seems to
+  ;; work well, and that might be more complicated.
+  (concat (make-string (* 2 depth) ? )
+	  (buffer-name buffer)))
+
+(bufler-define-column "Size" 'bufler-size
+  (ignore depth)
+  (file-size-human-readable (buffer-size buffer)))
+
+(bufler-define-column "VC State" 'bufler-vc
+  (ignore depth)
+  (when (buffer-file-name buffer)
+    (if-let ((vc-state (vc-state (buffer-file-name buffer))))
+	(symbol-name vc-state)
+      "")))
+
+(bufler-define-column "Path" 'bufler-path
+  (ignore depth)
+  (or (buffer-file-name buffer) ""))
+
+(defcustom bufler-columns
+  '("Name" "Size" "VC State" "Path")
+  "Columns displayed in `bufler-list'.
+Each string corresponds to a function in
+`bufler-column-format-fns'.  Custom columns must be defined with
+`bufler-define-column'."
+  :type '(repeat (choice (const "Name")
+			 (const "Size")
+			 (const "VC State")
+			 (const "Path")
+			 (string :tag "Custom column"))))
 
 (defun bufler-format-buffer-groups (groups)
-  "Return a hash table keyed by buffer whose values are display strings.
-Each string is formatted according to `bufler-columns' and takes
-into account the width of all the buffers' values for each
-column."
+  "Return a cons (table . column-sizes) for GROUPS.
+Table is a hash table keyed by buffer whose values are display
+strings.  Column-sizes is an alist whose keys are column names
+and values are the column width.  Each string is formatted
+according to `bufler-columns' and takes into account the width of
+all the buffers' values for each column."
   ;; Let's see if this works, and if it's fast enough.
   (let ((table (make-hash-table))
-        column-sizes)
-    (cl-labels ((format-buffer
-                 (buffer depth) (puthash buffer (--map (format-column buffer depth it)
-						       bufler-columns)
+	(columns bufler-columns)
+	column-sizes)
+    (cl-labels ((format-column
+		 (buffer depth column-name)
+		 (let* ((fn (alist-get column-name bufler-column-format-fns nil nil #'string=))
+			(value (funcall fn buffer depth))
+			(current-column-size (or (map-elt column-sizes column-name) 0)))
+		   (setf (map-elt column-sizes column-name)
+			 (max current-column-size (1+ (length (format "%s" value)))))
+		   value))
+		(format-buffer
+		 (buffer depth) (puthash buffer (--map (format-column buffer depth it)
+						       columns)
 					 table))
-                (format-column
-                 (buffer depth column)
-                 (pcase-let* ((`(,header . ,fn) column)
-                              (value (funcall fn buffer depth))
-                              (current-column-size (or (map-elt column-sizes header) 0)))
-                   (setf (map-elt column-sizes header)
-                         (max current-column-size (1+ (length (format "%s" value)))))
-                   value))
-                (each-buffer
-                 (fn groups depth) (--each groups
+		(each-buffer
+		 (fn groups depth) (--each groups
 				     (cl-typecase it
 				       (buffer (format-buffer it depth))
 				       (list (each-buffer fn it
@@ -637,17 +691,15 @@ column."
 							    depth)))))))
       (each-buffer #'format-buffer groups 0)
       ;; Now format each buffer's string using the column sizes.
-      (let* (;; (name-width (cl-loop for buffer being the hash-values of table
-	     ;; 			  maximize (length (cadr buffer))))
-	     (column-sizes (nreverse column-sizes))
-             (format-string (string-join (--map (format "%%-%ss" (cdr it))
-                                                column-sizes)
-                                         " ")))
-        (maphash (lambda (buffer column-values)
-                   (puthash buffer (apply #'format format-string column-values)
-                            table))
-                 table)
-        table))))
+      (let* ((column-sizes (nreverse column-sizes))
+	     (format-string (string-join (cl-loop for (_name . size) in column-sizes
+						  collect (format "%%-%ss" size))
+					 " ")))
+	(maphash (lambda (buffer column-values)
+		   (puthash buffer (apply #'format format-string column-values)
+			    table))
+		 table)
+	(cons table column-sizes)))))
 
 ;;;;; Grouping
 
