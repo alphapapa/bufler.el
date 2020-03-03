@@ -208,13 +208,17 @@ string, not in group headers.")
   '((t (:inherit font-lock-comment-face)))
   "Face for the size of buffers and groups.")
 
+(defface bufler-dim
+  '((t (:inherit font-lock-comment-face)))
+  "Face for columns whose values should be deemphasized.")
+
 (defface bufler-vc
   '((t (:inherit font-lock-warning-face)))
   "Face for the VC status of buffers.")
 
 (defface bufler-path
   '((t (:inherit font-lock-string-face)))
-  "Face for the VC status of buffers.")
+  "Face for file paths.")
 
 ;; Silence byte-compiler.  This is defined later in the file.
 (defvar bufler-groups)
@@ -236,16 +240,16 @@ string, not in group headers.")
 	;; to implement "chains" of grouping functions.
 	((insert-thing (thing path &optional (level 0))
 		       (pcase thing
-			 ((pred bufferp) (insert-buffer thing level))
+			 ((pred bufferp) (insert-buffer thing))
 			 (_ (insert-group thing (append path (list (car thing))) level))))
 	 (insert-buffer
-	  (buffer _level) (magit-insert-section nil (bufler-buffer buffer)
-			    (insert (gethash buffer format-table) "\n")))
+	  (buffer) (magit-insert-section nil (bufler-buffer buffer)
+                     (insert (gethash buffer format-table) "\n")))
 	 (insert-group
 	  (group path level) (pcase (car group)
-			       ('() (pcase-let* ((`(,_type . ,things) group))
-				      (--each things
-					(insert-thing it path level))))
+			       ('nil (pcase-let* ((`(,_type . ,things) group))
+                                       (--each things
+                                         (insert-thing it path level))))
 			       (_ (pcase-let* ((`(,type . ,things) group)
 					       (num-buffers 0)
 					       (suffix (alist-get level bufler-list-group-separators)))
@@ -611,35 +615,47 @@ the group tree, and returns a string as its column value.")
 (defmacro bufler-define-column (name face &rest body)
   "Define a column formatting function with NAME.
 NAME should be a string.  BODY should return a string or nil.
-FACE is applied to the string.  In the BODY, `buffer' is bound to
-the buffer, and `depth' is bound to the buffer's depth in the
-group tree."
+FACE, if non-nil, is applied to the string.  In the BODY,
+`buffer' is bound to the buffer, and `depth' is bound to the
+buffer's depth in the group tree."
   (declare (indent defun))
   (cl-check-type name string)
   (let ((fn-name (intern (concat "bufler-column-format-" (downcase name)))))
     `(progn
        (defun ,fn-name (buffer depth)
 	 (if-let ((string (progn ,@body)))
-	     (propertize string 'face ,face)
+	     (if ,face
+		 (propertize string 'face ,face)
+	       string)
 	   ""))
        (setf (map-elt bufler-column-format-fns ,name) #',fn-name))))
 
 (bufler-define-column "Name" nil
   ;; MAYBE: Move indentation back to `bufler-list'.  But this seems to
   ;; work well, and that might be more complicated.
-  (concat (make-string (* 2 depth) ? )
-	  (buffer-name buffer)))
+  (let ((mode-annotation (when (cl-loop for fn in bufler-buffer-mode-annotate-preds
+					thereis (funcall fn buffer))
+			   (propertize (concat (replace-regexp-in-string
+						(rx "-mode" eos) ""
+						(symbol-name (buffer-local-value 'major-mode buffer))
+						t t)
+					       " ")
+				       'face 'bufler-mode))))
+    (concat (make-string (* 2 depth) ? )
+	    mode-annotation
+	    (buffer-name buffer))))
 
 (bufler-define-column "Size" 'bufler-size
   (ignore depth)
   (file-size-human-readable (buffer-size buffer)))
 
-(bufler-define-column "VC State" 'bufler-vc
+(bufler-define-column "VC State" nil
   (ignore depth)
   (when (buffer-file-name buffer)
-    (if-let ((vc-state (vc-state (buffer-file-name buffer))))
-	(symbol-name vc-state)
-      "")))
+    (pcase (vc-state (buffer-file-name buffer))
+      ('nil nil)
+      ((and 'edited it) (propertize (symbol-name it) 'face 'bufler-vc))
+      (it (propertize (symbol-name it) 'face 'bufler-dim)))))
 
 (bufler-define-column "Path" 'bufler-path
   (ignore depth)
