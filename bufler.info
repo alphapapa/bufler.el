@@ -62,11 +62,13 @@ window.  Note how the same, recursively grouped buffers are shown in
 both ways.
 
    This screenshot compares Bufler and Ibuffer showing the same buffers
-with the default settings.  Note how Bufler allows commands to be
-applied to selected sections: for example, pressing ‘k’ in the Bufler
-list would kill the buffers in the groups ‘compilation-mode’ and
-‘completion-list-mode’ (and, of course, since it calls ‘kill-buffer’,
-any unsaved, file-backed buffers would ask to be saved first).
+with the default settings.  Note how Bufler provides collapsible
+sections to group and hide uninteresting buffers.  It also allows
+commands to be applied to selected sections: for example, pressing ‘k’
+in this Bufler list would kill the buffers in the groups
+‘compilation-mode’ and ‘completion-list-mode’ (and, of course, since it
+calls ‘kill-buffer’, any unsaved, file-backed buffers would ask to be
+saved first).
 
 
 File: README.info,  Node: Installation,  Next: Usage,  Prev: Screenshots,  Up: Top
@@ -451,21 +453,21 @@ GPLv3
 Tag Table:
 Node: Top258
 Node: Screenshots1234
-Node: Installation1988
-Node: Usage2283
-Node: Commands2522
-Node: Bindings3620
-Node: Tips4444
-Node: Defining groups4785
-Node: Helm support10956
-Node: Prism support11593
-Node: Compared to Ibuffer12034
-Node: Changelog15726
-Node: 02-pre15886
-Node: 0116028
-Node: Credits16131
-Node: Development16676
-Node: License16846
+Node: Installation2069
+Node: Usage2364
+Node: Commands2603
+Node: Bindings3701
+Node: Tips4525
+Node: Defining groups4866
+Node: Helm support11037
+Node: Prism support11674
+Node: Compared to Ibuffer12115
+Node: Changelog15807
+Node: 02-pre15967
+Node: 0116109
+Node: Credits16212
+Node: Development16757
+Node: License16927
 
 End Tag Table
 
