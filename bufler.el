@@ -163,7 +163,8 @@ May be used to add extra space between groups in `bufler-list'."
   :type '(choice (const :tag "No extra space" nil)
                  (const :tag "Blank line after top-level groups"
                         ((0 . "\n")))
-                 (alist :key-type (integer :tag "Group level") :value-type (string :tag "Suffix string"))))
+                 (alist :key-type (integer :tag "Group level")
+			:value-type (string :tag "Suffix string"))))
 
 (defcustom bufler-cache-related-dirs-p t
   "Whether to cache whether directory pairs are related.
