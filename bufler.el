@@ -102,6 +102,7 @@ See `bufler-cache-related-dirs-p'.")
 (defgroup bufler nil
   "Like Ibuffer, but using Magit-Section sections."
   :link '(url-link "https://github.com/alphapapa/bufler.el")
+  :link '(custom-manual "(Bufler)Top")
   :group 'convenience)
 
 (defcustom bufler-use-cache t
