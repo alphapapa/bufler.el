@@ -276,6 +276,8 @@ string, not in group headers.")
 
 				    ;; FIXME: Track down what's causing killed buffers to remain in
 				    ;; `bufler-buffers', even though there don't seem to be any in `buffer-list'.
+
+				    ;; TODO: Return `bufler-group' structs from `bufler-buffers'.
 				    (-tree-map-nodes #'bufferp
 						     (lambda (buffer)
 						       (when (buffer-live-p buffer)
