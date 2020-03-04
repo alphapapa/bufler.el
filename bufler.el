@@ -658,7 +658,7 @@ buffer's depth in the group tree."
   (ignore depth)
   (file-size-human-readable (buffer-size buffer)))
 
-(bufler-define-column "VC State" nil
+(bufler-define-column "VC" nil
   (ignore depth)
   (when (buffer-file-name buffer)
     (pcase (vc-state (buffer-file-name buffer))
@@ -673,7 +673,7 @@ buffer's depth in the group tree."
       ""))
 
 (defcustom bufler-columns
-  '("Name" "Size" "VC State" "Path")
+  '("Name" "Size" "VC" "Path")
   "Columns displayed in `bufler-list'.
 Each string corresponds to a function in
 `bufler-column-format-fns'.  Custom columns must be defined with
