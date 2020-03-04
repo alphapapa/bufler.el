@@ -42,6 +42,7 @@ Usage
 * Tips::
 * Defining groups::
 * Helm support::
+* Ivy support::
 * Prism support::
 
 Changelog
@@ -88,7 +89,7 @@ File: README.info,  Node: Usage,  Next: Compared to Ibuffer,  Prev: Installation
 3 Usage
 *******
 
-   • • • • • • 
+   • • • • • • • 
 * Menu:
 
 * Commands::
@@ -96,6 +97,7 @@ File: README.info,  Node: Usage,  Next: Compared to Ibuffer,  Prev: Installation
 * Tips::
 * Defining groups::
 * Helm support::
+* Ivy support::
 * Prism support::
 
 
@@ -291,16 +293,20 @@ Other types
           (a feature probably broken at the moment).  See example above.
 
 
-File: README.info,  Node: Helm support,  Next: Prism support,  Prev: Defining groups,  Up: Usage
+File: README.info,  Node: Helm support,  Next: Ivy support,  Prev: Defining groups,  Up: Usage
 
 3.5 Helm support
 ================
 
-Bufler does not require nor depend on Helm, but it provides optional
-support for it in ‘helm-bufler.el’ in the form of ‘helm-bufler-source’,
-a Helm source that shows buffers in the current workspace (or when the
-Helm command is called with ‘C-u’, all buffers).  It looks like this
-when showing all buffers:
+Bufler does not require nor depend on Helm, but because it uses
+‘completing-read’, it requires no special configuration to work with
+‘helm-mode’ for selecting buffers.
+
+   To show Bufler’s grouped buffers in a Helm-specific command, Bufler
+provides ‘helm-bufler.el’, which includes ‘helm-bufler-source’, a Helm
+source that shows buffers in the current workspace (or when the Helm
+command is called with ‘C-u’, all buffers).  It looks like this when
+showing all buffers:
 
    Use it like this:
 
@@ -308,13 +314,22 @@ when showing all buffers:
 
      (helm :sources '(helm-bufler-source))
 
-   Or you can use the source in an existing Helm command, like
-‘helm-find-files’.
+
+File: README.info,  Node: Ivy support,  Next: Prism support,  Prev: Helm support,  Up: Usage
+
+3.6 Ivy support
+===============
+
+Bufler does not require nor depend on Ivy, but because it uses
+‘completing-read’, Bufler requires no special configuration to work with
+‘ivy-mode’ for selecting buffers.  For example, this shows
+‘bufler-switch-buffers’ with ‘ivy-mode’ activated (in the
+‘spacemacs-dark’ theme):
 
 
-File: README.info,  Node: Prism support,  Prev: Helm support,  Up: Usage
+File: README.info,  Node: Prism support,  Prev: Ivy support,  Up: Usage
 
-3.6 Prism support
+3.7 Prism support
 =================
 
 Bufler does not require nor depend on Prism
@@ -455,22 +470,23 @@ GPLv3
 
 Tag Table:
 Node: Top258
-Node: Screenshots1234
-Node: Installation2069
-Node: Usage2364
-Node: Commands2603
-Node: Bindings3701
-Node: Tips4565
-Node: Defining groups4906
-Node: Helm support11077
-Node: Prism support11714
-Node: Compared to Ibuffer12155
-Node: Changelog15847
-Node: 02-pre16007
-Node: 0116149
-Node: Credits16252
-Node: Development16941
-Node: License17111
+Node: Screenshots1250
+Node: Installation2085
+Node: Usage2380
+Node: Commands2639
+Node: Bindings3737
+Node: Tips4601
+Node: Defining groups4942
+Node: Helm support11113
+Node: Ivy support11834
+Node: Prism support12262
+Node: Compared to Ibuffer12702
+Node: Changelog16394
+Node: 02-pre16554
+Node: 0116696
+Node: Credits16799
+Node: Development17488
+Node: License17658
 
 End Tag Table
 

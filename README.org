@@ -78,6 +78,7 @@ Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like t
 - [[#tips][Tips]]
 - [[#defining-groups][Defining groups]]
 - [[#helm-support][Helm support]]
+- [[#ivy-support][Ivy support]]
 - [[#prism-support][Prism support]]
 :END:
 
@@ -208,7 +209,9 @@ The following group types are available in =bufler-defgroups=.  Note that each o
 
 ** Helm support
 
-Bufler does not require nor depend on Helm, but it provides optional support for it in =helm-bufler.el= in the form of =helm-bufler-source=, a Helm source that shows buffers in the current workspace (or when the Helm command is called with =C-u=, all buffers).  It looks like this when showing all buffers:
+Bufler does not require nor depend on Helm, but because it uses =completing-read=, it requires no special configuration to work with =helm-mode= for selecting buffers.
+
+To show Bufler's grouped buffers in a Helm-specific command, Bufler provides =helm-bufler.el=, which includes =helm-bufler-source=, a Helm source that shows buffers in the current workspace (or when the Helm command is called with =C-u=, all buffers).  It looks like this when showing all buffers:
 
 [[images/helm-bufler.png]]
 
@@ -220,7 +223,11 @@ Use it like this:
   (helm :sources '(helm-bufler-source))
 #+END_SRC
 
-Or you can use the source in an existing Helm command, like =helm-find-files=.
+** Ivy support
+
+Bufler does not require nor depend on Ivy, but because it uses =completing-read=, Bufler requires no special configuration to work with =ivy-mode= for selecting buffers.  For example, this shows =bufler-switch-buffers= with =ivy-mode= activated (in the =spacemacs-dark= theme):
+
+[[images/ivy-mode-spacemacs-dark-theme.png]]
 
 ** Prism support
 
