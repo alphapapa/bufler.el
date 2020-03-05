@@ -1,9 +1,31 @@
+* Plans
+** 0.3
+*** TODO Multiple Bufler buffers
+
+i.e. call Bufler like ~(bufler :groups GROUPS :buffer-name "*Matrix Bufler*")~, and those variables should be set buffer-locally, and refreshing should use those values instead of the global ones.  That would allow multiple, unique Bufler buffers.
+*** TODO Use =group-tree-defmacro=
+
+Was working fine in the prototype, so it should work fine here too.  But I want to release 0.2 before making any changes like this.
+** 0.4
+*** TODO Buffer/group sorting
+
+The WIP branch works pretty well already.
+** 0.5
+*** TODO Sortable columns
+
+
+** 0.6
+*** TODO Factor out GUI code
+
+There should be a companion library to =group-tree= that provides the section-based view with columns.
 * Ideas
-** Name
-*** Mr. Buffer
-
-Sort of cute and catchy.  Maybe some clip art available.
-
+** DONE Name
 *** Bufler
 
 Sort of like "buffer butler."  Maybe a buffalo for a mascot?
+
+...Yep, works great!
+
+*** Mr. Buffer
+
+Sort of cute and catchy.  Maybe some clip art available.
