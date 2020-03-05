@@ -57,6 +57,122 @@ with prefix arguments."
   "Functions called when the workspace is set."
   :type 'hook)
 
+;;;; Tab-bar and Tab-line modes
+
+;; This provides a mode that makes `tab-bar-mode' show Bufler
+;; workspaces and `tab-line-mode' show buffers in the current
+;; workspace.
+
+(defvar tab-bar-tabs-function)
+(defvar tab-bar-close-button-show)
+(defvar tab-line-tabs-function)
+;; Because the mode isn't necessarily defined.
+(defvar bufler-workspace-tabs-mode)
+
+(declare-function tab-bar-mode "ext:tab-bar" t t)
+(declare-function tab-bar--current-tab-index "ext:tab-bar" t t)
+(declare-function tab-bar--tab "ext:tab-bar" t t)
+(declare-function tab-bar-tabs "ext:tab-bar" t t)
+(declare-function global-tab-line-mode "ext:tab-line" t t)
+(declare-function tab-line-tabs-window-buffers "ext:tab-line" t t)
+
+(declare-function bufler-workspace-tab-bar-select-tab "ext:bufler-workspace" t t)
+(declare-function bufler-workspace-buffers "ext:bufler-workspace" t t)
+(declare-function bufler-workspace-tabs "ext:bufler-workspace" t t)
+(declare-function bufler-workspace-tabs-mode "ext:bufler-workspace" t t)
+
+(when (require 'tab-bar nil t)
+
+  ;; Only on Emacs 27+.
+
+  ;; FIXME: Maybe these should be autoloaded, but how to do that conditionally?
+
+  (defvar bufler-workspace-tabs-mode-saved-settings
+    '((tab-bar-close-button-show))
+    "Settings saved from before `bufler-workspace-tabs-mode' was activated.
+Used to restore them when the mode is disabled.")
+
+  (define-minor-mode bufler-workspace-tabs-mode
+    "Use Bufler workspaces for `tab-bar-mode' and `tab-line-mode'."
+    :global t
+    (if bufler-workspace-tabs-mode
+	(progn
+	  ;; Save settings.
+	  (cl-loop for (symbol . _value) in bufler-workspace-tabs-mode-saved-settings
+		   do (setf (map-elt bufler-workspace-tabs-mode-saved-settings symbol)
+			    (symbol-value symbol)))
+	  (advice-add 'tab-bar-select-tab :override #'bufler-workspace-tab-bar-select-tab)
+          (setf tab-bar-tabs-function #'bufler-workspace-tabs
+                tab-line-tabs-function #'bufler-workspace-buffers
+                tab-bar-close-button-show nil)
+          (tab-bar-mode 1)
+          (global-tab-line-mode 1))
+      (advice-remove 'tab-bar-select-tab #'bufler-workspace-tab-bar-select-tab)
+      (setf tab-bar-tabs-function #'tab-bar-tabs
+            tab-line-tabs-function #'tab-line-tabs-window-buffers)
+      ;; Restore settings.
+      (cl-loop for (symbol . value) in bufler-workspace-tabs-mode-saved-settings
+               do (set symbol value)
+               do (setf (map-elt bufler-workspace-tabs-mode-saved-settings symbol) nil))
+      (tab-bar-mode -1)
+      (global-tab-line-mode -1))
+    (force-mode-line-update 'all))
+
+  (defalias 'bufler-tabs-mode #'bufler-workspace-tabs-mode)
+
+  (defun bufler-workspace-tab-bar-select-tab (&optional arg)
+    "Set the frame's workspace to the selected tab's workspace.
+ARG is the position of the tab in the tab bar."
+    ;; Modeled on/copied from `tab-bar-select-tab'.
+    (interactive "P")
+    (unless (integerp arg)
+      (let ((key (event-basic-type last-command-event)))
+        (setq arg (if (and (characterp key) (>= key ?1) (<= key ?9))
+                      (- key ?0)
+                    1))))
+    (let* ((tabs (funcall tab-bar-tabs-function))
+           (from-index (tab-bar--current-tab-index tabs))
+           (to-index (1- (max 1 (min arg (length tabs))))))
+      (unless (eq from-index to-index)
+        (let* ((_from-tab (tab-bar--tab))
+               (to-tab (nth to-index tabs))
+               (workspace-path (alist-get 'path to-tab)))
+          (bufler-workspace-frame-set workspace-path)
+          (force-mode-line-update 'all)))))
+
+  (cl-defun bufler-workspace-tabs (&optional (frame (selected-frame)))
+    "Return a list of workspace tabs.
+Works as `tab-bar-tabs-function'."
+    (with-selected-frame frame
+      (let* ((bufler-vc-state nil)
+             (grouped-buffers (bufler-buffers))
+             (buffer-paths (bufler-group-tree-paths grouped-buffers)))
+        (cl-labels ((tab-type
+                     (path) (if (equal (car path) (car (frame-parameter nil 'bufler-workspace-path)))
+                                'current-tab
+                              'tab))
+                    (path-cons
+                     (path) (list (tab-type path)
+                                  (cons 'name (bufler-format-path path))
+                                  (cons 'path path))))
+          (thread-last buffer-paths
+            ;; NOTE: This only shows top-level workspaces.
+            ;; TODO: Select deeper workspaces using menus, like `tab-line-mode' offers buffers in menus.
+            (mapcar #'car)
+            (seq-uniq)
+            (mapcar #'list)
+            (mapcar #'path-cons)
+            (--remove (string-empty-p (alist-get 'name it))))))))
+
+  (cl-defun bufler-workspace-buffers (&optional (frame (selected-frame)))
+    "Return list of buffers for FRAME's workspace.
+Works as `tab-line-tabs-function'."
+    (let (buffers)
+      (--tree-map-nodes (bufferp it)
+                        (push it buffers)
+                        (bufler-buffers :path (frame-parameter frame 'bufler-workspace-path)))
+      (cl-sort buffers #'string< :key #'buffer-name))))
+
 ;;;; Commands
 
 ;;;###autoload

@@ -71,6 +71,11 @@ in this Bufler list would kill the buffers in the groups
 calls ‘kill-buffer’, any unsaved, file-backed buffers would ask to be
 saved first).
 
+   This screenshot shows Bufler Tabs Mode, which works with the new
+‘tab-bar-mode’ and ‘tab-line-mode’ from Emacs 27.  The ‘tab-bar’ selects
+the workspace, and the ‘tab-line’ selects a buffer in the current
+workspace.
+
 
 File: README.info,  Node: Installation,  Next: Usage,  Prev: Screenshots,  Up: Top
 
@@ -111,6 +116,10 @@ File: README.info,  Node: Commands,  Next: Bindings,  Up: Usage
 ‘bufler-mode’
      Enable the Bufler workspace mode, which allows each frame to have a
      chosen workspace from Bufler’s groups.
+‘bufler-tabs-mode’
+     Enable the Bufler workspace tabs mode, which uses ‘tab-bar-mode’
+     and ‘tab-line-mode’ from Emacs 27+ to display Bufler workspaces and
+     buffers.
 ‘bufler-switch-buffer’
      Switch to a buffer selected from the frame’s workspace.  With
      prefix, select from all buffers.  With two prefixes, also set the
@@ -471,22 +480,22 @@ GPLv3
 Tag Table:
 Node: Top258
 Node: Screenshots1250
-Node: Installation2085
-Node: Usage2380
-Node: Commands2639
-Node: Bindings3737
-Node: Tips4601
-Node: Defining groups4942
-Node: Helm support11113
-Node: Ivy support11834
-Node: Prism support12262
-Node: Compared to Ibuffer12702
-Node: Changelog16394
-Node: 02-pre16554
-Node: 0116696
-Node: Credits16799
-Node: Development17488
-Node: License17658
+Node: Installation2320
+Node: Usage2615
+Node: Commands2874
+Node: Bindings4160
+Node: Tips5024
+Node: Defining groups5365
+Node: Helm support11536
+Node: Ivy support12257
+Node: Prism support12685
+Node: Compared to Ibuffer13125
+Node: Changelog16817
+Node: 02-pre16977
+Node: 0117119
+Node: Credits17222
+Node: Development17911
+Node: License18081
 
 End Tag Table
 
