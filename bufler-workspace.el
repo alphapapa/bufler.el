@@ -141,7 +141,7 @@ ARG is the position of the tab in the tab bar."
           (force-mode-line-update 'all)))))
 
   (cl-defun bufler-workspace-tabs (&optional (frame (selected-frame)))
-    "Return a list of workspace tabs.
+    "Return a list of workspace tabs from FRAME's perspective.
 Works as `tab-bar-tabs-function'."
     (with-selected-frame frame
       (let* ((bufler-vc-state nil)
