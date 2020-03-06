@@ -144,8 +144,8 @@ appear in a named workspace, the buffer must be matched by an
   :global t
   (let ((lighter '(bufler-workspace-mode (:eval (bufler-workspace-mode-lighter)))))
     (if bufler-workspace-mode
-        (setf mode-line-misc-info
-              (append mode-line-misc-info (list lighter)))
+	;; Avoid adding the lighter multiple times if the mode is activated again.
+	(cl-pushnew (list lighter) mode-line-misc-info :test #'equal)
       (setf mode-line-misc-info
             (delete lighter mode-line-misc-info)))))
 
