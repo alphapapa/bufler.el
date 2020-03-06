@@ -145,24 +145,26 @@ ARG is the position of the tab in the tab bar."
 Works as `tab-bar-tabs-function'."
     (with-selected-frame frame
       (let* ((bufler-vc-state nil)
-             (grouped-buffers (bufler-buffers))
-             (buffer-paths (bufler-group-tree-paths grouped-buffers)))
-        (cl-labels ((tab-type
-                     (path) (if (equal (car path) (car (frame-parameter nil 'bufler-workspace-path)))
-                                'current-tab
-                              'tab))
-                    (path-cons
-                     (path) (list (tab-type path)
-                                  (cons 'name (bufler-format-path path))
-                                  (cons 'path path))))
-          (thread-last buffer-paths
-            ;; NOTE: This only shows top-level workspaces.
-            ;; TODO: Select deeper workspaces using menus, like `tab-line-mode' offers buffers in menus.
-            (mapcar #'car)
-            (seq-uniq)
-            (mapcar #'list)
-            (mapcar #'path-cons)
-            (--remove (string-empty-p (alist-get 'name it))))))))
+	     (grouped-buffers (bufler-buffers))
+	     (buffer-paths (bufler-group-tree-paths grouped-buffers)))
+	(cl-labels ((tab-type
+		     (path) (if (equal (car path) (car (frame-parameter nil 'bufler-workspace-path)))
+				'current-tab
+			      'tab))
+		    (path-cons
+		     (path) (list (tab-type path)
+				  (cons 'name (bufler-format-path path))
+				  (cons 'path path)))
+		    (path-first  ;; CAR, or CADR if CAR is nil.
+		     (path) (or (car path) (cadr path))))
+	  (thread-last buffer-paths
+	    ;; NOTE: This only shows top-level workspaces.
+	    ;; TODO: Select deeper workspaces using menus, like `tab-line-mode' offers buffers in menus.
+	    (mapcar #'path-first)
+	    (seq-uniq)
+	    (mapcar #'list)
+	    (mapcar #'path-cons)
+	    (--remove (string-empty-p (alist-get 'name it))))))))
 
   (cl-defun bufler-workspace-buffers (&optional (frame (selected-frame)))
     "Return list of buffers for FRAME's workspace.
