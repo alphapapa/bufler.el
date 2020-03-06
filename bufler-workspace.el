@@ -144,27 +144,35 @@ ARG is the position of the tab in the tab bar."
     "Return a list of workspace tabs from FRAME's perspective.
 Works as `tab-bar-tabs-function'."
     (with-selected-frame frame
-      (let* ((bufler-vc-state nil)
-	     (grouped-buffers (bufler-buffers))
-	     (buffer-paths (bufler-group-tree-paths grouped-buffers)))
-	(cl-labels ((tab-type
-		     (path) (if (equal path (frame-parameter nil 'bufler-workspace-path))
-				'current-tab
-			      'tab))
-		    (path-cons
-		     (path) (list (tab-type path)
-				  (cons 'name (bufler-format-path path))
-				  (cons 'path path)))
-		    (path-first  ;; CAR, or CADR if CAR is nil.
-		     (path) (or (car path) (cadr path))))
-	  (thread-last buffer-paths
-	    ;; NOTE: This only shows top-level workspaces.
-	    ;; TODO: Select deeper workspaces using menus, like `tab-line-mode' offers buffers in menus.
-	    (mapcar #'path-first)
-	    (seq-uniq)
-	    (mapcar #'list)
-	    (mapcar #'path-cons)
-	    (--remove (string-empty-p (alist-get 'name it))))))))
+      (cl-labels ((tab-type
+		   (path) (if (equal path (frame-parameter nil 'bufler-workspace-path))
+			      'current-tab
+			    'tab))
+		  (path-cons
+		   (path &optional type) (list (or type (tab-type path))
+					       (cons 'name (bufler-format-path path))
+					       (cons 'path path)))
+		  (path-first ;; CAR, or CADR if CAR is nil.
+		   (path) (or (car path) (cadr path))))
+	(let* ((bufler-vc-state nil)
+	       (tabs (thread-last (bufler-group-tree-paths (bufler-buffers))
+		       ;; NOTE: This only shows top-level workspaces.
+		       ;; TODO: Select deeper workspaces using menus, like `tab-line-mode' offers buffers in menus.
+		       (mapcar #'path-first)
+		       (seq-uniq)
+		       (mapcar #'list)
+		       (mapcar #'path-cons)
+		       (--remove (string-empty-p (alist-get 'name it))))))
+	  (unless (cl-member (frame-parameter nil 'bufler-workspace-path)
+			     tabs :key (lambda (tab)
+					 (alist-get 'path (cdr tab))))
+	    ;; Current workspace is not top-level: add it to tabs so
+	    ;; the current workspace is always shown.  Show only its
+	    ;; last path element.
+	    (push (path-cons (last (frame-parameter nil 'bufler-workspace-path))
+			     'current-tab)
+		  tabs))
+	  tabs))))
 
   (cl-defun bufler-workspace-buffers (&optional (frame (selected-frame)))
     "Return list of buffers for FRAME's workspace.
