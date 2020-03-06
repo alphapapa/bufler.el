@@ -197,8 +197,9 @@ Works as `tab-bar-tabs-function'."
 			   for tab in tabs
 			   for tab-path = (alist-get 'path tab)
 			   thereis (equal tab-path current-path))
-	    (push (workspace-to-tab (path-to-workspace (frame-parameter nil 'bufler-workspace-path))
-				    'current-tab)
+	    (push (list 'current-tab
+			(cons 'name (bufler-format-path (frame-parameter nil 'bufler-workspace-path)))
+			(cons 'path (frame-parameter nil 'bufler-workspace-path)))
 		  tabs))
 	  tabs)))))
 
