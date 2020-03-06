@@ -147,35 +147,58 @@ ARG is the position of the tab in the tab bar."
   (cl-defun bufler-workspace-tabs (&optional (frame (selected-frame)))
     "Return a list of workspace tabs from FRAME's perspective.
 Works as `tab-bar-tabs-function'."
+    ;; This is ridiculously complicated.  It seems to all stem from,
+    ;; again, that group paths can start with nil, but we need to ignore
+    ;; initial nils when displaying paths, but we need to keep the
+    ;; initial nil in the actual path.  And then we need to store paths
+    ;; as lists, not ever single elements, but putting a list in an
+    ;; alist by consing the key onto the beginning causes its value to
+    ;; be just the car of the value list, not a list itself (at least,
+    ;; when retrieved with `alist-get'), which is very confusing, so we
+    ;; use a plist at one point to avoid that.  Anyway, this feels like
+    ;; a terrible mess, so in the future we should probably use structs
+    ;; for groups, which would probably make this much easier.  I think
+    ;; I've spent more time messing with this function than I have on
+    ;; the actual grouping logic, which may say more about me than the
+    ;; code.
     (with-selected-frame frame
       (cl-labels ((tab-type
 		   (path) (if (equal path (frame-parameter nil 'bufler-workspace-path))
 			      'current-tab
 			    'tab))
-		  (path-cons
-		   (path &optional type) (list (or type (tab-type path))
-					       (cons 'name (bufler-format-path path))
-					       (cons 'path path)))
 		  (path-first ;; CAR, or CADR if CAR is nil.
-		   (path) (or (car path) (cadr path))))
+		   (path) (cl-typecase path
+			    (string (list path))
+			    (list (if (car path)
+				      (list (car path))
+				    (list (cadr path))))))
+		  (workspace-to-tab
+		   (workspace &optional type) (-let* (((&plist :name :path) workspace))
+						(list (or type (tab-type path))
+						      (cons 'name (car name))
+						      (cons 'path path))))
+		  (path-to-workspace
+		   ;; This gets too complicated.  We need to preserve the real path, but
+		   ;; if the first element is nil, we need to ignore that and display
+		   ;; the string after the nil.  We sort-of cheat here by using
+		   ;; `path-first' in this function.
+		   (path) (list :name (path-first path)
+				:path path)))
 	(let* ((bufler-vc-state nil)
-	       (tabs (thread-last (bufler-group-tree-paths (bufler-buffers))
-		       ;; NOTE: This only shows top-level workspaces.
-		       ;; TODO: Select deeper workspaces using menus, like `tab-line-mode' offers buffers in menus.
-		       (mapcar #'path-first)
-		       (seq-uniq)
-		       (mapcar #'list)
-		       (mapcar #'path-cons)
-		       (--remove (string-empty-p (alist-get 'name it))))))
-	  (unless (cl-loop with frame-path = (frame-parameter nil 'bufler-workspace-path)
+	       (buffer-paths (bufler-group-tree-paths (bufler-buffers)))
+	       (group-paths (mapcar #'butlast buffer-paths))
+	       (top-level-group-paths (mapcar #'path-first group-paths))
+	       (uniq-top-level-group-paths (seq-uniq top-level-group-paths))
+	       (workspaces (mapcar #'path-to-workspace uniq-top-level-group-paths))
+	       (tabs (mapcar #'workspace-to-tab workspaces)))
+	  ;; Add the current workspace if it's not listed (i.e. when the
+	  ;; current workspace is not a top-level workspace).
+	  (unless (cl-loop with current-path = (frame-parameter nil 'bufler-workspace-path)
 			   for tab in tabs
-			   for tab-path = (alist-get 'path (cdr tab))
-			   thereis (equal frame-path tab-path))
-	    ;; Current workspace is not top-level: add it to tabs so
-	    ;; the current workspace is always shown.  Show only its
-	    ;; last path element.
-	    (push (path-cons (last (frame-parameter nil 'bufler-workspace-path))
-			     'current-tab)
+			   for tab-path = (alist-get 'path tab)
+			   thereis (equal tab-path current-path))
+	    (push (workspace-to-tab (path-to-workspace (frame-parameter nil 'bufler-workspace-path))
+				    'current-tab)
 		  tabs))
 	  tabs)))))
 
