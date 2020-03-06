@@ -87,6 +87,7 @@ Return the workspace path."
   (set-frame-parameter nil 'bufler-workspace-path path)
   (set-frame-parameter nil 'bufler-workspace-path-formatted (bufler-format-path path))
   (run-hook-with-args 'bufler-workspace-set-hook path)
+  (force-mode-line-update 'all)
   path)
 
 ;;;###autoload
