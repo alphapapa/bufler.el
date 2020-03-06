@@ -148,7 +148,7 @@ Works as `tab-bar-tabs-function'."
 	     (grouped-buffers (bufler-buffers))
 	     (buffer-paths (bufler-group-tree-paths grouped-buffers)))
 	(cl-labels ((tab-type
-		     (path) (if (equal (car path) (car (frame-parameter nil 'bufler-workspace-path)))
+		     (path) (if (equal path (frame-parameter nil 'bufler-workspace-path))
 				'current-tab
 			      'tab))
 		    (path-cons
