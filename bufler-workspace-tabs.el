@@ -161,9 +161,10 @@ Works as `tab-bar-tabs-function'."
 		       (mapcar #'list)
 		       (mapcar #'path-cons)
 		       (--remove (string-empty-p (alist-get 'name it))))))
-	  (unless (cl-member (frame-parameter nil 'bufler-workspace-path)
-			     tabs :key (lambda (tab)
-					 (alist-get 'path (cdr tab))))
+	  (unless (cl-loop with frame-path = (frame-parameter nil 'bufler-workspace-path)
+			   for tab in tabs
+			   for tab-path = (alist-get 'path (cdr tab))
+			   thereis (equal frame-path tab-path))
 	    ;; Current workspace is not top-level: add it to tabs so
 	    ;; the current workspace is always shown.  Show only its
 	    ;; last path element.
