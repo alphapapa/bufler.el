@@ -37,6 +37,7 @@
 ;; and functions to avoid byte-compiler warnings.
 
 (defvar tab-bar-tabs-function)
+(defvar tab-bar-close-button)
 (defvar tab-bar-close-button-show)
 (defvar tab-line-tabs-function)
 ;; Because the mode isn't necessarily defined.
@@ -84,7 +85,8 @@ aren't closable manually, so we repurpose the
 
 This string can be anything, including an image using display
 properties.  See the default value of `tab-bar-close-button'."
-    :type 'string)
+    :type 'string
+    :group 'bufler-workspace)
 
 ;;;; Commands
 
