@@ -66,14 +66,14 @@
   ;; FIXME: Maybe these should be autoloaded, but how to do that conditionally?
 
 ;;;; Variables
-  
+
   (defvar bufler-workspace-tabs-mode-saved-settings
     '((tab-bar-close-button-show))
     "Settings saved from before `bufler-workspace-tabs-mode' was activated.
 Used to restore them when the mode is disabled.")
 
 ;;;; Customization
-  
+
   (defcustom bufler-workspace-tab-separator " |"
     "String displayed between tabs.
 Since there is no built-in separator between tabs, it can be
