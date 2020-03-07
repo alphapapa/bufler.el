@@ -8,6 +8,20 @@
 
 Sometimes changing =bufler-groups= doesn't seem to take effect because =buffer-list= hasn't changed and =bufler-buffers= is cached.
 
+*** TODO Explain the big 4 features
+:PROPERTIES:
+:ID:       2f7ddcb5-906d-4586-8a86-d21a09b2cf36
+:END:
+
+I think the big 4 features now are basically:
+
+1.  =bufler-list=
+2.  =bufler-switch-buffer=
+3.  =bufler-workspace-mode=
+4.  =bufler-tabs-mode=
+
+And while they all work together, they can also be used independently.  =bufler-list= and =bufler-switch-buffer= don't even require =bufler-workspace-mode= to be activated.
+
 ** 0.3
 
 *** TODO Multiple Bufler buffers
