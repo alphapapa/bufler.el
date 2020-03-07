@@ -14,6 +14,10 @@ Sometimes changing =bufler-groups= doesn't seem to take effect because =buffer-l
 
 i.e. call Bufler like ~(bufler :groups GROUPS :buffer-name "*Matrix Bufler*")~, and those variables should be set buffer-locally, and refreshing should use those values instead of the global ones.  That would allow multiple, unique Bufler buffers.
 
+*** TODO Rename some things
+
+e.g. the grouping rules should probably be =rules= rather than =groups=, to distinguish the rules from the groups of buffers that they produce.
+
 *** TODO Use =group-tree-defmacro=
 
 Was working fine in the prototype, so it should work fine here too.  But I want to release 0.2 before making any changes like this.
