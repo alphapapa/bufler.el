@@ -1,25 +1,77 @@
+
+
 * Plans
+
+** 0.2
+
+*** TODO Prefix to =bufler-list= to clear cache
+
+Sometimes changing =bufler-groups= doesn't seem to take effect because =buffer-list= hasn't changed and =bufler-buffers= is cached.
+
 ** 0.3
+
 *** TODO Multiple Bufler buffers
 
 i.e. call Bufler like ~(bufler :groups GROUPS :buffer-name "*Matrix Bufler*")~, and those variables should be set buffer-locally, and refreshing should use those values instead of the global ones.  That would allow multiple, unique Bufler buffers.
+
 *** TODO Use =group-tree-defmacro=
 
 Was working fine in the prototype, so it should work fine here too.  But I want to release 0.2 before making any changes like this.
+
+*** TODO Keyword arguments to groups
+
+e.g. instead of:
+
+#+BEGIN_SRC elisp
+(group-not "*Special*" (group ...) ...)
+#+END_SRC
+
+Something like:
+
+#+BEGIN_SRC elisp
+(group-not :name "*Special*" (group ...) ...)
+#+END_SRC
+
+Which should also allow:
+
+#+BEGIN_SRC elisp
+(group-not (group ...) ...)
+#+END_SRC
+
+That would provide a lot of flexibility.
+
+*** TODO Try to improve vc-state
+
+Here's a common scenario:
+
+1.  =bufler-list=.
+2.  Switch to a buffer showing a file in a project.
+3.  Make changes, save file, switch to =magit-status=, commit.
+4.  =bufler-list=.  Even though the file is now up-to-date, it shows as =edited= because =vc-state= only gets updated when the buffer is saved, and the buffer hasn't been saved since it was committed.
+
+Unfortunately, calling =vc-state-refresh= every time =bufler-list= is updated seems far too slow.
+
 ** 0.4
+
 *** TODO Buffer/group sorting
 
 The WIP branch works pretty well already.
+
 ** 0.5
+
 *** TODO Sortable columns
 
 
 ** 0.6
+
 *** TODO Factor out GUI code
 
 There should be a companion library to =group-tree= that provides the section-based view with columns.
+
 * Ideas
+
 ** DONE Name
+
 *** Bufler
 
 Sort of like "buffer butler."  Maybe a buffalo for a mascot?
