@@ -1,4 +1,4 @@
-
+#+PROPERTY: logging nil
 
 * Plans
 
