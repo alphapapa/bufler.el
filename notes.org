@@ -4,7 +4,7 @@
 
 ** 0.2
 
-*** TODO Prefix to =bufler-list= to clear cache
+*** DONE Prefix to =bufler-list= to clear cache
 
 Sometimes changing =bufler-groups= doesn't seem to take effect because =buffer-list= hasn't changed and =bufler-buffers= is cached.
 

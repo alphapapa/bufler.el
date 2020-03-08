@@ -239,9 +239,12 @@ string, not in group headers.")
   type path elements)
 
 ;;;###autoload
-(defun bufler-list ()
-  "Show Bufler's list."
-  (interactive)
+(defun bufler-list (&optional force-refresh)
+  "Show Bufler's list.
+With prefix argument FORCE-REFRESH, clear `bufler-cache' and
+regenerate buffer groups (which can be useful after changing
+`bufler-groups' if the buffer list has not yet changed)."
+  (interactive "P")
   (let (format-table)
     (cl-labels
 	;; This gets a little hairy because we have to wrap `-group-by'
@@ -314,6 +317,8 @@ string, not in group headers.")
 		  (string< (as-string test-dir) (as-string buffer-dir)))
 	 (boring-p (buffer)
 		   (hidden-p buffer)))
+      (when force-refresh
+	(setf bufler-cache nil))
       (pcase-let* ((inhibit-read-only t)
 		   (groups (bufler-buffers))
 		   (`(,*format-table . ,column-sizes) (bufler-format-buffer-groups groups))
