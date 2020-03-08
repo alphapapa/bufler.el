@@ -76,6 +76,14 @@ Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like t
 :PROPERTIES:
 :TOC:      :include descendants :depth 1
 :END:
+
+Bufler provides four primary, user-facing features.  They complement each other, but each one may be used independently.
+
+1.  The command =bufler= shows a list of buffers grouped according to the defined grouping rules.  It allows manipulation of buffers and groups of buffers.
+2.  The command =bufler-switch-buffer= prompts for a buffer with completion and switches to the selected one.  Buffers are presented by their "path" in the groups.
+3.  The global minor mode =bufler-mode= allows each frame to have a "workspace," which is a buffer group selected by the user.  When the mode is active, the command =bufler-switch-buffer= presents only buffers from the current workspace (unless called with a prefix, in which case it shows all buffers), and the current workspace is displayed in the mode line and the frame's title.  Buffers can also be manually assigned to named workspaces.
+4.  The global minor mode =bufler-tabs-mode= uses the new Emacs 27 =tab-bar= and =tab-line= features to display workspaces and buffers.  The =tab-bar= shows top-level workspaces (and whatever the selected one is, even if not top-level), and the =tab-line= shows buffers from the current workspace.
+
 :CONTENTS:
 - [[#commands][Commands]]
 - [[#bindings][Bindings]]

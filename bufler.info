@@ -94,6 +94,28 @@ File: README.info,  Node: Usage,  Next: Compared to Ibuffer,  Prev: Installation
 3 Usage
 *******
 
+Bufler provides four primary, user-facing features.  They complement
+each other, but each one may be used independently.
+
+  1. The command ‘bufler’ shows a list of buffers grouped according to
+     the defined grouping rules.  It allows manipulation of buffers and
+     groups of buffers.
+  2. The command ‘bufler-switch-buffer’ prompts for a buffer with
+     completion and switches to the selected one.  Buffers are presented
+     by their "path" in the groups.
+  3. The global minor mode ‘bufler-mode’ allows each frame to have a
+     "workspace," which is a buffer group selected by the user.  When
+     the mode is active, the command ‘bufler-switch-buffer’ presents
+     only buffers from the current workspace (unless called with a
+     prefix, in which case it shows all buffers), and the current
+     workspace is displayed in the mode line and the frame’s title.
+     Buffers can also be manually assigned to named workspaces.
+  4. The global minor mode ‘bufler-tabs-mode’ uses the new Emacs 27
+     ‘tab-bar’ and ‘tab-line’ features to display workspaces and
+     buffers.  The ‘tab-bar’ shows top-level workspaces (and whatever
+     the selected one is, even if not top-level), and the ‘tab-line’
+     shows buffers from the current workspace.
+
    • • • • • • • 
 * Menu:
 
@@ -482,20 +504,20 @@ Node: Top258
 Node: Screenshots1250
 Node: Installation2320
 Node: Usage2615
-Node: Commands2874
-Node: Bindings4160
-Node: Tips5024
-Node: Defining groups5365
-Node: Helm support11536
-Node: Ivy support12257
-Node: Prism support12685
-Node: Compared to Ibuffer13125
-Node: Changelog16817
-Node: 02-pre16977
-Node: 0117119
-Node: Credits17222
-Node: Development17911
-Node: License18081
+Node: Commands4169
+Node: Bindings5455
+Node: Tips6319
+Node: Defining groups6660
+Node: Helm support12831
+Node: Ivy support13552
+Node: Prism support13980
+Node: Compared to Ibuffer14420
+Node: Changelog18112
+Node: 02-pre18272
+Node: 0118414
+Node: Credits18517
+Node: Development19206
+Node: License19376
 
 End Tag Table
 

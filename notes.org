@@ -8,7 +8,7 @@
 
 Sometimes changing =bufler-groups= doesn't seem to take effect because =buffer-list= hasn't changed and =bufler-buffers= is cached.
 
-*** TODO Explain the big 4 features
+*** DONE Explain the big 4 features
 :PROPERTIES:
 :ID:       2f7ddcb5-906d-4586-8a86-d21a09b2cf36
 :END:
