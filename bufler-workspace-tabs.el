@@ -199,7 +199,7 @@ Works as `tab-bar-tabs-function'."
         ;; We bind all these lists to make understanding and debugging easier.  And because
         ;; Edebug seems somewhat broken in Emacs 28 in that breakpoints don't seem to work
         ;; at all, so stepping through to the relevant point is practically impossible.
-        (let* ((bufler-vc-state nil)
+        (let* ((bufler-vc-refresh nil)
                (buffer-paths (bufler-group-tree-paths (bufler-buffers)))
                (group-paths (mapcar #'butlast buffer-paths))
                (top-level-paths (mapcar #'path-top-level group-paths))
