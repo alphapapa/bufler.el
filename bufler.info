@@ -173,7 +173,8 @@ section at point.
    • ‘M-1’ – ‘M-4’ Cycle top-level sections.
    • ‘RET’ Switch to buffer.
    • ‘SPC’ Peek at buffer, keeping focus in buffer list.
-   • ‘g’ Refresh Bufler list.
+   • ‘g’ Refresh Bufler list (with prefix, force updating buffers’ VC
+     state and grouping).
    • ‘f’ Set the current frame’s workspace to the group at point (with
      prefix, unset).
    • ‘F’ Make a new frame whose workspace is the group at point.
@@ -506,18 +507,18 @@ Node: Installation2320
 Node: Usage2615
 Node: Commands4169
 Node: Bindings5455
-Node: Tips6319
-Node: Defining groups6660
-Node: Helm support12831
-Node: Ivy support13552
-Node: Prism support13980
-Node: Compared to Ibuffer14420
-Node: Changelog18112
-Node: 02-pre18272
-Node: 0118414
-Node: Credits18517
-Node: Development19206
-Node: License19376
+Node: Tips6387
+Node: Defining groups6728
+Node: Helm support12899
+Node: Ivy support13620
+Node: Prism support14048
+Node: Compared to Ibuffer14488
+Node: Changelog18180
+Node: 02-pre18340
+Node: 0118482
+Node: Credits18585
+Node: Development19274
+Node: License19444
 
 End Tag Table
 

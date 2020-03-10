@@ -141,6 +141,15 @@ because `vc-registered' and `vc-refresh-state' must be called to
 get correct results."
   :type 'boolean)
 
+(defcustom bufler-vc-refresh nil
+  "Force refresh of VC state.
+When disabled, VC state is updated when buffers are saved, which
+is usually sufficient.  When enabled, VC state is always
+up-to-date, but with a lot of file-backed buffers open, this
+might be slow, because `vc-registered' and `vc-refresh-state'
+must be called to get up-to-date results."
+  :type 'boolean)
+
 (defcustom bufler-filter-fns (list #'bufler-hidden-buffer-p)
   "Buffers that match these functions are not shown."
   :type '(repeat function))
@@ -241,9 +250,10 @@ string, not in group headers.")
 ;;;###autoload
 (defun bufler-list (&optional force-refresh)
   "Show Bufler's list.
-With prefix argument FORCE-REFRESH, clear `bufler-cache' and
-regenerate buffer groups (which can be useful after changing
-`bufler-groups' if the buffer list has not yet changed)."
+With prefix argument FORCE-REFRESH, force refreshing of buffers'
+VC state, and clear `bufler-cache' and regenerate buffer
+groups (which can be useful after changing `bufler-groups' if the
+buffer list has not yet changed)."
   (interactive "P")
   (let (format-table)
     (cl-labels
@@ -320,6 +330,7 @@ regenerate buffer groups (which can be useful after changing
       (when force-refresh
 	(setf bufler-cache nil))
       (pcase-let* ((inhibit-read-only t)
+		   (bufler-vc-refresh force-refresh)
 		   (groups (bufler-buffers))
 		   (`(,*format-table . ,column-sizes) (bufler-format-buffer-groups groups))
 		   (header (concat (format (format " %%-%ss" (cdar column-sizes)) (caar column-sizes))
@@ -667,6 +678,11 @@ buffer's depth in the group tree."
 (bufler-define-column "VC" nil
   (ignore depth)
   (when (buffer-file-name buffer)
+    (when (and bufler-vc-refresh
+	       (vc-registered (buffer-file-name buffer)))
+      (with-current-buffer buffer
+	(vc-state-refresh (buffer-file-name buffer)
+			  (vc-backend (buffer-file-name buffer)))))
     (pcase (vc-state (buffer-file-name buffer))
       ('nil nil)
       ((and 'edited it) (propertize (symbol-name it) 'face 'bufler-vc))
