@@ -37,6 +37,7 @@ buffers in workspaces manually.
 
 Usage
 
+* Workflow::
 * Commands::
 * Bindings::
 * Tips::
@@ -116,9 +117,10 @@ each other, but each one may be used independently.
      the selected one is, even if not top-level), and the ‘tab-line’
      shows buffers from the current workspace.
 
-   • • • • • • • 
+   • • • • • • • • 
 * Menu:
 
+* Workflow::
 * Commands::
 * Bindings::
 * Tips::
@@ -128,9 +130,49 @@ each other, but each one may be used independently.
 * Prism support::
 
 
-File: README.info,  Node: Commands,  Next: Bindings,  Up: Usage
+File: README.info,  Node: Workflow,  Next: Commands,  Up: Usage
 
-3.1 Commands
+3.1 Workflow
+============
+
+A workflow using Bufler could be something like this:
+
+  1. Start Emacs.
+  2. Activate ‘bufler-mode’.
+  3. Open some buffers, find some files, etc.
+  4. When you need to switch buffers, use ‘M-x bufler-switch-buffer’.
+     The buffers are presented by group with their "outline paths,"
+     which makes it easier to find the buffer you’re looking for, since
+     they’re organized by project, directory, mode, etc.
+  5. The next time you call ‘bufler-switch-buffer’ in that frame, it
+     will only offer buffers from that frame’s buffer group, making it
+     easier to find buffers related to the current project.  Or if you
+     need to select a buffer in a different group, use ‘C-u’ with
+     ‘bufler-switch-buffer’ to see all buffers.  (Of course, existing
+     commands like ‘switch-to-buffer’ are not affected; Bufler doesn’t
+     interfere with other modes or commands.)
+  6. Make a new frame for a different project by using ‘bufler-list’ to
+     show the list of buffer groups, then selecting a group and pressing
+     ‘F’ to make the frame, which will be automatically set to that
+     group’s workspace.
+  7. When you need to kill or save a bunch of buffers at once, use
+     ‘bufler-list’, put the cursor on a group you want to kill or save,
+     and press ‘k’ or ‘s’.  If you want to see which buffers have
+     unsaved (indicated with ‘*’) or uncommitted (indicated with
+     ‘edited’) changes, you can browse through the list of buffers
+     (enable ‘bufler-vc-state’ to show VC state for each buffer; this is
+     disabled by default because getting up-to-date information on a
+     buffer’s VC state can be slow).
+
+   Then, you can write your own buffer-grouping rules to make them as
+simple or as complex as you like.  They’re just Lisp functions, so you
+can do anything with them, but the DSL provided by the macro makes
+simple ones easy to write.
+
+
+File: README.info,  Node: Commands,  Next: Bindings,  Prev: Workflow,  Up: Usage
+
+3.2 Commands
 ============
 
 ‘bufler’
@@ -161,7 +203,7 @@ File: README.info,  Node: Commands,  Next: Bindings,  Up: Usage
 
 File: README.info,  Node: Bindings,  Next: Tips,  Prev: Commands,  Up: Usage
 
-3.2 Bindings
+3.3 Bindings
 ============
 
 In the Bufler buffer list, these keys are available (use ‘C-h m’ to get
@@ -185,7 +227,7 @@ section at point.
 
 File: README.info,  Node: Tips,  Next: Defining groups,  Prev: Bindings,  Up: Usage
 
-3.3 Tips
+3.4 Tips
 ========
 
    • ‘bufler-switch-buffer’ works best when ‘completion-styles’ includes
@@ -196,7 +238,7 @@ File: README.info,  Node: Tips,  Next: Defining groups,  Prev: Bindings,  Up: Us
 
 File: README.info,  Node: Defining groups,  Next: Helm support,  Prev: Tips,  Up: Usage
 
-3.4 Defining groups
+3.5 Defining groups
 ===================
 
 _See the ‘bufler’ info page to view this information in Emacs._
@@ -327,7 +369,7 @@ Other types
 
 File: README.info,  Node: Helm support,  Next: Ivy support,  Prev: Defining groups,  Up: Usage
 
-3.5 Helm support
+3.6 Helm support
 ================
 
 Bufler does not require nor depend on Helm, but because it uses
@@ -349,7 +391,7 @@ showing all buffers:
 
 File: README.info,  Node: Ivy support,  Next: Prism support,  Prev: Helm support,  Up: Usage
 
-3.6 Ivy support
+3.7 Ivy support
 ===============
 
 Bufler does not require nor depend on Ivy, but because it uses
@@ -361,7 +403,7 @@ Bufler does not require nor depend on Ivy, but because it uses
 
 File: README.info,  Node: Prism support,  Prev: Ivy support,  Up: Usage
 
-3.7 Prism support
+3.8 Prism support
 =================
 
 Bufler does not require nor depend on Prism
@@ -403,40 +445,6 @@ selected buffer’s group.
 
    Of course, Ibuffer is a mature tool with many features, so Bufler
 doesn’t replace it completely.  Bufler is a very young project.
-
-   A workflow using Bufler could be something like this:
-
-  1. Start Emacs.
-  2. Activate ‘bufler-mode’.
-  3. Open some buffers, find some files, etc.
-  4. When you need to switch buffers, use ‘M-x bufler-switch-buffer’.
-     The buffers are presented by group with their "outline paths,"
-     which makes it easier to find the buffer you’re looking for, since
-     they’re organized by project, directory, mode, etc.
-  5. The next time you call ‘bufler-switch-buffer’ in that frame, it
-     will only offer buffers from that frame’s buffer group, making it
-     easier to find buffers related to the current project.  Or if you
-     need to select a buffer in a different group, use ‘C-u’ with
-     ‘bufler-switch-buffer’ to see all buffers.  (Of course, existing
-     commands like ‘switch-to-buffer’ are not affected; Bufler doesn’t
-     interfere with other modes or commands.)
-  6. Make a new frame for a different project by using ‘bufler-list’ to
-     show the list of buffer groups, then selecting a group and pressing
-     ‘F’ to make the frame, which will be automatically set to that
-     group’s workspace.
-  7. When you need to kill or save a bunch of buffers at once, use
-     ‘bufler-list’, put the cursor on a group you want to kill or save,
-     and press ‘k’ or ‘s’.  If you want to see which buffers have
-     unsaved (indicated with ‘*’) or uncommitted (indicated with
-     ‘edited’) changes, you can browse through the list of buffers
-     (enable ‘bufler-vc-state’ to show VC state for each buffer; this is
-     disabled by default because getting up-to-date information on a
-     buffer’s VC state can be slow).
-
-   Then, you can write your own buffer-grouping rules to make them as
-simple or as complex as you like.  They’re just Lisp functions, so you
-can do anything with them, but the DSL provided by the macro makes
-simple ones easy to write.
 
 
 File: README.info,  Node: Changelog,  Next: Credits,  Prev: Compared to Ibuffer,  Up: Top
@@ -502,23 +510,24 @@ GPLv3
 
 Tag Table:
 Node: Top258
-Node: Screenshots1250
-Node: Installation2320
-Node: Usage2615
-Node: Commands4169
-Node: Bindings5455
-Node: Tips6387
-Node: Defining groups6728
-Node: Helm support12899
-Node: Ivy support13620
-Node: Prism support14048
-Node: Compared to Ibuffer14488
-Node: Changelog18180
-Node: 02-pre18340
-Node: 0118482
-Node: Credits18585
-Node: Development19274
-Node: License19444
+Node: Screenshots1263
+Node: Installation2333
+Node: Usage2628
+Node: Workflow4199
+Node: Commands6232
+Node: Bindings7535
+Node: Tips8467
+Node: Defining groups8808
+Node: Helm support14979
+Node: Ivy support15700
+Node: Prism support16128
+Node: Compared to Ibuffer16568
+Node: Changelog18318
+Node: 02-pre18478
+Node: 0118620
+Node: Credits18723
+Node: Development19412
+Node: License19582
 
 End Tag Table
 
