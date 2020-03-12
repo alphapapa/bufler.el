@@ -69,13 +69,13 @@
 ;;;; Variables
 
   (defvar bufler-workspace-tabs-mode-saved-settings
-    '((tab-bar-close-button . nil) (tab-bar-close-button-show . nil))
+    '((tab-bar-separator . nil) (tab-bar-close-button-show . nil))
     "Settings saved from before `bufler-workspace-tabs-mode' was activated.
 Used to restore them when the mode is disabled.")
 
 ;;;; Customization
 
-  (defcustom bufler-workspace-tabs-tab-separator " |"
+  (defcustom bufler-workspace-tabs-tab-separator " | "
     "String displayed between tabs.
 Since there is no built-in separator between tabs, it can be
 unclear where one tab ends and the next begins, depending on face
@@ -107,8 +107,8 @@ properties.  See the default value of `tab-bar-close-button'."
           (global-tab-line-mode 1)
 	  ;; NOTE: `tab-bar-mode' adds text properties to `tab-bar-close-button'
 	  ;; when it is activated, so we must set it after the mode is activated.
-	  (setf tab-bar-close-button bufler-workspace-tabs-tab-separator
-		tab-bar-close-button-show t))
+	  (setf tab-bar-separator bufler-workspace-tabs-tab-separator
+		tab-bar-close-button-show nil))
       (advice-remove 'tab-bar-select-tab #'bufler-workspace-tabs--tab-bar-select-tab)
       (setf tab-bar-tabs-function #'tab-bar-tabs
             tab-line-tabs-function #'tab-line-tabs-window-buffers)
