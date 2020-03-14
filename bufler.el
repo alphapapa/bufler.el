@@ -953,6 +953,16 @@ NAME, okay, `checkdoc'?"
               (project-root (car (project-roots project))))
     (concat "Project: " project-root)))
 
+(eval-and-compile
+  (declare-function projectile-project-name "ext:projectile" t t)
+  (if (require 'projectile nil 'noerror)
+      (bufler-defauto-group projectile
+        (if-let ((project (with-current-buffer buffer
+                            (projectile-project-name))))
+            (concat "Projectile: " project)))
+    (bufler-defauto-group projectile
+      (ignore buffer))))
+
 (bufler-defauto-group tramp
   (when-let* ((host (file-remote-p (buffer-local-value 'default-directory buffer)
                                    'host)))
@@ -993,6 +1003,7 @@ See documentation for details."
                  (auto-indirect () `(bufler-group 'auto-indirect))
                  (auto-mode () `(bufler-group 'auto-mode))
                  (auto-project () `(bufler-group 'auto-project))
+                 (auto-projectile () `(bufler-group 'auto-projectile))
                  (auto-tramp () `(bufler-group 'auto-tramp))
                  (auto-workspace () `(bufler-group 'auto-workspace)))
      (list ,@groups)))
@@ -1053,6 +1064,9 @@ See documentation for details."
      ;; Group remaining buffers by whether they're file backed, then by mode.
      (group-not "*special*" (auto-file))
      (auto-mode))
+    (group
+     ;; Subgroup collecting buffers in a projectile project.
+     (auto-projectile))
     (group
      ;; Subgroup collecting buffers in a version-control project,
      ;; grouping them by directory.
