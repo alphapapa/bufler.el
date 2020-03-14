@@ -960,7 +960,7 @@ NAME, okay, `checkdoc'?"
 
 (bufler-defauto-group workspace
   (when-let* ((name (buffer-local-value 'bufler-workspace-name buffer)))
-    (concat "Workspace: " name)))
+    name))
 
 ;;;;;; Group-defining macro
 
