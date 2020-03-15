@@ -957,9 +957,10 @@ NAME, okay, `checkdoc'?"
   (declare-function projectile-project-name "ext:projectile" t t)
   (if (require 'projectile nil 'noerror)
       (bufler-defauto-group projectile
-        (if-let ((project (with-current-buffer buffer
-                            (projectile-project-name))))
-            (concat "Projectile: " project)))
+        (let ((project (with-current-buffer buffer
+                         (projectile-project-name))))
+          (when (and project (not (equal project "-")))
+            (concat "Projectile: " project))))
     (bufler-defauto-group projectile
       (ignore buffer))))
 
