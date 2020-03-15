@@ -3,8 +3,7 @@
 ;; Copyright (C) 2020  Adam Porter
 
 ;; Author: Adam Porter <adam@alphapapa.net>
-;; Package-Requires: ((emacs "26.3"))
-;; Keywords: convenience
+;; URL: https://github.com/alphapapa/bufler.el
 
 ;;; License:
 

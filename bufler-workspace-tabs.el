@@ -3,7 +3,7 @@
 ;; Copyright (C) 2020  Adam Porter
 
 ;; Author: Adam Porter <adam@alphapapa.net>
-;; Keywords: convenience
+;; URL: https://github.com/alphapapa/bufler.el
 
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by

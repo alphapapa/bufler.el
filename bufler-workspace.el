@@ -4,8 +4,6 @@
 
 ;; Author: Adam Porter <adam@alphapapa.net>
 ;; URL: https://github.com/alphapapa/bufler.el
-;; Package-Requires: ((emacs "26.3"))
-;; Keywords: convenience
 
 ;;; License:
 
