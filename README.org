@@ -103,9 +103,13 @@ A workflow using Bufler could be something like this:
 2.  Activate =bufler-mode=.
 3.  Open some buffers, find some files, etc.
 4.  When you need to switch buffers, use =M-x bufler-switch-buffer=.  The buffers are presented by group with their "outline paths," which makes it easier to find the buffer you're looking for, since they're organized by project, directory, mode, etc.
-5.  The next time you call =bufler-switch-buffer= in that frame, it will only offer buffers from that frame's buffer group, making it easier to find buffers related to the current project.  Or if you need to select a buffer in a different group, use =C-u= with =bufler-switch-buffer= to see all buffers.  (Of course, existing commands like =switch-to-buffer= are not affected; Bufler doesn't interfere with other modes or commands.)
-6.  Make a new frame for a different project by using =bufler-list= to show the list of buffer groups, then selecting a group and pressing =F= to make the frame, which will be automatically set to that group's workspace.
-7.  When you need to kill or save a bunch of buffers at once, use =bufler-list=, put the cursor on a group you want to kill or save, and press =k= or =s=.  If you want to see which buffers have unsaved (indicated with =*=) or uncommitted (indicated with =edited=) changes, you can browse through the list of buffers (enable =bufler-vc-state= to show VC state for each buffer; this is disabled by default because getting up-to-date information on a buffer's VC state can be slow).
+5.  If you want to focus on a certain group's buffers:
+      a.  Use =C-u C-u M-x bufler-switch-buffer RET= and select a buffer; or
+      b.  Use =M-x bufler-workspace-frame-set RET= and select a workspace; or
+      c.  Use =M-x bufler RET= and press =f= to focus the current frame on a workspace, or =F= to open a new frame focused on a workspace.
+6.  The next time you call =bufler-switch-buffer= in that frame, it will only offer buffers from that frame's buffer group, making it easier to find buffers related to the current project.  (Of course, existing commands like =switch-to-buffer= are not affected; Bufler doesn't interfere with other modes or commands.)
+7.  When you need to switch to a buffer in a different group without changing the frame's workspace, use =C-u M-x bufler-switch-buffer= to select from all buffers in all groups.
+8.  When you need to kill or save a bunch of buffers at once, use =bufler-list=, put the cursor on a group you want to kill or save, and press =k= or =s=.  If you want to see which buffers have unsaved (indicated with =*=) or uncommitted (indicated with =edited=) changes, you can browse through the list of buffers (enable =bufler-vc-state= to show VC state for each buffer; this is disabled by default because getting up-to-date information on a buffer's VC state can be slow).
 
 Then, you can write your own buffer-grouping rules to make them as simple or as complex as you like.  They're just Lisp functions, so you can do anything with them, but the DSL provided by the macro makes simple ones easy to write.
 
