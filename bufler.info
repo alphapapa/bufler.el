@@ -1,4 +1,4 @@
-This is README.info, produced by makeinfo version 5.2 from README.texi.
+This is README.info, produced by makeinfo version 6.5 from README.texi.
 
 INFO-DIR-SECTION Emacs
 START-INFO-DIR-ENTRY
@@ -48,8 +48,8 @@ Usage
 
 Changelog
 
-* 0.2-pre: 02-pre. 
-* 0.1: 01. 
+* 0.2-pre: 02-pre.
+* 0.1: 01.
 
 
 
@@ -310,6 +310,9 @@ groups are defined like this:
         (group-not "*special*" (auto-file))
         (auto-mode))
        (group
+        ;; Subgroup collecting buffers in a projectile project.
+        (auto-projectile))
+       (group
         ;; Subgroup collecting buffers in a version-control project,
         ;; grouping them by directory.
         (auto-project))
@@ -347,6 +350,8 @@ Auto-types
         • ‘auto-mode’ Buffer’s major mode.
         • ‘auto-project’ Buffer’s version-control project directory
           according to ‘project.el’.
+        • ‘auto-projectile’ Buffer’s project as defined in the
+          ‘projectile’ package (if installed).
         • ‘auto-special’ Whether the buffer is special (i.e.  whether
           its name starts with ‘*’).
         • ‘auto-tramp’ Whether the buffer is opened via Tramp.
@@ -362,9 +367,10 @@ Regexp types
           the buffer’s major-mode.
 Other types
         • ‘dir (DIRS DEPTH)’ Groups buffers which match one of the given
-          DIRS. DIRS may be one or a list of directory paths.  DEPTH may
-          be nil or a depth above which to produce subdirectory groups
-          (a feature probably broken at the moment).  See example above.
+          DIRS.  DIRS may be one or a list of directory paths.  DEPTH
+          may be nil or a depth above which to produce subdirectory
+          groups (a feature probably broken at the moment).  See example
+          above.
 
 
 File: README.info,  Node: Helm support,  Next: Ivy support,  Prev: Defining groups,  Up: Usage
@@ -454,8 +460,8 @@ File: README.info,  Node: Changelog,  Next: Credits,  Prev: Compared to Ibuffer,
 
 * Menu:
 
-* 0.2-pre: 02-pre. 
-* 0.1: 01. 
+* 0.2-pre: 02-pre.
+* 0.1: 01.
 
 
 File: README.info,  Node: 02-pre,  Next: 01,  Up: Changelog
@@ -510,24 +516,24 @@ GPLv3
 
 Tag Table:
 Node: Top258
-Node: Screenshots1263
-Node: Installation2333
-Node: Usage2628
-Node: Workflow4199
-Node: Commands6232
-Node: Bindings7535
-Node: Tips8467
-Node: Defining groups8808
-Node: Helm support14979
-Node: Ivy support15700
-Node: Prism support16128
-Node: Compared to Ibuffer16568
-Node: Changelog18318
-Node: 02-pre18478
-Node: 0118620
-Node: Credits18723
-Node: Development19412
-Node: License19582
+Node: Screenshots1261
+Node: Installation2331
+Node: Usage2626
+Node: Workflow4197
+Node: Commands6230
+Node: Bindings7533
+Node: Tips8465
+Node: Defining groups8806
+Node: Helm support15215
+Node: Ivy support15936
+Node: Prism support16364
+Node: Compared to Ibuffer16804
+Node: Changelog18554
+Node: 02-pre18712
+Node: 0118854
+Node: Credits18957
+Node: Development19646
+Node: License19816
 
 End Tag Table
 
