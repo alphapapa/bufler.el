@@ -39,6 +39,7 @@
 (defvar tab-bar-tabs-function)
 (defvar tab-bar-close-button)
 (defvar tab-bar-close-button-show)
+(defvar tab-bar-separator)
 (defvar tab-line-tabs-function)
 ;; Because the mode isn't necessarily defined.
 (defvar bufler-workspace-tabs-mode)
