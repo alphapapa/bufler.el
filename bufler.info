@@ -35,6 +35,10 @@ buffers in workspaces manually.
 
 — The Detailed Node Listing —
 
+Installation
+
+* Quelpa::
+
 Usage
 
 * Workflow::
@@ -83,8 +87,20 @@ File: README.info,  Node: Installation,  Next: Usage,  Prev: Screenshots,  Up: T
 2 Installation
 **************
 
-Use quelpa-use-package (https://github.com/quelpa/quelpa-use-package),
-like this:
+If you’ve installed from MELPA (https://melpa.org/), you’re done!
+
+* Menu:
+
+* Quelpa::
+
+
+File: README.info,  Node: Quelpa,  Up: Installation
+
+2.1 Quelpa
+==========
+
+If you prefer, you may install with quelpa-use-package
+(https://github.com/quelpa/quelpa-use-package), like this:
 
      (use-package bufler
        :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"))
@@ -518,24 +534,25 @@ GPLv3
 
 Tag Table:
 Node: Top258
-Node: Screenshots1261
-Node: Installation2331
-Node: Usage2626
-Node: Workflow4197
-Node: Commands6420
-Node: Bindings7723
-Node: Tips8655
-Node: Defining groups8996
-Node: Helm support15405
-Node: Ivy support16126
-Node: Prism support16554
-Node: Compared to Ibuffer16994
-Node: Changelog18744
-Node: 02-pre18902
-Node: 0119044
-Node: Credits19147
-Node: Development19836
-Node: License20006
+Node: Screenshots1287
+Node: Installation2357
+Node: Quelpa2566
+Node: Usage2854
+Node: Workflow4425
+Node: Commands6647
+Node: Bindings7950
+Node: Tips8882
+Node: Defining groups9223
+Node: Helm support15632
+Node: Ivy support16353
+Node: Prism support16781
+Node: Compared to Ibuffer17221
+Node: Changelog18971
+Node: 02-pre19129
+Node: 0119271
+Node: Credits19374
+Node: Development20063
+Node: License20233
 
 End Tag Table
 

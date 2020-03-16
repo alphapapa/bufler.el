@@ -48,29 +48,16 @@ This screenshot shows Bufler Tabs Mode, which works with the new =tab-bar-mode= 
 :TOC:      :depth 0
 :END:
 
-Use [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like this:
+If you've installed from [[https://melpa.org/][MELPA]], you're done!
+
+** Quelpa
+
+If you prefer, you may install with [[https://github.com/quelpa/quelpa-use-package][quelpa-use-package]], like this:
 
 #+BEGIN_SRC elisp
   (use-package bufler
     :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"))
 #+END_SRC
-
-# ** MELPA
-# 
-# If you installed from MELPA, you're done.  Just run one of the commands below.
-# 
-# ** Manual
-# 
-#   Install these required packages:
-# 
-#   + =foo=
-#   + =bar=
-# 
-#   Then put this file in your load-path, and put this in your init file:
-# 
-#   #+BEGIN_SRC elisp
-# (require 'bufler)
-#   #+END_SRC
 
 * Usage
 :PROPERTIES:
