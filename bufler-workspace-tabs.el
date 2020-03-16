@@ -28,6 +28,8 @@
 
 ;;;; Requirements
 
+(require 'map)
+
 (require 'bufler-workspace)
 
 ;;;; Compatibility
