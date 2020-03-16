@@ -50,6 +50,11 @@ Usage
 * Ivy support::
 * Prism support::
 
+Defining groups
+
+* Default groups example::
+* Group types::
+
 Changelog
 
 * 0.2-pre: 02-pre.
@@ -259,23 +264,41 @@ File: README.info,  Node: Defining groups,  Next: Helm support,  Prev: Tips,  Up
 3.5 Defining groups
 ===================
 
-_See the ‘bufler’ info page to view this information in Emacs._
+   • • 
+   _See the ‘bufler’ info page to view this information in Emacs._
 
    The Bufler groups definition is a list stored in variable
-‘bufler-groups’.  Each element of the list is either a lambda function
-which takes a single argument, a buffer, or a list of such functions.
-Each buffer is matched against these functions in order until it does
-not match any more functions at that level.  A list of functions defines
-a subgroup which short-circuits other groups at the same level,
+‘bufler-groups’.  Each element of the list is a function which takes a
+buffer as its only argument and returns a string naming the group the
+buffer should be in at that level (or nil if the buffer should not be
+grouped by the function), or a list of such functions; each list may
+contain more such lists.  Each buffer is matched against these functions
+in-order until the list of functions is exhausted.  A list of functions
+defines a subgroup which short-circuits other groups at the same level,
 preventing further grouping outside of the subgroup’s functions.
-Ultimately, it’s lambdas all the way down.
+Ultimately, it’s functions all the way down.
 
-   This seems somewhat difficult to explain, so please see the examples.
+   If this explanation doesn’t seem clear, please see the examples.
 Once you get the hang of it, it’s powerful and flexible.
 
-   For convenience, the macro ‘bufler-defgroups’ provides a sort of DSL,
-a concise vocabulary for defining groups.  For example, the default
-groups are defined like this:
+   For convenience, the macro ‘bufler-defgroups’ provides a concise
+vocabulary for defining groups.  *Note* that the macro does not _set_
+the variable ‘bufler-groups’, it only expands a groups form, so you
+should use, e.g.  ‘(setf bufler-groups (bufler-defgroups ...))’ to
+actually set the groups.
+
+* Menu:
+
+* Default groups example::
+* Group types::
+
+
+File: README.info,  Node: Default groups example,  Next: Group types,  Up: Defining groups
+
+3.5.1 Default groups example
+----------------------------
+
+The default groups are defined like this:
 
      (bufler-defgroups
        (group
@@ -338,11 +361,13 @@ groups are defined like this:
        (auto-directory)
        (auto-mode))
 
-   *Note* that the macro does not _set_ the variable ‘bufler-groups’, it
-merely expands a groups form, so you should use, e.g.  ‘(setf
-bufler-groups (bufler-defgroups ...))’ to actually set the groups.
+
+File: README.info,  Node: Group types,  Prev: Default groups example,  Up: Defining groups
 
-   The following group types are available in ‘bufler-defgroups’.  Note
+3.5.2 Group types
+-----------------
+
+The following group types are available in ‘bufler-defgroups’.  Note
 that each one is expanded into a lambda, so they may also be called by
 ‘funcall’ (see example above).
 
@@ -535,25 +560,27 @@ GPLv3
 
 Tag Table:
 Node: Top258
-Node: Screenshots1287
-Node: Installation2357
-Node: Quelpa2566
-Node: Usage2854
-Node: Workflow4425
-Node: Commands6647
-Node: Bindings7950
-Node: Tips8882
-Node: Defining groups9223
-Node: Helm support15703
-Node: Ivy support16424
-Node: Prism support16852
-Node: Compared to Ibuffer17292
-Node: Changelog19042
-Node: 02-pre19200
-Node: 0119342
-Node: Credits19445
-Node: Development20134
-Node: License20304
+Node: Screenshots1348
+Node: Installation2418
+Node: Quelpa2627
+Node: Usage2915
+Node: Workflow4486
+Node: Commands6708
+Node: Bindings8011
+Node: Tips8943
+Node: Defining groups9284
+Node: Default groups example10671
+Node: Group types13598
+Node: Helm support16228
+Node: Ivy support16949
+Node: Prism support17377
+Node: Compared to Ibuffer17817
+Node: Changelog19567
+Node: 02-pre19725
+Node: 0119867
+Node: Credits19970
+Node: Development20659
+Node: License20829
 
 End Tag Table
 

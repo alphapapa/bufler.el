@@ -131,14 +131,25 @@ In the Bufler buffer list, these keys are available (use =C-h m= to get the most
 +  Customize settings in the =bufler= group.
 
 ** Defining groups
+:PROPERTIES:
+:TOC:      :include descendants
+:END:
+:CONTENTS:
+- [[#default-groups-example][Default groups example]]
+- [[#group-types][Group types]]
+:END:
 
 /See the =bufler= info page to view this information in Emacs./
 
-The Bufler groups definition is a list stored in variable =bufler-groups=.  Each element of the list is either a lambda function which takes a single argument, a buffer, or a list of such functions.  Each buffer is matched against these functions in order until it does not match any more functions at that level.  A list of functions defines a subgroup which short-circuits other groups at the same level, preventing further grouping outside of the subgroup's functions.  Ultimately, it's lambdas all the way down.
+The Bufler groups definition is a list stored in variable =bufler-groups=.  Each element of the list is a function which takes a buffer as its only argument and returns a string naming the group the buffer should be in at that level (or nil if the buffer should not be grouped by the function), or a list of such functions; each list may contain more such lists.  Each buffer is matched against these functions in-order until the list of functions is exhausted.  A list of functions defines a subgroup which short-circuits other groups at the same level, preventing further grouping outside of the subgroup's functions.  Ultimately, it's functions all the way down.
 
-This seems somewhat difficult to explain, so please see the examples.  Once you get the hang of it, it's powerful and flexible.
+If this explanation doesn't seem clear, please see the examples.  Once you get the hang of it, it's powerful and flexible.
 
-For convenience, the macro =bufler-defgroups= provides a sort of DSL, a concise vocabulary for defining groups.  For example, the default groups are defined like this:
+For convenience, the macro =bufler-defgroups= provides a concise vocabulary for defining groups.  *Note* that the macro does not /set/ the variable =bufler-groups=, it only expands a groups form, so you should use, e.g. ~(setf bufler-groups (bufler-defgroups ...))~ to actually set the groups.
+
+*** Default groups example
+
+The default groups are defined like this:
 
 #+BEGIN_SRC elisp
   (bufler-defgroups
@@ -203,7 +214,7 @@ For convenience, the macro =bufler-defgroups= provides a sort of DSL, a concise 
     (auto-mode))
 #+END_SRC
 
-*Note* that the macro does not /set/ the variable =bufler-groups=, it merely expands a groups form, so you should use, e.g. ~(setf bufler-groups (bufler-defgroups ...))~ to actually set the groups.
+*** Group types
 
 The following group types are available in =bufler-defgroups=.  Note that each one is expanded into a lambda, so they may also be called by =funcall= (see example above).
 
