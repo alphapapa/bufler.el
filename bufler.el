@@ -851,6 +851,12 @@ e.g. symlinks are resolved."
                                        (-take depth (f-split (f-relative buffer-dir dir)))))
                       group-name))))
 
+(defun bufler-group-hidden (buffer)
+  "If BUFFER is hidden, return \"*hidden*\"."
+  (when (and (string-prefix-p " " (buffer-name buffer))
+             (not (buffer-file-name buffer)))
+    "*hidden*"))
+
 (defun bufler-dir-related-p (dir-a dir-b)
   "Return non-nil if DIR-A is related to DIR-B.
 In other words, if DIR-A is either equal to or an ancestor of
@@ -937,11 +943,6 @@ NAME, okay, `checkdoc'?"
   (when (buffer-base-buffer buffer)
     "*indirect*"))
 
-(bufler-defauto-group hidden
-  (if (string-prefix-p " " (buffer-name buffer))
-      "*hidden*"
-    "Normal"))
-
 (bufler-defauto-group special
   (if (bufler-special-buffer-p buffer)
       "*special*"
@@ -999,6 +1000,7 @@ See documentation for details."
                              `(bufler-group 'name-match ,name ,regexp))
                  (dir (dirs &optional depth)
                       `(bufler-group 'dir ,dirs ,depth))
+                 (hidden () `(bufler-group 'hidden))
                  (auto-directory () `(bufler-group 'auto-directory))
                  (auto-file () `(bufler-group 'auto-file))
                  (auto-indirect () `(bufler-group 'auto-indirect))
