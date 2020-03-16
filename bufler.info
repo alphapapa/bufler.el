@@ -357,7 +357,7 @@ Meta types
           the given types.
         • ‘group-or (NAME TYPE...)’ Groups buffers which match any of
           the given types.
-Auto-types
+Auto types
      These types automatically create groups for the buffer’s attribute
      of this type.
         • ‘auto-directory’ Buffer’s directory.

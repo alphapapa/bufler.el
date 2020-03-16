@@ -212,7 +212,7 @@ The following group types are available in =bufler-defgroups=.  Note that each o
      -  ~group-not (NAME TYPE)~ Groups buffers which do /not/ match the given type.
      -  ~group-and (NAME TYPE...)~ Groups buffers which match all of the given types.
      -  ~group-or (NAME TYPE...)~  Groups buffers which match any of the given types.
-+  Auto-types :: These types automatically create groups for the buffer's attribute of this type.
++  Auto types :: These types automatically create groups for the buffer's attribute of this type.
      -  ~auto-directory~  Buffer's directory.
      -  ~auto-file~  Buffer's file name.
      -  ~auto-indirect~  Whether the buffer is indirect (e.g. a cloned indirect buffer).
