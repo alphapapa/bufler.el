@@ -65,6 +65,8 @@
 ;;;###autoload
 (when (require 'tab-bar nil t)
 
+  (require 'tab-line)
+
   ;; Only on Emacs 27+.
 
   ;; FIXME: Maybe these should be autoloaded, but how to do that conditionally?
