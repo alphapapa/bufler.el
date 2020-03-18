@@ -100,20 +100,20 @@ properties.  See the default value of `tab-bar-close-button'."
     "Use Bufler workspaces for `tab-bar-mode' and `tab-line-mode'."
     :global t
     (if bufler-workspace-tabs-mode
-	(progn
-	  ;; Save settings.
-	  (cl-loop for (symbol . _value) in bufler-workspace-tabs-mode-saved-settings
-		   do (setf (map-elt bufler-workspace-tabs-mode-saved-settings symbol)
-			    (symbol-value symbol)))
-	  (advice-add 'tab-bar-select-tab :override #'bufler-workspace-tabs--tab-bar-select-tab)
+        (progn
+          ;; Save settings.
+          (cl-loop for (symbol . _value) in bufler-workspace-tabs-mode-saved-settings
+                   do (setf (map-elt bufler-workspace-tabs-mode-saved-settings symbol)
+                            (symbol-value symbol)))
+          (advice-add 'tab-bar-select-tab :override #'bufler-workspace-tabs--tab-bar-select-tab)
           (setf tab-bar-tabs-function #'bufler-workspace-tabs
                 tab-line-tabs-function #'bufler-workspace-buffers)
           (tab-bar-mode 1)
           (global-tab-line-mode 1)
-	  ;; NOTE: `tab-bar-mode' adds text properties to `tab-bar-close-button'
-	  ;; when it is activated, so we must set it after the mode is activated.
-	  (setf tab-bar-separator bufler-workspace-tabs-tab-separator
-		tab-bar-close-button-show nil))
+          ;; NOTE: `tab-bar-mode' adds text properties to `tab-bar-close-button'
+          ;; when it is activated, so we must set it after the mode is activated.
+          (setf tab-bar-separator bufler-workspace-tabs-tab-separator
+                tab-bar-close-button-show nil))
       (advice-remove 'tab-bar-select-tab #'bufler-workspace-tabs--tab-bar-select-tab)
       (setf tab-bar-tabs-function #'tab-bar-tabs
             tab-line-tabs-function #'tab-line-tabs-window-buffers)
@@ -186,7 +186,7 @@ FRAME defaults to the selected frame.  Works as
                   (path-top-level
                    (path) (pcase-exhaustive path
                             (`(,(and first (guard (not first)))
-                               ,(and second (guard second)) .,_rest)
+                               ,(and second (guard second)) . ,_rest)
                              ;; If I use _ in the variable names, it complains that they are not
                              ;; unused.  The test in (guard) doesn't count as using them, so it
                              ;; complains either way.  So use `ignore'.  I hope it compiles out.
