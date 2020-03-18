@@ -149,9 +149,10 @@ ARG is the position of the tab in the tab bar."
 
 ;;;; Functions
 
-  (cl-defun bufler-workspace-tabs (&optional (frame (selected-frame)))
+  (defun bufler-workspace-tabs (&optional frame)
     "Return a list of workspace tabs from FRAME's perspective.
-Works as `tab-bar-tabs-function'."
+FRAME defaults to the selected frame.  Works as
+`tab-bar-tabs-function'."
     ;; This is ridiculously complicated.  It seems to all stem from,
     ;; again, that group paths can start with nil, but we need to ignore
     ;; initial nils when displaying paths, but we need to keep the
@@ -166,7 +167,7 @@ Works as `tab-bar-tabs-function'."
     ;; I've spent more time messing with this function than I have on
     ;; the actual grouping logic, which may say more about me than the
     ;; code.
-    (with-selected-frame frame
+    (with-selected-frame (or frame (selected-frame))
       (cl-labels ((tab-type
                    (path) (if (equal path (frame-parameter nil 'bufler-workspace-path))
                               'current-tab
