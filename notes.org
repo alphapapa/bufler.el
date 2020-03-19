@@ -24,6 +24,10 @@ And while they all work together, they can also be used independently.  =bufler-
 
 ** 0.3
 
+*** TODO Testing
+
+Can probably use =with-simulated-input= to do some testing, which will help with refactoring.
+
 *** TODO Multiple Bufler buffers
 
 i.e. call Bufler like ~(bufler :groups GROUPS :buffer-name "*Matrix Bufler*")~, and those variables should be set buffer-locally, and refreshing should use those values instead of the global ones.  That would allow multiple, unique Bufler buffers.
