@@ -955,6 +955,17 @@ NAME, okay, `checkdoc'?"
     (concat "Project: " project-root)))
 
 (eval-and-compile
+  (declare-function erc-network "ext:erc-network" t t)
+  (if (require 'erc-networks nil 'noerror)
+      (bufler-defauto-group erc
+        (let ((erc-network (symbol-name (with-current-buffer buffer
+                                          (erc-network)))))
+          (when (and erc-network (not (equal erc-network "-")))
+            (concat "Network: " erc-network))))
+    (bufler-defauto-group erc
+      (ignore buffer))))
+
+(eval-and-compile
   (declare-function projectile-project-name "ext:projectile" t t)
   (if (require 'projectile nil 'noerror)
       (bufler-defauto-group projectile
@@ -1007,6 +1018,7 @@ See documentation for details."
                  (auto-mode () `(bufler-group 'auto-mode))
                  (auto-project () `(bufler-group 'auto-project))
                  (auto-projectile () `(bufler-group 'auto-projectile))
+                 (auto-erc () `(bufler-group 'auto-erc))
                  (auto-tramp () `(bufler-group 'auto-tramp))
                  (auto-workspace () `(bufler-group 'auto-workspace)))
      (list ,@groups)))
