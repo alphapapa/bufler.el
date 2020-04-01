@@ -261,7 +261,12 @@ buffer list has not yet changed)."
 	;; to implement "chains" of grouping functions.
 	((insert-thing (thing path &optional (level 0))
 		       (pcase thing
-			 ((pred bufferp) (insert-buffer thing))
+			 ((pred bufferp)
+                          (when (buffer-live-p thing)
+                            ;; Killed buffers can remain in `bufler-cache' because, apparently, the hash
+                            ;; of `buffer-list' does not necessarily change when a buffer is killed and
+                            ;; has not yet been GC'ed.  So we test here and only insert live buffers.
+                            (insert-buffer thing)))
 			 (_ (insert-group thing (append path (list (car thing))) level))))
 	 (insert-buffer
 	  (buffer) (magit-insert-section nil (bufler-buffer buffer)
@@ -274,22 +279,16 @@ buffer list has not yet changed)."
 			       (_ (pcase-let* ((`(,type . ,things) group)
 					       (num-buffers 0)
 					       (suffix (alist-get level bufler-list-group-separators)))
-				    ;; This almost seems lazy, using `-tree-map-nodes'
-				    ;; with `bufferp', but it works, and it's correct,
-				    ;; and since `bufferp' is in C, maybe it's even fast.
+                                    ;; NOTE: When `bufler-use-cache' is enabled, killed buffers can
+                                    ;; remain in the list of groups returned by `bufler-buffers', because
+                                    ;; the cache retains references to the killed buffers.  We avoid
+                                    ;; inserting killed buffers with two tests: 1. If a group contains no
+                                    ;; live buffers, we cancel the group's section immediately.  2. If
+                                    ;; the group contains some live buffers, we insert it, and we test
+                                    ;; the liveness of each buffer before inserting it.
 
-				    ;; NOTE: Sometimes killed buffers remain in the list
-				    ;; of buffers returned by `bufler-buffers'.  I haven't
-				    ;; figured out why.  Maybe we're keeping a reference
-				    ;; to them in the list buffer or in the cached groups.
-				    ;; Anyway, as long as that is the case, we have to
-				    ;; avoid inserting killed buffers, and we have to
-				    ;; avoid showing empty sections.  So we only increment
-				    ;; the number of buffers for live ones, and if there
-				    ;; aren't any, we cancel the section.
-
-				    ;; FIXME: Track down what's causing killed buffers to remain in
-				    ;; `bufler-buffers', even though there don't seem to be any in `buffer-list'.
+                                    ;; MAYBE: Find a more elegant way, so we could avoid testing buffers'
+                                    ;; liveness twice.
 
 				    ;; TODO: Return `bufler-group' structs from `bufler-buffers'.
 				    (-tree-map-nodes #'bufferp
