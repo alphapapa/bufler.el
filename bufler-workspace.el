@@ -104,7 +104,8 @@ act as if SET-WORKSPACE-P is non-nil."
          (path (unless all-p
                  (frame-parameter nil 'bufler-workspace-path)))
          (buffers (bufler-buffer-alist-at path))
-         (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers))
+         (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers)
+                                                      nil t)
                                      buffers nil nil #'string=)))
     (when (or bufler-workspace-switch-buffer-sets-workspace
 	      set-workspace-p)
