@@ -1,9 +1,12 @@
-;;; helm-bufler.el --- Helm for bufler  -*- lexical-binding: t; -*-
+;;; helm-bufler.el --- Helm source for Bufler  -*- lexical-binding: t; -*-
 
 ;; Copyright (C) 2020  Adam Porter
 
 ;; Author: Adam Porter <adam@alphapapa.net>
 ;; URL: https://github.com/alphapapa/bufler.el
+;; Package-Version: 0.2-pre
+;; Package-Requires: ((emacs "26.3") (bufler "0.2-pre") (helm "1.9.4"))
+;; Keywords: convenience
 
 ;;; License:
 
@@ -29,55 +32,47 @@
 
 ;;   (helm :sources '(helm-bufler-source))
 
-;; Note that Bufler does not depend on the Helm package; this support
-;; is optional.
-
 ;;; Code:
 
 (require 'bufler-workspace)
+(require 'helm)
+(require 'helm-source)
+(require 'helm-types)
 
-(eval-and-compile
-  (defvar helm-map)
-  (defvar helm-type-buffer-actions)
-  (declare-function helm-make-source "helm-source" t t)
-
-  (when (require 'helm nil 'noerror)
-
-    (require 'helm-types)
-
-    (defun helm-bufler-switch-buffer (buffer)
-      "Switch to BUFFER.
+(defun helm-bufler-switch-buffer (buffer)
+  "Switch to BUFFER.
 With two universal prefixes, also set the frame's workspace.
 This mimics `bufler-workspace-switch-buffer'."
-      (when (equal '(16) current-prefix-arg)
-        (bufler-workspace-frame-set
-         ;; FIXME: Ideally we wouldn't call `bufler-buffers' again
-         ;; here, but `bufler-buffer-alist-at' returns a slightly
-         ;; different structure, and `bufler-group-tree-leaf-path'
-         ;; doesn't accept it.  Maybe the issue is related to using
-         ;; `map-nested-elt' in `bufler-buffer-alist-at'.  Maybe
-         ;; that difference has been the source of some other
-         ;; confusion too...
-         (butlast (bufler-group-tree-leaf-path (bufler-buffers) buffer))))
-      (switch-to-buffer buffer))
+  (when (equal '(16) current-prefix-arg)
+    (bufler-workspace-frame-set
+     ;; FIXME: Ideally we wouldn't call `bufler-buffers' again
+     ;; here, but `bufler-buffer-alist-at' returns a slightly
+     ;; different structure, and `bufler-group-tree-leaf-path'
+     ;; doesn't accept it.  Maybe the issue is related to using
+     ;; `map-nested-elt' in `bufler-buffer-alist-at'.  Maybe
+     ;; that difference has been the source of some other
+     ;; confusion too...
+     (butlast (bufler-group-tree-leaf-path (bufler-buffers) buffer))))
+  (switch-to-buffer buffer))
 
-    (defvar helm-bufler-source
-      (helm-make-source "Bufler's workspace buffers" 'helm-source-sync
-        :header-name (lambda (_name)
-                       (concat "Bufler"
-                               (unless current-prefix-arg
-                                 (concat ": " (bufler-format-path (frame-parameter nil 'bufler-workspace-path))))))
-        :candidates (lambda ()
-                      (let* ((bufler-vc-state nil)
-                             (group-path (unless current-prefix-arg
-                                           ;; FIXME: This initial-nil-skipping logic probably belongs elsewhere.
-                                           (if (car (frame-parameter nil 'bufler-workspace-path))
-                                               (frame-parameter nil 'bufler-workspace-path)
-                                             (cdr (frame-parameter nil 'bufler-workspace-path))))))
-                        (bufler-buffer-alist-at group-path)))
-        :action (cons (cons "Switch to buffer with Bufler" 'helm-bufler-switch-buffer)
-                      helm-type-buffer-actions))
-      "Helm source for `bufler'.")))
+;;;###autoload
+(defvar helm-bufler-source
+  (helm-make-source "Bufler's workspace buffers" 'helm-source-sync
+    :header-name (lambda (_name)
+                   (concat "Bufler"
+                           (unless current-prefix-arg
+                             (concat ": " (bufler-format-path (frame-parameter nil 'bufler-workspace-path))))))
+    :candidates (lambda ()
+                  (let* ((bufler-vc-state nil)
+                         (group-path (unless current-prefix-arg
+                                       ;; FIXME: This initial-nil-skipping logic probably belongs elsewhere.
+                                       (if (car (frame-parameter nil 'bufler-workspace-path))
+                                           (frame-parameter nil 'bufler-workspace-path)
+                                         (cdr (frame-parameter nil 'bufler-workspace-path))))))
+                    (bufler-buffer-alist-at group-path)))
+    :action (cons (cons "Switch to buffer with Bufler" 'helm-bufler-switch-buffer)
+                  helm-type-buffer-actions))
+  "Helm source for `bufler'.")
 
 ;;;; Footer
 

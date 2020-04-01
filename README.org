@@ -245,15 +245,13 @@ The following group types are available in =bufler-defgroups=.  Note that each o
 
 Bufler does not require nor depend on Helm, but because it uses =completing-read=, it requires no special configuration to work with =helm-mode= for selecting buffers.
 
-To show Bufler's grouped buffers in a Helm-specific command, Bufler provides =helm-bufler.el=, which includes =helm-bufler-source=, a Helm source that shows buffers in the current workspace (or when the Helm command is called with =C-u=, all buffers).  It looks like this when showing all buffers:
+To show Bufler's grouped buffers in a Helm-specific command, a separate =helm-bufler= package is available, which includes =helm-bufler-source=, a Helm source that shows buffers in the current workspace (or when the Helm command is called with =C-u=, all buffers).  It looks like this when showing all buffers:
 
 [[images/helm-bufler.png]]
 
-Use it like this:
+After installing the package from MELPA, use it like this:
 
 #+BEGIN_SRC elisp
-  (require 'helm-bufler)
-
   (helm :sources '(helm-bufler-source))
 #+END_SRC
 
@@ -342,4 +340,3 @@ GPLv3
 # org-export-initial-scope: buffer
 # org-comment-string: "NOTCOMMENT"
 # End:
-

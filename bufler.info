@@ -426,15 +426,13 @@ Bufler does not require nor depend on Helm, but because it uses
 ‘completing-read’, it requires no special configuration to work with
 ‘helm-mode’ for selecting buffers.
 
-   To show Bufler’s grouped buffers in a Helm-specific command, Bufler
-provides ‘helm-bufler.el’, which includes ‘helm-bufler-source’, a Helm
-source that shows buffers in the current workspace (or when the Helm
-command is called with ‘C-u’, all buffers).  It looks like this when
-showing all buffers:
+   To show Bufler’s grouped buffers in a Helm-specific command, a
+separate ‘helm-bufler’ package is available, which includes
+‘helm-bufler-source’, a Helm source that shows buffers in the current
+workspace (or when the Helm command is called with ‘C-u’, all buffers).
+It looks like this when showing all buffers:
 
-   Use it like this:
-
-     (require 'helm-bufler)
+   After installing the package from MELPA, use it like this:
 
      (helm :sources '(helm-bufler-source))
 
@@ -572,15 +570,15 @@ Node: Defining groups9284
 Node: Default groups example10671
 Node: Group types13598
 Node: Helm support16228
-Node: Ivy support16949
-Node: Prism support17377
-Node: Compared to Ibuffer17817
-Node: Changelog19567
-Node: 02-pre19725
-Node: 0119867
-Node: Credits19970
-Node: Development20659
-Node: License20829
+Node: Ivy support16973
+Node: Prism support17401
+Node: Compared to Ibuffer17841
+Node: Changelog19591
+Node: 02-pre19749
+Node: 0119891
+Node: Credits19994
+Node: Development20683
+Node: License20853
 
 End Tag Table
 
