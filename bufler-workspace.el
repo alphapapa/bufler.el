@@ -67,21 +67,21 @@ Return the workspace path."
    (list
     (unless current-prefix-arg
       (let* ((bufler-vc-state nil)
-	     (grouped-buffers (bufler-buffers))
-	     (buffer-paths (bufler-group-tree-paths grouped-buffers))
-	     group-paths alist)
-	(cl-labels ((push-subpaths
-		     (path) (when path
-			      (push path group-paths)
-			      (push-subpaths (butlast path))))
-		    (path-cons
-		     (path) (cons (bufler-format-path path) path)))
-	  (thread-last buffer-paths
-	    (mapcar #'butlast)
-	    (mapc #'push-subpaths))
-	  (setf group-paths (seq-uniq group-paths)
-		alist (mapcar #'path-cons group-paths))
-	  (bufler-read-from-alist "Group: " alist))))))
+             (grouped-buffers (bufler-buffers))
+             (buffer-paths (bufler-group-tree-paths grouped-buffers))
+             group-paths alist)
+        (cl-labels ((push-subpaths
+                     (path) (when path
+                              (push path group-paths)
+                              (push-subpaths (butlast path))))
+                    (path-cons
+                     (path) (cons (bufler-format-path path) path)))
+          (thread-last buffer-paths
+            (mapcar #'butlast)
+            (mapc #'push-subpaths))
+          (setf group-paths (seq-uniq group-paths)
+                alist (mapcar #'path-cons group-paths))
+          (bufler-read-from-alist "Group: " alist))))))
   (set-frame-parameter nil 'bufler-workspace-path path)
   (set-frame-parameter nil 'bufler-workspace-path-formatted (bufler-format-path path))
   (run-hook-with-args 'bufler-workspace-set-hook path)
@@ -100,7 +100,7 @@ If `bufler-workspace-switch-buffer-sets-workspace' is non-nil,
 act as if SET-WORKSPACE-P is non-nil."
   (interactive (list current-prefix-arg (equal '(16) current-prefix-arg)))
   (let* ((bufler-vc-state nil)
-	 (completion-ignore-case bufler-workspace-ignore-case)
+         (completion-ignore-case bufler-workspace-ignore-case)
          (path (unless all-p
                  (frame-parameter nil 'bufler-workspace-path)))
          (buffers (bufler-buffer-alist-at path))
@@ -108,7 +108,7 @@ act as if SET-WORKSPACE-P is non-nil."
                                                       nil t)
                                      buffers nil nil #'string=)))
     (when (or bufler-workspace-switch-buffer-sets-workspace
-	      set-workspace-p)
+              set-workspace-p)
       (bufler-workspace-frame-set
        ;; FIXME: Ideally we wouldn't call `bufler-buffers' again
        ;; here, but `bufler-buffer-alist-at' returns a slightly
@@ -143,8 +143,8 @@ appear in a named workspace, the buffer must be matched by an
   :global t
   (let ((lighter '(bufler-workspace-mode (:eval (bufler-workspace-mode-lighter)))))
     (if bufler-workspace-mode
-	;; Avoid adding the lighter multiple times if the mode is activated again.
-	(cl-pushnew (list lighter) mode-line-misc-info :test #'equal)
+        ;; Avoid adding the lighter multiple times if the mode is activated again.
+        (cl-pushnew (list lighter) mode-line-misc-info :test #'equal)
       (setf mode-line-misc-info
             (delete lighter mode-line-misc-info)))))
 
@@ -168,7 +168,7 @@ Works as `tab-line-tabs-function'."
 (defun bufler-workspace-set-frame-name (path)
   "Set current frame's name according to PATH."
   (set-frame-name (when path
-		    (format "Workspace: %s" (bufler-format-path path)))))
+                    (format "Workspace: %s" (bufler-format-path path)))))
 
 (cl-defun bufler-workspace-read-item (tree &key (leaf-key #'identity))
   "Return a leaf read from TREE with completion.
