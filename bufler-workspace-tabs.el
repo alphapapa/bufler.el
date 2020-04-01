@@ -106,6 +106,7 @@ properties.  See the default value of `tab-bar-close-button'."
                    do (setf (map-elt bufler-workspace-tabs-mode-saved-settings symbol)
                             (symbol-value symbol)))
           (advice-add 'tab-bar-select-tab :override #'bufler-workspace-tabs--tab-bar-select-tab)
+          (advice-add 'tab-bar-switch-to-tab :override #'bufler-workspace-frame-set)
           (setf tab-bar-tabs-function #'bufler-workspace-tabs
                 tab-line-tabs-function #'bufler-workspace-buffers)
           (tab-bar-mode 1)
@@ -115,6 +116,7 @@ properties.  See the default value of `tab-bar-close-button'."
           (setf tab-bar-separator bufler-workspace-tabs-tab-separator
                 tab-bar-close-button-show nil))
       (advice-remove 'tab-bar-select-tab #'bufler-workspace-tabs--tab-bar-select-tab)
+      (advice-remove 'tab-bar-switch-to-tab #'bufler-workspace-frame-set)
       (setf tab-bar-tabs-function #'tab-bar-tabs
             tab-line-tabs-function #'tab-line-tabs-window-buffers)
       ;; Restore settings.
