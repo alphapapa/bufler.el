@@ -758,12 +758,11 @@ all the buffers' values for each column."
 (require 'pretty-hydra)
 
 (pretty-hydra-define hydra:bufler
-  (:hint t :foreign-keys run :quit-key "q" :post (progn
-                                                   (quit-window)))
+  (:hint t :foreign-keys run :quit-key "?" :exit t)
   ("Bufler"
    (("g" #'bufler "Refresh")
     ("m" #'bufler-mode "Toggle mode")
-    ("q" nil "Quit"))
+    ("q" #'quit-window "Quit"))
    "Buffer"
    (("SPC" #'bufler-list-buffer-peek "Peek at")
     ("RET" #'bufler-list-buffer-switch "Switch to")
