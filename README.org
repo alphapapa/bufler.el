@@ -56,7 +56,16 @@ If you prefer, you may install with [[https://github.com/quelpa/quelpa-use-packa
 
 #+BEGIN_SRC elisp
   (use-package bufler
-    :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"))
+    :quelpa (bufler :fetcher github :repo "alphapapa/bufler.el"
+                    :files (:defaults (:exclude "helm-bufler.el"))))
+#+END_SRC
+
+To install the additional =helm-bufler= package, use:
+
+#+BEGIN_SRC elisp
+  (use-package helm-bufler
+    :quelpa (helm-bufler :fetcher github :repo "alphapapa/bufler.el"
+                         :files ("helm-bufler.el")))
 #+END_SRC
 
 * Usage
@@ -72,14 +81,8 @@ Bufler provides four primary, user-facing features.  They complement each other,
 4.  The global minor mode =bufler-tabs-mode= uses the new Emacs 27 =tab-bar= and =tab-line= features to display workspaces and buffers.  The =tab-bar= shows top-level workspaces (and whatever the selected one is, even if not top-level), and the =tab-line= shows buffers from the current workspace.
 
 :CONTENTS:
-- [[#workflow][Workflow]]
-- [[#commands][Commands]]
-- [[#bindings][Bindings]]
-- [[#tips][Tips]]
-- [[#defining-groups][Defining groups]]
-- [[#helm-support][Helm support]]
-- [[#ivy-support][Ivy support]]
-- [[#prism-support][Prism support]]
+- [[#default-groups-example][Default groups example]]
+- [[#group-types][Group types]]
 :END:
 
 ** Workflow
@@ -250,7 +253,7 @@ To show Bufler's grouped buffers in a Helm-specific command, a separate =helm-bu
 
 [[images/helm-bufler.png]]
 
-After installing the package from MELPA, use it like this:
+After installing the package (see [[#installation][installation instructions]] above), use it like this:
 
 #+BEGIN_SRC elisp
   (helm :sources '(helm-bufler-source))
