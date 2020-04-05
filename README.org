@@ -81,8 +81,14 @@ Bufler provides four primary, user-facing features.  They complement each other,
 4.  The global minor mode =bufler-tabs-mode= uses the new Emacs 27 =tab-bar= and =tab-line= features to display workspaces and buffers.  The =tab-bar= shows top-level workspaces (and whatever the selected one is, even if not top-level), and the =tab-line= shows buffers from the current workspace.
 
 :CONTENTS:
-- [[#default-groups-example][Default groups example]]
-- [[#group-types][Group types]]
+- [[#workflow][Workflow]]
+- [[#commands][Commands]]
+- [[#bindings][Bindings]]
+- [[#tips][Tips]]
+- [[#defining-groups][Defining groups]]
+- [[#helm-support][Helm support]]
+- [[#ivy-support][Ivy support]]
+- [[#prism-support][Prism support]]
 :END:
 
 ** Workflow
