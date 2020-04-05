@@ -215,9 +215,9 @@ File: README.info,  Node: Commands,  Next: Bindings,  Prev: Workflow,  Up: Usage
      and ‘tab-line-mode’ from Emacs 27+ to display Bufler workspaces and
      buffers.
 ‘bufler-switch-buffer’
-     Switch to a buffer selected from the frame’s workspace.  With
-     prefix, select from all buffers.  With two prefixes, also set the
-     frame’s workspace.
+     Switch to a buffer selected from the frame’s workspace.  Without
+     any input, switch to the previous buffer.  With prefix, select from
+     all buffers.  With two prefixes, also set the frame’s workspace.
 ‘bufler-workspace-focus-buffer’
      Set current frame’s workspace to the current buffer’s workspace.
 ‘bufler-workspace-frame-set’
@@ -441,7 +441,7 @@ separate ‘helm-bufler’ package is available, which includes
 workspace (or when the Helm command is called with ‘C-u’, all buffers).
 It looks like this when showing all buffers:
 
-   After installing the package from MELPA, use it like this:
+   After installing the package (see above), use it like this:
 
      (helm :sources '(helm-bufler-source))
 
@@ -573,21 +573,21 @@ Node: Quelpa2627
 Node: Usage3206
 Node: Workflow4753
 Node: Commands6975
-Node: Bindings8388
-Node: Tips9320
-Node: Defining groups9661
-Node: Default groups example11048
-Node: Group types13975
-Node: Helm support16605
-Node: Ivy support17350
-Node: Prism support17778
-Node: Compared to Ibuffer18218
-Node: Changelog19968
-Node: 02-pre20126
-Node: 0120268
-Node: Credits20371
-Node: Development21060
-Node: License21230
+Node: Bindings8439
+Node: Tips9371
+Node: Defining groups9712
+Node: Default groups example11099
+Node: Group types14026
+Node: Helm support16656
+Node: Ivy support17402
+Node: Prism support17830
+Node: Compared to Ibuffer18270
+Node: Changelog20020
+Node: 02-pre20178
+Node: 0120320
+Node: Credits20423
+Node: Development21112
+Node: License21282
 
 End Tag Table
 

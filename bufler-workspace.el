@@ -98,10 +98,11 @@ Interactively, use current buffer."
 ;;;###autoload
 (defun bufler-workspace-switch-buffer (&optional all-p set-workspace-p)
   "Switch to another buffer in the current group.
-If ALL-P (interactively, with universal prefix) or if the frame
-has no workspace, select from all buffers.  If
-SET-WORKSPACE-P (with two universal prefixes), select from all
-buffers and set the frame's workspace.
+Without any input, switch to the previous buffer, like
+`switch-to-buffer'.  If ALL-P (interactively, with universal
+prefix) or if the frame has no workspace, select from all
+buffers.  If SET-WORKSPACE-P (with two universal prefixes),
+select from all buffers and set the frame's workspace.
 
 If `bufler-workspace-switch-buffer-sets-workspace' is non-nil,
 act as if SET-WORKSPACE-P is non-nil."
@@ -111,8 +112,12 @@ act as if SET-WORKSPACE-P is non-nil."
          (path (unless all-p
                  (frame-parameter nil 'bufler-workspace-path)))
          (buffers (bufler-buffer-alist-at path))
+         (other-buffer-path (bufler-group-tree-leaf-path
+                             (bufler-buffers) (other-buffer (current-buffer))))
+         (other-buffer-cons (cons (buffer-name (-last-item other-buffer-path))
+                                  other-buffer-path))
          (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers)
-                                                      nil t)
+                                                      nil t nil nil other-buffer-cons)
                                      buffers nil nil #'string=)))
     (when (or bufler-workspace-switch-buffer-sets-workspace
               set-workspace-p)
