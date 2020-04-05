@@ -89,6 +89,13 @@ Return the workspace path."
   path)
 
 ;;;###autoload
+(defun bufler-workspace-focus-buffer (buffer)
+  "Set current frame's workspace to BUFFER's workspace.
+Interactively, use current buffer."
+  (interactive (list (current-buffer)))
+  (bufler-workspace-frame-set (bufler-buffer-workspace-path buffer)))
+
+;;;###autoload
 (defun bufler-workspace-switch-buffer (&optional all-p set-workspace-p)
   "Switch to another buffer in the current group.
 If ALL-P (interactively, with universal prefix) or if the frame
@@ -117,7 +124,7 @@ act as if SET-WORKSPACE-P is non-nil."
        ;; `map-nested-elt' in `bufler-buffer-alist-at'.  Maybe
        ;; that difference has been the source of some other
        ;; confusion too...
-       (butlast (bufler-group-tree-leaf-path (bufler-buffers) selected-buffer))))
+       (bufler-buffer-workspace-path selected-buffer)))
     (switch-to-buffer selected-buffer)))
 
 ;;;###autoload

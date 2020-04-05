@@ -542,6 +542,10 @@ Each cell is suitable for completion functions."
                                              alist) nil t)))
     (alist-get key alist nil nil testfn)))
 
+(defun bufler-buffer-workspace-path (buffer)
+  "Return workspace path for BUFFER."
+  (butlast (bufler-group-tree-leaf-path (bufler-buffers) buffer)))
+
 (defun bufler-format-path (path)
   "Return PATH formatted as a string."
   (string-join (cl-loop for level from 0

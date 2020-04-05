@@ -52,7 +52,7 @@ This mimics `bufler-workspace-switch-buffer'."
      ;; `map-nested-elt' in `bufler-buffer-alist-at'.  Maybe
      ;; that difference has been the source of some other
      ;; confusion too...
-     (butlast (bufler-group-tree-leaf-path (bufler-buffers) buffer))))
+     (bufler-buffer-workspace-path buffer)))
   (switch-to-buffer buffer))
 
 ;;;###autoload
