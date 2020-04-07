@@ -912,19 +912,23 @@ nil."
 ;; raised to the next level.  (This is implemented in the `bufler'
 ;; function.)
 
-(defmacro bufler-defauto-group (name &rest body)
-  "Define a grouping function named `bufler-group-by-NAME'.
+(eval-and-compile
+  ;; This macro must be enclosed in `eval-and-compile' so that the call
+  ;; to it in another `eval-and-compile' will work.  See discussion at
+  ;; <https://lists.gnu.org/archive/html/emacs-devel/2020-04/msg00430.html>.
+  (defmacro bufler-defauto-group (name &rest body)
+    "Define a grouping function named `bufler-group-by-NAME'.
 It takes one argument, a buffer, which is bound to `buffer' in
 BODY.  It should return a key by which to group its buffer, or
 nil if it should not be grouped.
 
 NAME, okay, `checkdoc'?"
-  (declare (indent defun))
-  (let* ((fn-name (intern (concat "bufler-group-auto-" (symbol-name name))))
-         (docstring (format "Group buffers by %s." name)))
-    `(defun ,fn-name (buffer)
-       ,docstring
-       ,@body)))
+    (declare (indent defun))
+    (let* ((fn-name (intern (concat "bufler-group-auto-" (symbol-name name))))
+           (docstring (format "Group buffers by %s." name)))
+      `(defun ,fn-name (buffer)
+         ,docstring
+         ,@body))))
 
 (bufler-defauto-group file
   (when-let* ((filename (or (buffer-file-name buffer)
