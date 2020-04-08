@@ -886,14 +886,14 @@ If it matches, NAME is returned, otherwise nil."
   (cl-check-type name string)
   (when (and (buffer-file-name buffer)
              (string-match-p regexp (buffer-file-name buffer)))
-    (propertize name 'face 'magit-head)))
+    name))
 
 (defun bufler-group-name-match (name regexp buffer)
   "Group BUFFERs whose names match REGEXP.
 If it matches, NAME is returned, otherwise nil."
   (cl-check-type name string)
   (when (string-match-p regexp (buffer-name buffer))
-    (propertize name 'face 'magit-head)))
+    name))
 
 (defun bufler-group-mode-match (name regexp buffer)
   "Group buffers whose major modes match REGEXP.
@@ -902,7 +902,7 @@ nil."
   (cl-check-type name string)
   (let ((mode-name (symbol-name (buffer-local-value 'major-mode buffer))))
     (when (string-match-p regexp mode-name)
-      (propertize name 'face 'magit-head))))
+      name)))
 
 ;;;;;; Auto-groups
 
@@ -942,8 +942,7 @@ NAME, okay, `checkdoc'?"
               'face 'magit-section-heading))
 
 (bufler-defauto-group mode
-  (propertize (symbol-name (buffer-local-value 'major-mode buffer))
-              'face 'magit-head))
+  (symbol-name (buffer-local-value 'major-mode buffer)))
 
 (bufler-defauto-group indirect
   (when (buffer-base-buffer buffer)
