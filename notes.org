@@ -1,4 +1,7 @@
 #+PROPERTY: logging nil
+#+TODO: TODO UNDERWAY | DONE CANCELED
+#+TYP_TODO: MAYBE | CANCELED
+#+TYP_TODO: TEMPLATE
 
 * Plans
 
@@ -109,3 +112,19 @@ Sort of like "buffer butler."  Maybe a buffalo for a mascot?
 *** Mr. Buffer
 
 Sort of cute and catchy.  Maybe some clip art available.
+
+* Checklists
+
+** TEMPLATE Release
+
++  [ ] Check comment TODOs (using =magit-todos=).
++  [ ] Check issues.
++  [ ] Check plans (in this file).
++  [ ] Check linters.
++  [ ] Check tests.
++  [ ] Update version numbers in file headers.
+     -  [ ] bufler.el
+     -  [ ] helm-bufler.el
++  [ ] Tag and sign new version (using Magit's =t r=).
++  [ ] Push =master=.
++  [ ] Push tags.
