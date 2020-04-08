@@ -57,7 +57,7 @@ Defining groups
 
 Changelog
 
-* 0.2-pre: 02-pre.
+* 0.2: 02.
 * 0.1: 01.
 
 
@@ -511,19 +511,19 @@ File: README.info,  Node: Changelog,  Next: Credits,  Prev: Compared to Ibuffer,
 
 * Menu:
 
-* 0.2-pre: 02-pre.
+* 0.2: 02.
 * 0.1: 01.
 
 
-File: README.info,  Node: 02-pre,  Next: 01,  Up: Changelog
+File: README.info,  Node: 02,  Next: 01,  Up: Changelog
 
-5.1 0.2-pre
-===========
+5.1 0.2
+=======
 
 Project expanded and renamed from Sbuffer to Bufler.
 
 
-File: README.info,  Node: 01,  Prev: 02-pre,  Up: Changelog
+File: README.info,  Node: 01,  Prev: 02,  Up: Changelog
 
 5.2 0.1
 =======
@@ -567,27 +567,27 @@ GPLv3
 
 Tag Table:
 Node: Top258
-Node: Screenshots1348
-Node: Installation2418
-Node: Quelpa2627
-Node: Usage3206
-Node: Workflow4753
-Node: Commands6975
-Node: Bindings8439
-Node: Tips9371
-Node: Defining groups9712
-Node: Default groups example11099
-Node: Group types14026
-Node: Helm support16656
-Node: Ivy support17402
-Node: Prism support17830
-Node: Compared to Ibuffer18270
-Node: Changelog20020
-Node: 02-pre20178
-Node: 0120320
-Node: Credits20423
-Node: Development21112
-Node: License21282
+Node: Screenshots1340
+Node: Installation2410
+Node: Quelpa2619
+Node: Usage3198
+Node: Workflow4745
+Node: Commands6967
+Node: Bindings8431
+Node: Tips9363
+Node: Defining groups9704
+Node: Default groups example11091
+Node: Group types14018
+Node: Helm support16648
+Node: Ivy support17394
+Node: Prism support17822
+Node: Compared to Ibuffer18262
+Node: Changelog20012
+Node: 0220162
+Node: 0120292
+Node: Credits20391
+Node: Development21080
+Node: License21250
 
 End Tag Table
 
