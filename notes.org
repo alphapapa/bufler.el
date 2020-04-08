@@ -5,9 +5,9 @@
 
 * Plans
 
-** 0.2
+** DONE 0.2
 
-*** TODO Release 0.2
+*** DONE Release 0.2
 
 +  [X] Check comment TODOs (using =magit-todos=).
 +  [X] Check issues.
@@ -17,9 +17,9 @@
 +  [X] Update version numbers in file headers.
      -  [X] bufler.el
      -  [X] helm-bufler.el
-+  [ ] Tag and sign new version (using Magit's =t r=).
-+  [ ] Push =master=.
-+  [ ] Push tags.
++  [X] Tag and sign new version (using Magit's =t r=).
++  [X] Push =master=.
++  [X] Push tags.
 
 *** DONE Prefix to =bufler-list= to clear cache
 
