@@ -292,6 +292,10 @@ Of course, Ibuffer is a mature tool with many features, so Bufler doesn't replac
 :TOC:      :depth 0
 :END:
 
+** 0.3-pre
+
+Nothing new yet.
+
 ** 0.2
 
 Project expanded and renamed from Sbuffer to Bufler.

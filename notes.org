@@ -20,6 +20,11 @@
 +  [X] Tag and sign new version (using Magit's =t r=).
 +  [X] Push =master=.
 +  [X] Push tags.
++  [X] Post-release changes:
+     -  [X] Bump version numbers to n+1-pre:
+          +  [X] bufler.el
+          +  [X] helm-bufler.el
+          +  [X] README.org
 
 *** DONE Prefix to =bufler-list= to clear cache
 
