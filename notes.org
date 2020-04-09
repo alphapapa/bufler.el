@@ -143,4 +143,9 @@ Sort of cute and catchy.  Maybe some clip art available.
 +  [ ] Tag and sign new version (using Magit's =t r=).
 +  [ ] Push =master=.
 +  [ ] Push tags.
++  [ ] Post-release changes:
+     -  [ ] Bump version numbers to n+1-pre:
+          +  [ ] bufler.el
+          +  [ ] helm-bufler.el
+          +  [ ] README.org
 
