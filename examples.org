@@ -1,0 +1,76 @@
+#+TITLE: Bufler extension examples
+
+* Contents
+:PROPERTIES:
+:TOC:      :include siblings :ignore this
+:END:
+:CONTENTS:
+- [[#group][Group]]
+  - [[#erc-message-buffer-by-networks][ERC message buffer by networks]]
+    - [[#define-the-group][Define the group]]
+    - [[#add-the-group-to-the-list-of-available-groups-and-regenerate-the-macro][Add the group to the list of available groups and regenerate the macro]]
+    - [[#use-in-the-group-definition][Use in the group definition]]
+- [[#column-management][Column management]]
+  - [[#add-edited-status-column][Add edited status column]]
+:END:
+
+* Group
+** ERC message buffer by networks
+*** Define the group
+#+begin_src emacs-lisp
+    (eval-and-compile
+      (declare-function erc-network "ext:erc-network" t t)
+      (if (require 'erc-networks nil 'noerror)
+          (bufler-defauto-group erc
+            (let ((erc-network (symbol-name (with-current-buffer buffer
+                                              (erc-network)))))
+              (when (and erc-network (not (equal erc-network "-")))
+                (concat "Network: " erc-network))))
+        (bufler-defauto-group erc
+          (ignore buffer))))
+#+end_src
+
+*** Add the group to the list of available groups and regenerate the macro
+#+begin_src emacs-lisp
+  (add-to-list 'bufler-available-groups
+               '(auto-erc () `(bufler-group 'auto-erc)))
+  (bufler-group-tree-defmacro bufler-defgroups bufler-available-groups)
+#+end_src
+
+*** Use in the group definition
+#+begin_src emacs-lisp
+  (setq bufler-groups (bufler-defgroups
+                        (group (group-or "Chatty"
+                                         (mode-match "ERC" (rx bos "erc-")))
+                               (group (mode-match "ERC" (rx bos "erc-"))
+                                      (group (name-match "Channels" (rx bos (or "#" "&"))))
+                                      (group (name-match "Servers" ".*:[0-9]\\{4\\}"))
+                                      (auto-erc)
+                                      ))))
+#+end_src
+
+* Column management
+** Add edited status column
+
+#+begin_src emacs-lisp
+(defcustom bufler-edited-marker "✎"
+  "Character to mark that buffer has been edited but not saved.")
+
+(bufler-define-column "Ed." 'bufler-name
+  (ignore depth)
+  (when (buffer-modified-p buffer) bufler-edited-marker))
+
+(setq bufler-columns '("Name" "Size" "Ed.""VC" "Path"))
+#+end_src
+
+* COMMENT Code                                                     :noexport:
+:PROPERTIES:
+:TOC:      :ignore (this descendants)
+:END:
+
+** File-local variables
+
+# Local Variables:
+# eval: (require 'org-make-toc)
+# before-save-hook: org-make-toc
+# End:
