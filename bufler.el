@@ -983,38 +983,29 @@ NAME, okay, `checkdoc'?"
 
 ;; This seems to work better than I expected.
 
-;; FIXME: Use `bufler-group-tree-defmacro'.
+(defvar bufler-available-groups
+  "Variable containing the list of available groups used to fill the vocabulary of `bufler-group-tree-defmacro'.
+If this variable is modified, it is necessary to generate a proper macro using  `bufler-group-tree-defmacro'"
+    '((filename-match (name regexp)
+                      `(bufler-group 'filename-match ,name ,regexp))
+      (mode-match (name regexp)
+                  `(bufler-group 'mode-match ,name ,regexp))
+      (name-match (name regexp)
+                  `(bufler-group 'name-match ,name ,regexp))
+      (dir (dirs &optional depth)
+           `(bufler-group 'dir ,dirs ,depth))
+      (hidden () `(bufler-group 'hidden))
+      (auto-directory () `(bufler-group 'auto-directory))
+      (auto-file () `(bufler-group 'auto-file))
+      (auto-indirect () `(bufler-group 'auto-indirect))
+      (auto-mode () `(bufler-group 'auto-mode))
+      (auto-project () `(bufler-group 'auto-project))
+      (auto-projectile () `(bufler-group 'auto-projectile))
+      (auto-tramp () `(bufler-group 'auto-tramp))
+      (auto-workspace () `(bufler-group 'auto-workspace))))
 
-;;;###autoload
-(defmacro bufler-defgroups (&rest groups)
-  "Expand GROUPS into a group definition suitable for `bufler-groups'.
-See documentation for details."
-  (declare (indent defun))
-  `(cl-macrolet ((group (&rest groups) `(list ,@groups))
-                 (group-and (name &rest groups)
-                            `(bufler-and ,name ,@groups))
-                 (group-or (name &rest groups)
-                           `(bufler-or ,name ,@groups))
-                 (group-not (name group)
-                            `(bufler-not ,name ,group))
-                 (filename-match (name regexp)
-                                 `(bufler-group 'filename-match ,name ,regexp))
-                 (mode-match (name regexp)
-                             `(bufler-group 'mode-match ,name ,regexp))
-                 (name-match (name regexp)
-                             `(bufler-group 'name-match ,name ,regexp))
-                 (dir (dirs &optional depth)
-                      `(bufler-group 'dir ,dirs ,depth))
-                 (hidden () `(bufler-group 'hidden))
-                 (auto-directory () `(bufler-group 'auto-directory))
-                 (auto-file () `(bufler-group 'auto-file))
-                 (auto-indirect () `(bufler-group 'auto-indirect))
-                 (auto-mode () `(bufler-group 'auto-mode))
-                 (auto-project () `(bufler-group 'auto-project))
-                 (auto-projectile () `(bufler-group 'auto-projectile))
-                 (auto-tramp () `(bufler-group 'auto-tramp))
-                 (auto-workspace () `(bufler-group 'auto-workspace)))
-     (list ,@groups)))
+;; Generate a default macro
+(bufler-group-tree-defmacro bufler-defgroups bufler-available-groups)
 
 ;;;; Additional customization
 
