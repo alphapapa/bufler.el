@@ -5,7 +5,7 @@
 ;; Author: Adam Porter <adam@alphapapa.net>
 ;; URL: https://github.com/alphapapa/bufler.el
 ;; Package-Version: 0.3-pre
-;; Package-Requires: ((emacs "26.3") (dash "2.17") (dash-functional "2.17") (f "0.17") (pretty-hydra "0.2.2") (magit-section "0.1"))
+;; Package-Requires: ((emacs "26.3") (dash "2.17") (dash-functional "2.17") (f "0.17") (magit-section "0.1") (transient "0.2"))
 ;; Keywords: convenience
 
 ;;; License:
@@ -55,6 +55,7 @@
 (require 'dash-functional)
 (require 'f)
 (require 'magit-section)
+(require 'transient)
 
 (require 'bufler-group-tree)
 
@@ -63,7 +64,7 @@
 (defvar bufler-list-mode-map
   (let ((map (make-sparse-keymap)))
     (set-keymap-parent map magit-section-mode-map)
-    (define-key map (kbd "?") #'hydra:bufler/body)
+    (define-key map (kbd "?") #'bufler-transient)
     (define-key map (kbd "g") #'bufler)
     (define-key map (kbd "f") #'bufler-list-group-frame)
     (define-key map (kbd "F") #'bufler-list-group-make-frame)
@@ -753,25 +754,24 @@ all the buffers' values for each column."
                  table)
         (cons table column-sizes)))))
 
-;;;;; Hydra
+;;;;; Transient
 
-(require 'pretty-hydra)
-
-(pretty-hydra-define hydra:bufler
-  (:hint t :foreign-keys run :quit-key "?" :exit t)
-  ("Bufler"
-   (("g" #'bufler "Refresh")
-    ("m" #'bufler-mode "Toggle mode")
-    ("q" #'quit-window "Quit"))
-   "Buffer"
-   (("SPC" #'bufler-list-buffer-peek "Peek at")
-    ("RET" #'bufler-list-buffer-switch "Switch to")
-    ("k" #'bufler-list-buffer-kill "Kill")
-    ("s" #'bufler-list-buffer-save "Save")
-    ("N" #'bufler-list-buffer-name-workspace "Named workspace"))
-   "Workspace"
-   (("f" #'bufler-list-group-frame "Focus on")
-    ("F" #'bufler-list-group-make-frame "Make frame"))))
+(transient-define-prefix
+ bufler-transient ()
+ "Bufler operations."
+ [["Bufler"
+   ("g" "Refresh" bufler)
+   ("m" "Toggle mode" bufler-mode)
+   ("q" "Quit" quit-window)]
+  ["Buffer"
+   ("SPC" "Peek at" bufler-list-buffer-peek)
+   ("RET" "Switch to" bufler-list-buffer-switch)
+   ("k" "Kill" bufler-list-buffer-kill)
+   ("s" "Save" bufler-list-buffer-save)
+   ("N" "Named workspace" bufler-list-buffer-name-workspace)]
+  ["Workspace"
+   ("f" "Focus on" bufler-list-group-frame)
+   ("F" "Make frame" bufler-list-group-make-frame)]])
 
 ;;;;; Grouping
 
