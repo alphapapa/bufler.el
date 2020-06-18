@@ -672,7 +672,10 @@ buffer's depth in the group tree."
                                        'face 'bufler-mode))))
     (concat (make-string (* 2 depth) ? )
             mode-annotation
-            (buffer-name buffer))))
+            (buffer-name buffer)
+            (propertize (if (buffer-modified-p buffer)
+                            "*" "")
+                        'face 'font-lock-warning-face))))
 
 (bufler-define-column "Size" 'bufler-size
   (ignore depth)
