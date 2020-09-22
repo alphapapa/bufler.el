@@ -95,6 +95,10 @@ Here's a common scenario:
 
 Unfortunately, calling =vc-state-refresh= every time =bufler-list= is updated seems far too slow.
 
+*** TODO Pass ACTION argument to =pop-to-buffer=
+
+As Mike Zamansky mentioned, it would be nice to be able to control how the =bufler-list= window opens.
+
 ** 0.4
 
 *** TODO Buffer/group sorting
@@ -119,6 +123,11 @@ There should be a companion library to =group-tree= that provides the section-ba
 Jonas Bernoulli uses it in [[https://github.com/emacscollective/epkg/blob/master/epkg-desc.el][epkg-desc.el]], and it [[https://emacsmirror.net/assets/epkg.png][looks very nice]].  However, I'm guessing there are reasons he made or uses =magit-section= instead.
 
 Of special interest is how it uses display properties to [[https://github.com/emacscollective/epkg/blob/edf8c009066360af61caedf67a2482eaa19481b0/epkg-desc.el#L363][align text in columns]].  That might be a good alternative to using =format= for alignment.
+
+** TODO Add Mike Zamansky's video to readme
+
++  https://cestlaz.github.io/post/using-emacs-75-bufler/
++  https://www.reddit.com/r/emacs/comments/ixs73j/using_emacs_75_bufler/
 
 ** DONE Name
 
