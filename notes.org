@@ -99,6 +99,10 @@ Unfortunately, calling =vc-state-refresh= every time =bufler-list= is updated se
 
 As Mike Zamansky mentioned, it would be nice to be able to control how the =bufler-list= window opens.
 
+*** TODO Depend on =project= 0.3.0 and use =project-root= instead of =project-roots=
+
+=project= is on ELPA, and the version there is newer than the one included with Emacs 26.3, and it declares =project-roots= obsolete.
+
 ** 0.4
 
 *** TODO Buffer/group sorting
