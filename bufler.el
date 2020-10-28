@@ -678,9 +678,19 @@ buffer's depth in the group tree."
   (ignore depth)
   (file-size-human-readable (buffer-size buffer)))
 
+(defcustom bufler-vc-remote nil
+  "Whether to display remote files' version control state.
+Checking the version control state of remote files (e.g. ones
+accessed via TRAMP) can be slow, which delays the displaying of
+`bufler-list'.  When this option is nil, only local files will
+have their state displayed."
+  :type 'boolean)
+
 (bufler-define-column "VC" nil
   (ignore depth)
-  (when (buffer-file-name buffer)
+  (when (and (buffer-file-name buffer)
+             (or (not (file-remote-p (buffer-file-name buffer)))
+                 bufler-vc-remote))
     (when (and bufler-vc-refresh
                (vc-registered (buffer-file-name buffer)))
       (with-current-buffer buffer

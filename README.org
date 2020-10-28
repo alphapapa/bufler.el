@@ -297,6 +297,7 @@ Of course, Ibuffer is a mature tool with many features, so Bufler doesn't replac
 
 *Added*
 +  Group type =auto-parent-project=.
++  Option =bufler-vc-remote=, which controls the displaying of the version control state of remote files (default: off).  (Fixes [[https://github.com/alphapapa/bufler.el/issues/41][#41]].  Thanks to [[https://github.com/WorldsEndless][Tory S. Anderson]] for reporting.)
 
 ** 0.2
 
