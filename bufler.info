@@ -402,6 +402,11 @@ Auto types
         • ‘auto-mode’ Buffer’s major mode.
         • ‘auto-project’ Buffer’s version-control project directory
           according to ‘project.el’.
+             • ‘auto-parent-project’ Like ‘auto-project’, but if the
+               buffer’s parent directory is in a different project, use
+               that one instead.  Useful for git worktrees, where
+               ‘auto-project’ would show each worktree as a separate
+               project.
         • ‘auto-projectile’ Buffer’s project as defined in the
           ‘projectile’ package (if installed).
         • ‘auto-special’ Whether the buffer is special (i.e.  whether
@@ -522,7 +527,8 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
 5.1 0.3-pre
 ===========
 
-Nothing new yet.
+*Added*
+   • Group type ‘auto-parent-project’.
 
 
 File: README.info,  Node: 02,  Next: 01,  Prev: 03-pre,  Up: Changelog
@@ -588,17 +594,17 @@ Node: Tips9406
 Node: Defining groups9747
 Node: Default groups example11134
 Node: Group types14061
-Node: Helm support16691
-Node: Ivy support17437
-Node: Prism support17865
-Node: Compared to Ibuffer18305
-Node: Changelog20055
-Node: 03-pre20224
-Node: 0220330
-Node: 0120475
-Node: Credits20574
-Node: Development21263
-Node: License21433
+Node: Helm support17007
+Node: Ivy support17753
+Node: Prism support18181
+Node: Compared to Ibuffer18621
+Node: Changelog20371
+Node: 03-pre20540
+Node: 0220682
+Node: 0120827
+Node: Credits20926
+Node: Development21615
+Node: License21785
 
 End Tag Table
 

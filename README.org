@@ -239,6 +239,7 @@ The following group types are available in =bufler-defgroups=.  Note that each o
      -  ~auto-indirect~  Whether the buffer is indirect (e.g. a cloned indirect buffer).
      -  ~auto-mode~  Buffer's major mode.
      -  ~auto-project~  Buffer's version-control project directory according to ~project.el~.
+          +  ~auto-parent-project~  Like =auto-project=, but if the buffer's parent directory is in a different project, use that one instead.  Useful for git worktrees, where =auto-project= would show each worktree as a separate project.
      -  ~auto-projectile~ Buffer's project as defined in the ~projectile~ package (if installed).
      -  ~auto-special~  Whether the buffer is special (i.e. whether its name starts with ~*~).
      -  ~auto-tramp~  Whether the buffer is opened via Tramp.
@@ -294,7 +295,8 @@ Of course, Ibuffer is a mature tool with many features, so Bufler doesn't replac
 
 ** 0.3-pre
 
-Nothing new yet.
+*Added*
++  Group type =auto-parent-project=.
 
 ** 0.2
 
