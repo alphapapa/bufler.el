@@ -641,6 +641,10 @@ That is, if its name starts with \" \"."
 Each function takes two arguments, the buffer and its depth in
 the group tree, and returns a string as its column value.")
 
+(defcustom bufler-column-name-modified-buffer-sigil "*"
+  "Displayed after the name of modified, file-backed buffers."
+  :type 'string)
+
 (defmacro bufler-define-column (name face &rest body)
   "Define a column formatting function with NAME.
 NAME should be a string.  BODY should return a string or nil.
@@ -662,20 +666,20 @@ buffer's depth in the group tree."
 (bufler-define-column "Name" nil
   ;; MAYBE: Move indentation back to `bufler-list'.  But this seems to
   ;; work well, and that might be more complicated.
-  (let ((mode-annotation (when (cl-loop for fn in bufler-buffer-mode-annotate-preds
+  (let ((indentation (make-string (* 2 depth) ? ))
+        (mode-annotation (when (cl-loop for fn in bufler-buffer-mode-annotate-preds
                                         thereis (funcall fn buffer))
                            (propertize (concat (replace-regexp-in-string
                                                 (rx "-mode" eos) ""
                                                 (symbol-name (buffer-local-value 'major-mode buffer))
                                                 t t)
                                                " ")
-                                       'face 'bufler-mode))))
-    (concat (make-string (* 2 depth) ? )
-            mode-annotation
-            (buffer-name buffer)
-            (propertize (if (buffer-modified-p buffer)
-                            "*" "")
-                        'face 'font-lock-warning-face))))
+                                       'face 'bufler-mode)))
+        (modified (when (and (buffer-file-name buffer)
+                             (buffer-modified-p buffer))
+                    (propertize bufler-column-name-modified-buffer-sigil
+                                'face 'font-lock-warning-face))))
+    (concat indentation mode-annotation (buffer-name buffer) modified)))
 
 (bufler-define-column "Size" 'bufler-size
   (ignore depth)
