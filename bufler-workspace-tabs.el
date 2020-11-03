@@ -98,6 +98,7 @@ properties.  See the default value of `tab-bar-close-button'."
 
   (define-minor-mode bufler-workspace-tabs-mode
     "Use Bufler workspaces for `tab-bar-mode' and `tab-line-mode'."
+    :group 'bufler-workspace
     :global t
     (if bufler-workspace-tabs-mode
         (progn
