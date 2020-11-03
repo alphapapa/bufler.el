@@ -58,6 +58,16 @@
 
 (require 'bufler-group-tree)
 
+;;;; Compatibility
+
+(defalias 'bufler-project-root
+  ;; TODO: Remove this when support for Emacs <27 is dropped.
+  (if (fboundp 'project-root)
+      #'project-root
+    (with-no-warnings
+      (lambda (project)
+        (car (project-roots project))))))
+
 ;;;; Variables
 
 (defvar bufler-list-mode-map
@@ -973,18 +983,18 @@ NAME, okay, `checkdoc'?"
 (bufler-defauto-group project
   (when-let* ((project (with-current-buffer buffer
                          (project-current)))
-              (project-root (car (project-roots project))))
+              (project-root (bufler-project-root project)))
     (concat "Project: " project-root)))
 
 (bufler-defauto-group parent-project
   (when-let* ((project (project-current nil (buffer-local-value 'default-directory buffer))))
-    (let* ((project-root (car (project-roots project)))
+    (let* ((project-root (bufler-project-root project))
            ;; Emacs needs a built-in function like `f-parent'.
            (parent-dir (file-name-directory (directory-file-name project-root)))
            (parent-dir-project (project-current nil parent-dir)))
       (concat "Project: "
               (if parent-dir-project
-                  (car (project-roots parent-dir-project))
+                  (bufler-project-root parent-dir-project)
                 project-root)))))
 
 (eval-and-compile
