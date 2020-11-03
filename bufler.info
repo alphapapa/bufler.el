@@ -533,6 +533,8 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
      version control state of remote files (default: off).  (Fixes #41
      (https://github.com/alphapapa/bufler.el/issues/41).  Thanks to Tory
      S.  Anderson (https://github.com/WorldsEndless) for reporting.)
+   • Show an asterisk next to buffers with unsaved changes.  (Thanks to
+     Tatu Lahtela (https://github.com/ration).)
 
 
 File: README.info,  Node: 02,  Next: 01,  Prev: 03-pre,  Up: Changelog
@@ -604,11 +606,11 @@ Node: Prism support18181
 Node: Compared to Ibuffer18621
 Node: Changelog20371
 Node: 03-pre20540
-Node: 0220970
-Node: 0121115
-Node: Credits21214
-Node: Development21903
-Node: License22073
+Node: 0221092
+Node: 0121237
+Node: Credits21336
+Node: Development22025
+Node: License22195
 
 End Tag Table
 
