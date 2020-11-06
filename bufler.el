@@ -558,15 +558,18 @@ Each cell is suitable for completion functions."
 
 (defun bufler-format-path (path)
   "Return PATH formatted as a string."
-  (string-join (cl-loop for level from 0
-                        for element in (remq 'nil path)
-                        do (unless element
-                             (cl-decf level))
-                        collect (cl-typecase element
-                                  (string (propertize element
-                                                      'face (bufler-level-face level)))
-                                  (buffer (buffer-name element))))
-               bufler-group-path-separator))
+  (string-join (bufler-faceify-path path) bufler-group-path-separator))
+
+(defun bufler-faceify-path (path)
+  "Return PATH with string elements having Bufler level faces applied."
+  (cl-loop for level from 0
+           for element in (remq 'nil path)
+           do (unless element
+                (cl-decf level))
+           collect (cl-typecase element
+                     (string (propertize element
+                                         'face (bufler-level-face level)))
+                     (buffer (buffer-name element)))))
 
 (defun bufler-level-face (level)
   "Return face for LEVEL."
