@@ -55,6 +55,14 @@ with prefix arguments."
   "Functions called when the workspace is set."
   :type 'hook)
 
+(defcustom bufler-workspace-format-path-fn #'bufler-format-path
+  "Function to format group paths for display in mode line and frame title.
+May be customized to, e.g. only return the last element of a path."
+  :type '(choice (const :tag "Whole path" bufler-format-path)
+                 (const :tag "Last element" (lambda (path)
+                                              (car (last (bufler-faceify-path path)))))
+                 (function :tag "Custom function")))
+
 ;;;; Commands
 
 ;;;###autoload
@@ -83,7 +91,7 @@ Return the workspace path."
                 alist (mapcar #'path-cons group-paths))
           (bufler-read-from-alist "Group: " alist))))))
   (set-frame-parameter nil 'bufler-workspace-path path)
-  (set-frame-parameter nil 'bufler-workspace-path-formatted (bufler-format-path path))
+  (set-frame-parameter nil 'bufler-workspace-path-formatted (funcall bufler-workspace-format-path-fn path))
   (run-hook-with-args 'bufler-workspace-set-hook path)
   (force-mode-line-update 'all)
   path)
@@ -180,7 +188,7 @@ Works as `tab-line-tabs-function'."
 (defun bufler-workspace-set-frame-name (path)
   "Set current frame's name according to PATH."
   (set-frame-name (when path
-                    (format "Workspace: %s" (bufler-format-path path)))))
+                    (format "Workspace: %s" (funcall bufler-workspace-format-path-fn path)))))
 
 (cl-defun bufler-workspace-read-item (tree &key (leaf-key #'identity))
   "Return a leaf read from TREE with completion.
