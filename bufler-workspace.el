@@ -37,7 +37,7 @@
 ;;;; Customization
 
 (defgroup bufler-workspace nil
-  "Options for Mr. Buffer's workspaces."
+  "Options for Bufler's workspaces."
   :group 'bufler)
 
 (defcustom bufler-workspace-ignore-case t
@@ -159,7 +159,7 @@ appear in a named workspace, the buffer must be matched by an
 
 ;;;###autoload
 (define-minor-mode bufler-workspace-mode
-  "When active, set the frame title according to current Mr. Buffer group."
+  "When active, set the frame title according to current Bufler group."
   :global t
   (let ((lighter '(bufler-workspace-mode (:eval (bufler-workspace-mode-lighter)))))
     (if bufler-workspace-mode
