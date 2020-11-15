@@ -29,6 +29,7 @@
 ;;;; Requirements
 
 (require 'map)
+(eval-when-compile (require 'dash))
 
 (require 'bufler-workspace)
 
