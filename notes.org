@@ -151,6 +151,52 @@ Jonas Bernoulli uses it in [[https://github.com/emacscollective/epkg/blob/master
 
 Of special interest is how it uses display properties to [[https://github.com/emacscollective/epkg/blob/edf8c009066360af61caedf67a2482eaa19481b0/epkg-desc.el#L363][align text in columns]].  That might be a good alternative to using =format= for alignment.
 
+** Non-consuming grouping option
+
+The idea to have buffers appear in multiple groups which they match was mentioned in [[https://github.com/alphapapa/burly.el/pull/24#issuecomment-738204637][this comment by Gerry Agbobada]].  Here's a rough concept of how the alternative to ~bufler-group-tree~ could work.
+
+#+BEGIN_SRC elisp
+  (defun group-tree-non-consuming (fns sequence)
+    (cl-labels ((rec (fns sequence)
+                     (cl-loop for fn in fns
+                              collect (pcase fn
+                                        ((pred functionp)
+                                         (cons fn (cl-loop for item in sequence
+                                                           when (funcall fn item)
+                                                           collect item)))
+                                        (`(,(and (pred stringp) label) ,(and (pred functionp) fn))
+                                         (cons label (cl-loop for item in sequence
+                                                              when (funcall fn item)
+                                                              collect item)))
+                                        ((pred listp)
+                                         (cons (get-label (car fn))
+                                               (rec (cdr fn) (cl-remove-if-not (get-fn (car fn)) sequence)))))))
+                (get-fn (fn)
+                        (pcase-exhaustive fn
+                          (`(,(pred stringp) ,(pred functionp))
+                           (cadr fn))
+                          ((pred functionp)
+                           fn)))
+                (get-label (fn)
+                           (pcase-exhaustive fn
+                             (`(,(and (pred stringp) label) ,(pred functionp))
+                              label)
+                             ((pred functionp)
+                              fn))))
+      (rec fns sequence)))
+
+  (cl-labels ((<5-p (n) (< n 5)))
+    (group-tree-non-consuming (list (list (list "< 5" #'<5-p)
+                                          (list "even" #'evenp)
+                                          (list "non-zero" (-not #'zerop)))
+                                    #'evenp)
+                              '(0 1 2 3 4 5 6 7 8 9)))
+  ;; (("< 5"
+  ;;   ("even" 0 2 4)
+  ;;   ("non-zero" 1 2 3 4))
+  ;;  (evenp 0 2 4 6 8))
+#+END_SRC
+
 ** TODO Add Mike Zamansky's video to readme
 
 +  https://cestlaz.github.io/post/using-emacs-75-bufler/
