@@ -654,6 +654,11 @@ That is, if its name starts with \" \"."
 Each function takes two arguments, the buffer and its depth in
 the group tree, and returns a string as its column value.")
 
+(defcustom bufler-column-name-max-length nil
+  "Max length before column names are truncated in the list view, or unlimited if nil"
+  :type '(choice integer (const nil))
+  :group 'bufler)
+
 (defcustom bufler-column-name-modified-buffer-sigil "*"
   "Displayed after the name of modified, file-backed buffers."
   :type 'string)
@@ -688,11 +693,14 @@ buffer's depth in the group tree."
                                                 t t)
                                                " ")
                                        'face 'bufler-mode)))
+        (constrained-buffer-name (if bufler-column-name-max-length
+                                     (truncate-string-to-width (buffer-name buffer) bufler-column-name-max-length)
+                                   (buffer-name buffer)))
         (modified (when (and (buffer-file-name buffer)
                              (buffer-modified-p buffer))
                     (propertize bufler-column-name-modified-buffer-sigil
                                 'face 'font-lock-warning-face))))
-    (concat indentation mode-annotation (buffer-name buffer) modified)))
+    (concat indentation mode-annotation constrained-buffer-name modified)))
 
 (bufler-define-column "Size" 'bufler-size
   (ignore depth)
