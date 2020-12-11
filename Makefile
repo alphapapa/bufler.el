@@ -1,6 +1,7 @@
 # * makem.sh/Makefile --- Script to aid building and testing Emacs Lisp packages
 
-# This Makefile is from the makem.sh repo: <https://github.com/alphapapa/makem.sh>.
+# URL: https://github.com/alphapapa/makem.sh
+# Version: 0.4.2
 
 # * Arguments
 
@@ -37,7 +38,9 @@ endif
 
 verbose = $(v)
 
-ifneq (,$(findstring vv,$(verbose)))
+ifneq (,$(findstring vvv,$(verbose)))
+	VERBOSE = "-vvv"
+else ifneq (,$(findstring vv,$(verbose)))
 	VERBOSE = "-vv"
 else ifneq (,$(findstring v,$(verbose)))
 	VERBOSE = "-v"
