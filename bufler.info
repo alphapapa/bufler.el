@@ -538,6 +538,9 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
      customized to show just the last element).
    • Show an asterisk next to buffers with unsaved changes.  (Thanks to
      Tatu Lahtela (https://github.com/ration).)
+   • Option ‘bufler-name-column-width’ limits the width of buffer names
+     in the buffer list.  (Thanks to Tory S.  Anderson
+     (https://github.com/WorldsEndless).)
 
 
 File: README.info,  Node: 02,  Next: 01,  Prev: 03-pre,  Up: Changelog
@@ -609,11 +612,11 @@ Node: Prism support18181
 Node: Compared to Ibuffer18621
 Node: Changelog20371
 Node: 03-pre20540
-Node: 0221284
-Node: 0121429
-Node: Credits21528
-Node: Development22217
-Node: License22387
+Node: 0221459
+Node: 0121604
+Node: Credits21703
+Node: Development22392
+Node: License22562
 
 End Tag Table
 
