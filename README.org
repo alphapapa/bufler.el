@@ -301,6 +301,7 @@ Of course, Ibuffer is a mature tool with many features, so Bufler doesn't replac
 +  Option =bufler-workspace-format-path-fn=, which formats group paths for display in mode lines and frame titles (e.g. it may be customized to show just the last element).
 +  Show an asterisk next to buffers with unsaved changes.  (Thanks to [[https://github.com/ration][Tatu Lahtela]].)
 +  Option ~bufler-name-column-width~ limits the width of buffer names in the buffer list.  (Thanks to [[https://github.com/WorldsEndless][Tory S. Anderson]].)
++  Column ~Mode~ shows buffer's major mode, sans ~-mode~ suffix.
 
 ** 0.2
 

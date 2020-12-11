@@ -227,9 +227,7 @@ cleared with a timer that runs this many seconds after the last
 
 (defface bufler-mode
   '((t (:inherit font-lock-type-face)))
-  "Face for the mode of buffers and groups.
-Only used in the mode annotation in each buffer's formatted
-string, not in group headers.")
+  "Face for the mode of buffers and groups.")
 
 (defface bufler-size
   '((t (:inherit font-lock-comment-face)))
@@ -706,6 +704,11 @@ buffer's depth in the group tree."
   (ignore depth)
   (file-size-human-readable (buffer-size buffer)))
 
+(bufler-define-column "Mode" 'bufler-mode
+  (ignore depth)
+  (string-remove-suffix
+   "-mode" (symbol-name (buffer-local-value 'major-mode buffer))))
+
 (defcustom bufler-vc-remote nil
   "Whether to display remote files' version control state.
 Checking the version control state of remote files (e.g. ones
@@ -742,6 +745,7 @@ Each string corresponds to a function in
 `bufler-column-format-fns'.  Custom columns must be defined with
 `bufler-define-column'."
   :type '(repeat (choice (const "Name")
+                         (const "Mode")
                          (const "Size")
                          (const "VC State")
                          (const "Path")
