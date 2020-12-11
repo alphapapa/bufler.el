@@ -300,6 +300,7 @@ Of course, Ibuffer is a mature tool with many features, so Bufler doesn't replac
 +  Option =bufler-vc-remote=, which controls the displaying of the version control state of remote files (default: off).  (Fixes [[https://github.com/alphapapa/bufler.el/issues/41][#41]].  Thanks to [[https://github.com/WorldsEndless][Tory S. Anderson]] for reporting.)
 +  Option =bufler-workspace-format-path-fn=, which formats group paths for display in mode lines and frame titles (e.g. it may be customized to show just the last element).
 +  Show an asterisk next to buffers with unsaved changes.  (Thanks to [[https://github.com/ration][Tatu Lahtela]].)
++  Option ~bufler-name-column-width~ limits the width of buffer names in the buffer list.  (Thanks to [[https://github.com/WorldsEndless][Tory S. Anderson]].)
 
 ** 0.2
 
