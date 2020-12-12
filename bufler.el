@@ -1030,7 +1030,7 @@ NAME, okay, `checkdoc'?"
 
 (bufler-defauto-group workspace
   (when-let* ((names (buffer-local-value 'bufler-workspace-names buffer)))
-    names))
+    (mapcar (lambda (name) (concat "Workspace: " name)) names)))
 
 
 ;;;;;; Group-defining macro
