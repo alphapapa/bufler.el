@@ -97,8 +97,8 @@ Usually this will be something like \"/usr/share/emacs/VERSION\".")
 (defvar bufler-cache nil
   "Cache of computed buffer groups.")
 
-(defvar bufler-workspace-name nil
-  "The buffer's named workspace, if any.")
+(defvar bufler-workspace-names nil
+  "A list of named workspaces owning the buffer, if any.")
 
 (defvar bufler-cache-related-dirs (make-hash-table :test #'equal)
   "Cache of relations between directories.
@@ -433,7 +433,7 @@ NAME, okay, `checkdoc'?"
 
 (declare-function bufler-workspace-buffer-name-workspace "bufler-workspace")
 (bufler-define-buffer-command name-workspace
-  "Set buffer's workspace name.
+  "Adds to buffer's workspace names.
 With prefix, unset it."
   (lambda (buffer)
     (with-current-buffer buffer
@@ -442,7 +442,7 @@ With prefix, unset it."
                  (completing-read "Named workspace: "
                                   (seq-uniq
                                    (cl-loop for buffer in (buffer-list)
-                                            when (buffer-local-value 'bufler-workspace-name buffer)
+                                            when (buffer-local-value 'bufler-workspace-names buffer)
                                             collect it)))))))
 
 ;;;;; Group commands
@@ -1029,8 +1029,9 @@ NAME, okay, `checkdoc'?"
     (concat "Tramp: " host)))
 
 (bufler-defauto-group workspace
-  (when-let* ((name (buffer-local-value 'bufler-workspace-name buffer)))
-    name))
+  (when-let* ((names (buffer-local-value 'bufler-workspace-names buffer)))
+    names))
+
 
 ;;;;;; Group-defining macro
 

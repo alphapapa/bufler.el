@@ -141,21 +141,26 @@ act as if SET-WORKSPACE-P is non-nil."
     (switch-to-buffer selected-buffer)))
 
 ;;;###autoload
+(defun bufler-workspace-list-named-workspaces ()
+  "Return the list of current named workspaces."
+  (seq-uniq
+   (cl-loop for buffer in (buffer-list)
+            when (buffer-local-value 'bufler-workspace-names buffer)
+            append it)))
+
+;;;###autoload
 (defun bufler-workspace-buffer-name-workspace (&optional name)
   "Set current buffer's workspace to NAME.
 If NAME is nil (interactively, with prefix), unset the buffer's
-workspace name.  This sets the buffer-local variable
-`bufler-workspace-name'.  Note that, in order for a buffer to
+workspace name.  This prepends to the buffer-local variable
+`bufler-workspace-names'.  Note that, in order for a buffer to
 appear in a named workspace, the buffer must be matched by an
 `auto-workspace' group before any other group."
   (interactive (list (unless current-prefix-arg
                        (completing-read "Named workspace: "
-                                        (seq-uniq
-                                         (cl-loop for buffer in (buffer-list)
-                                                  when (buffer-local-value 'bufler-workspace-name buffer)
-                                                  collect it))))))
+                                        (bufler-workspace-list-named-workspaces)))))
   (setf bufler-cache nil)
-  (setq-local bufler-workspace-name name))
+  (add-to-list (make-local-variable 'bufler-workspace-names) name))
 
 ;;;###autoload
 (define-minor-mode bufler-workspace-mode
