@@ -1,9 +1,6 @@
-#+PROPERTY: logging nil
-#+TODO: TODO UNDERWAY | DONE CANCELED
-#+TYP_TODO: MAYBE | CANCELED
-#+TYP_TODO: TEMPLATE
+#+TITLE: Bufler notes
 
-* Plans
+* [#A] Plans
 
 ** DONE 0.2
 
@@ -132,6 +129,15 @@ In these functions.  I'd expect =cl-loop= to be faster.
 
 The WIP branch works pretty well already.
 
+*** PROJECT ~bufler-defpred~
+
+From [[https://github.com/alphapapa/bufler.el/pull/32#issuecomment-742928816][comment]]:
+
++ A macro like ~bufler-defpred~ would define a grouping predicate.  It would define a function like ~bufler--predicate-NAME~, and it would add its ~macrolet~ form to a variable like ~bufler-predicates~.
++ A function like ~bufler-define-expand-groups~ would define a function ~bufler-expand-groups~ which would splice in the predicate ~macrolet~ forms into the ~cl-macrolet~ form.
++ Users would do something like ~(setf bufler-groups (bufler-expand-groups ...))~.
++ New groups could be added with ~bufler-defpred~, which would also call ~bufler-define-expand-groups~ to redefine the expansion function to include the new predicate.
+
 ** 0.5
 
 *** TODO Sortable columns
@@ -214,7 +220,7 @@ Sort of like "buffer butler."  Maybe a buffalo for a mascot?
 
 Sort of cute and catchy.  Maybe some clip art available.
 
-* Checklists
+* [#C] Checklists
 
 ** TEMPLATE Release
 
@@ -235,4 +241,19 @@ Sort of cute and catchy.  Maybe some clip art available.
           +  [ ] bufler.el
           +  [ ] helm-bufler.el
           +  [ ] README.org
+
+* [#C] COMMENT Config                                              :noexport:
+
+** Org settings
+
+#+PROPERTY: LOGGING nil
+#+TODO: TODO MAYBE NEXT PROJECT UNDERWAY WAITING | DONE(d) CANCELED
+#+TYP_TODO: TEMPLATE
+
+** File-local variables
+
+# Local Variables:
+# before-save-hook: ((lambda () (when (fboundp 'unpackaged/org-fix-blank-lines) (unpackaged/org-fix-blank-lines t))) (lambda () (when (fboundp 'ap/org-sort-entries-recursive-multi) (save-excursion (goto-char (point-min)) (ap/org-sort-entries-recursive-multi '(?a ?p ?o))))) org-update-all-dblocks org-make-toc)
+# org-ql-ask-unsafe-queries: nil
+# End:
 
