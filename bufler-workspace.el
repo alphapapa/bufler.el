@@ -63,6 +63,16 @@ May be customized to, e.g. only return the last element of a path."
                                               (car (last (bufler-faceify-path path)))))
                  (function :tag "Custom function")))
 
+(defcustom bufler-workspace-switch-buffer-filter-fns
+  '(bufler--buffer-hidden-p bufler--buffer-mode-filtered-p bufler--buffer-name-filtered-p)
+  "Buffers that match these functions are not shown when offering buffers for switching."
+  :type '(repeat
+          (choice (function-item bufler--buffer-hidden-p)
+                  (function-item bufler--buffer-mode-filtered-p)
+                  (function-item bufler--buffer-name-filtered-p)
+                  (function-item bufler--buffer-special-p)
+                  (function :tag "Custom function"))))
+
 ;;;; Commands
 
 ;;;###autoload
@@ -104,22 +114,31 @@ Interactively, use current buffer."
   (bufler-workspace-frame-set (bufler-buffer-workspace-path buffer)))
 
 ;;;###autoload
-(defun bufler-workspace-switch-buffer (&optional all-p set-workspace-p)
+(defun bufler-workspace-switch-buffer (&optional all-p set-workspace-p no-filter)
   "Switch to another buffer in the current group.
 Without any input, switch to the previous buffer, like
 `switch-to-buffer'.  If ALL-P (interactively, with universal
 prefix) or if the frame has no workspace, select from all
 buffers.  If SET-WORKSPACE-P (with two universal prefixes),
-select from all buffers and set the frame's workspace.
+select from all buffers and set the frame's workspace.  If
+NO-FILTER (with three universal prefixes), include buffers that
+would otherwise be filtered by
+`bufler-workspace-switch-buffer-filter-fns'.
 
 If `bufler-workspace-switch-buffer-sets-workspace' is non-nil,
 act as if SET-WORKSPACE-P is non-nil."
-  (interactive (list current-prefix-arg (equal '(16) current-prefix-arg)))
+  (interactive (list current-prefix-arg
+                     (and current-prefix-arg
+                          (>= (car current-prefix-arg) 16))
+                     (and current-prefix-arg
+                          (>= (car current-prefix-arg) 64))))
   (let* ((bufler-vc-state nil)
          (completion-ignore-case bufler-workspace-ignore-case)
          (path (unless all-p
                  (frame-parameter nil 'bufler-workspace-path)))
-         (buffers (bufler-buffer-alist-at path))
+         (buffers (bufler-buffer-alist-at
+                   path :filter-fns (unless no-filter
+                                      bufler-workspace-switch-buffer-filter-fns)))
          (other-buffer-path (bufler-group-tree-leaf-path
                              (bufler-buffers) (other-buffer (current-buffer))))
          (other-buffer-cons (cons (buffer-name (-last-item other-buffer-path))

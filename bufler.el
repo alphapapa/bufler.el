@@ -160,9 +160,33 @@ might be slow, because `vc-registered' and `vc-refresh-state'
 must be called to get up-to-date results."
   :type 'boolean)
 
-(defcustom bufler-filter-fns (list #'bufler-hidden-buffer-p)
-  "Buffers that match these functions are not shown."
-  :type '(repeat function))
+(defcustom bufler-filter-buffer-modes
+  '(bufler-list-mode calendar-mode fundamental-mode helm-major-mode
+                     magit-diff-mode magit-process-mode magit-revision-mode magit-section-mode
+                     special-mode timer-list-mode)
+  "List of major modes whose buffers are not shown by default."
+  :type '(repeat string))
+
+(defcustom bufler-filter-buffer-name-regexps
+  (list (rx "*Compile-Log*") (rx "*Disabled Command*")
+        ;; Org export logs.
+        (rx "*Org " (1+ anything) "Output*"))
+  "Regular expressions matched against buffer names.
+Buffers whose names match are hidden when function
+`bufler--buffer-name-filtered-p' is in `bufler-filter-buffer-fns'
+or `bufler-workspace-switch-buffer-filter-fns'."
+  :type '(repeat string))
+
+(defcustom bufler-filter-buffer-fns
+  '(bufler--buffer-hidden-p bufler--buffer-mode-filtered-p
+                            bufler--buffer-name-filtered-p)
+  "Buffers that match these functions are not shown by default."
+  :type '(repeat
+          (choice (function-item bufler--buffer-hidden-p)
+                  (function-item bufler--buffer-mode-filtered-p)
+                  (function-item bufler--buffer-name-filtered-p)
+                  (function-item bufler--buffer-special-p)
+                  (function :tag "Custom function"))))
 
 (defcustom bufler-group-path-separator " » "
   "Separator shown between path elements."
@@ -256,13 +280,14 @@ cleared with a timer that runs this many seconds after the last
   type path elements)
 
 ;;;###autoload
-(defun bufler-list (&optional force-refresh)
+(defun bufler-list (&optional arg)
   "Show Bufler's list.
-With prefix argument FORCE-REFRESH, force refreshing of buffers'
-VC state, and clear `bufler-cache' and regenerate buffer
-groups (which can be useful after changing `bufler-groups' if the
-buffer list has not yet changed)."
-  (interactive "P")
+With prefix argument ARG, force refreshing of buffers' VC state,
+clear `bufler-cache', and regenerate buffer groups (which can be
+useful after changing `bufler-groups' if the buffer list has not
+yet changed).  With two universal prefix args, also show buffers
+which are otherwise filtered by `bufler-filter-buffer-fns'."
+  (interactive "p")
   (let (format-table)
     (cl-labels
         ;; This gets a little hairy because we have to wrap `-group-by'
@@ -331,14 +356,13 @@ buffer list has not yet changed)."
                   (string arg)
                   (otherwise (format "%s" arg))))
          (format< (test-dir buffer-dir)
-                  (string< (as-string test-dir) (as-string buffer-dir)))
-         (boring-p (buffer)
-                   (hidden-p buffer)))
-      (when force-refresh
+                  (string< (as-string test-dir) (as-string buffer-dir))))
+      (when arg
         (setf bufler-cache nil))
       (pcase-let* ((inhibit-read-only t)
-                   (bufler-vc-refresh force-refresh)
-                   (groups (bufler-buffers))
+                   (bufler-vc-refresh arg)
+                   (groups (bufler-buffers :filter-fns (unless (>= arg 16)
+                                                         bufler-filter-buffer-fns)))
                    (`(,*format-table . ,column-sizes) (bufler-format-buffer-groups groups))
                    (header (concat (format (format " %%-%ss" (cdar column-sizes)) (caar column-sizes))
                                    (cl-loop for (name . size) in (cdr column-sizes)
@@ -495,28 +519,36 @@ NAME, okay, `checkdoc'?"
 
 ;;;; Functions
 
-(cl-defun bufler-buffers (&key (groups bufler-groups) path)
+(cl-defun bufler-buffers (&key (groups bufler-groups) filter-fns path)
   "Return buffers grouped by GROUPS.
-If PATH, return only buffers from the group at PATH."
+If PATH, return only buffers from the group at PATH.  If
+FILTER-FNS, remove buffers that match any of them."
   (cl-flet ((buffers
              () (bufler-group-tree groups
-                  (cl-loop with buffers = (cl-delete-if-not #'buffer-live-p (buffer-list))
-                           for fn in bufler-filter-fns
-                           do (setf buffers (cl-remove-if fn buffers))
-                           finally return buffers))))
+                  (if filter-fns
+                      (cl-loop with buffers = (cl-delete-if-not #'buffer-live-p (buffer-list))
+                               for fn in filter-fns
+                               do (setf buffers (cl-remove-if fn buffers))
+                               finally return buffers)
+                    (buffer-list)))))
     (let ((buffers (if bufler-use-cache
-                       (let ((hash (sxhash (buffer-list))))
-                         (if (equal hash (car bufler-cache))
-                             (cdr bufler-cache)
-                           (cdr (setf bufler-cache (cons hash (buffers))))))
+                       (let ((key (sxhash (buffer-list))))
+                         (if (eq key (car bufler-cache))
+                             ;; Buffer list unchanged.
+                             (or (map-elt (cdr bufler-cache) filter-fns)
+                                 ;; Different filters.
+                                 (setf (map-elt (cdr bufler-cache) filter-fns) (buffers)))
+                           ;; Buffer list has changed.
+                           (cddr (setf bufler-cache (cons key (cons filter-fns (buffers)))))))
                      (buffers))))
       (if path
           (bufler-group-tree-at path buffers)
         buffers))))
 
-(cl-defun bufler-buffer-alist-at (path)
+(cl-defun bufler-buffer-alist-at (path &key filter-fns)
   "Return alist of (display . buffer) cells at PATH.
-Each cell is suitable for completion functions."
+Each cell is suitable for completion functions.  If FILTER-FNS,
+omit buffers that match any of them."
   (interactive "P")
   (let* ((level-start (pcase path
                         ;; I don't like this, but it works for now.  It's necessary because a group
@@ -526,7 +558,7 @@ Each cell is suitable for completion functions."
                         ;; and some of the logic should probably be moved to bufler-group-tree.
                         ('nil 0)
                         (_ (1+ (length (-take-while #'null path))))))
-         (grouped-buffers (bufler-buffers :path path))
+         (grouped-buffers (bufler-buffers :path path :filter-fns filter-fns))
          (paths (bufler-group-tree-paths grouped-buffers)))
     (cl-labels ((format-heading
                  (heading level) (propertize heading
@@ -579,7 +611,7 @@ Each cell is suitable for completion functions."
                                           (buffer-modified-p buffer))
                                      "*" "")
                                  'face 'font-lock-warning-face))
-         (buffer-face (if (bufler-special-buffer-p buffer)
+         (buffer-face (if (bufler--buffer-special-p buffer)
                           'bufler-buffer-special 'bufler-buffer))
          (level-face (bufler-level-face depth))
          (face (list :inherit (list buffer-face level-face)))
@@ -632,16 +664,23 @@ Each cell is suitable for completion functions."
 ;; These functions take a buffer as their sole argument.  They may be
 ;; used in the grouping predicates defined later.
 
-(defun bufler-special-buffer-p (buffer)
+(defun bufler--buffer-hidden-p (buffer)
+  "Return non-nil if BUFFER's name is prefixed by a space."
+  (string-prefix-p " " (buffer-name buffer)))
+
+(defun bufler--buffer-mode-filtered-p (buffer)
+  "Return non-nil if BUFFER's major mode is in `bufler-filter-buffer-modes'."
+  (member (buffer-local-value 'major-mode buffer) bufler-filter-buffer-modes))
+
+(defun bufler--buffer-name-filtered-p (buffer)
+  "Return non-nil if BUFFER's major mode is in `bufler-filter-buffer-name-regexps'."
+  (cl-loop for regexp in bufler-filter-buffer-name-regexps
+           thereis (string-match regexp (buffer-name buffer))))
+
+(defun bufler--buffer-special-p (buffer)
   "Return non-nil if BUFFER is special.
 That is, if its name starts with \"*\"."
-  (string-match-p (rx bos (optional (1+ blank)) "*")
-                  (buffer-name buffer)))
-
-(defun bufler-hidden-buffer-p (buffer)
-  "Return non-nil if BUFFER is hidden.
-That is, if its name starts with \" \"."
-  (string-match-p (rx bos (1+ blank)) (buffer-name buffer)))
+  (string-prefix-p "*" (buffer-name buffer)))
 
 ;;;;; Buffer and Column Formatting
 
@@ -991,7 +1030,7 @@ NAME, okay, `checkdoc'?"
     "*indirect*"))
 
 (bufler-defauto-group special
-  (if (bufler-special-buffer-p buffer)
+  (if (bufler--buffer-special-p buffer)
       "*special*"
     "non-special buffers"))
 

@@ -302,6 +302,7 @@ Of course, Ibuffer is a mature tool with many features, so Bufler doesn't replac
 +  Show an asterisk next to buffers with unsaved changes.  (Thanks to [[https://github.com/ration][Tatu Lahtela]].)
 +  Option ~bufler-name-column-width~ limits the width of buffer names in the buffer list.  (Thanks to [[https://github.com/WorldsEndless][Tory S. Anderson]].)
 +  Column ~Mode~ shows buffer's major mode, sans ~-mode~ suffix.
++  More filtering options: ~bufler-filter-buffer-fns~, ~bufler-workspace-switch-buffer-filter-fns~, ~bufler-filter-buffer-modes~, and ~bufler-filter-buffer-name-regexps~.  By default, more buffers will be hidden in ~bufler-list~ and ~bufler-switch-buffer~, and filters may be disabled by calling those commands with universal prefix arguments.
 
 ** 0.2
 

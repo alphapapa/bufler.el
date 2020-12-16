@@ -69,7 +69,11 @@ This mimics `bufler-workspace-switch-buffer'."
                                        (if (car (frame-parameter nil 'bufler-workspace-path))
                                            (frame-parameter nil 'bufler-workspace-path)
                                          (cdr (frame-parameter nil 'bufler-workspace-path))))))
-                    (bufler-buffer-alist-at group-path)))
+                    (pcase current-prefix-arg
+                      ((or `nil '(4) '(16))
+                       (bufler-buffer-alist-at
+                        group-path :filter-fns bufler-workspace-switch-buffer-filter-fns))
+                      (_ (bufler-buffer-alist-at nil)))))
     :action (cons (cons "Switch to buffer with Bufler" 'helm-bufler-switch-buffer)
                   helm-type-buffer-actions))
   "Helm source for `bufler'.")
