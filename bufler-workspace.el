@@ -198,7 +198,10 @@ Works as `tab-line-tabs-function'."
     (--tree-map-nodes (bufferp it)
                       (push it buffers)
                       (bufler-buffers :path (frame-parameter frame 'bufler-workspace-path)))
-    (cl-sort buffers #'string< :key #'buffer-name)))
+
+    (if tab-line-tabs-buffer-group-sort-function
+	(cl-sort buffers tab-line-tabs-buffer-group-sort-function)
+      (cl-sort buffers #'string< :key #'buffer-name))))
 
 (defun bufler-workspace-mode-lighter ()
   "Return lighter string for mode line."
