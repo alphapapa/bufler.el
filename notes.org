@@ -157,6 +157,10 @@ Jonas Bernoulli uses it in [[https://github.com/emacscollective/epkg/blob/master
 
 Of special interest is how it uses display properties to [[https://github.com/emacscollective/epkg/blob/edf8c009066360af61caedf67a2482eaa19481b0/epkg-desc.el#L363][align text in columns]].  That might be a good alternative to using =format= for alignment.
 
+** Use ~tab-line-tabs-buffer-group-function~
+
+e.g. see [[id:e5657361-b5a9-4ab7-af1d-8c365f8b6706][Amit's Thoughts: Emacs: prettier tab-line]].
+
 ** Non-consuming grouping option
 
 The idea to have buffers appear in multiple groups which they match was mentioned in [[https://github.com/alphapapa/burly.el/pull/24#issuecomment-738204637][this comment by Gerry Agbobada]].  Here's a rough concept of how the alternative to ~bufler-group-tree~ could work.
@@ -219,6 +223,13 @@ Sort of like "buffer butler."  Maybe a buffalo for a mascot?
 *** Mr. Buffer
 
 Sort of cute and catchy.  Maybe some clip art available.
+
+* References
+
+** [[http://amitp.blogspot.com/2020/06/emacs-prettier-tab-line.html][Amit's Thoughts: Emacs: prettier tab-line]]
+:PROPERTIES:
+:ID:       e5657361-b5a9-4ab7-af1d-8c365f8b6706
+:END:
 
 * [#C] Checklists
 
