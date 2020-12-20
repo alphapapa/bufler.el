@@ -243,6 +243,7 @@ Sort of cute and catchy.  Maybe some clip art available.
 +  [ ] Update version numbers in file headers.
      -  [ ] bufler.el
      -  [ ] helm-bufler.el
+     -  [ ] README.org
 +  [ ] Update changelog in =README.org=.
 +  [ ] Tag and sign new version (using Magit's =t r=).
 +  [ ] Push =master=.
