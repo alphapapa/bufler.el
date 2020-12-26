@@ -361,7 +361,7 @@ which are otherwise filtered by `bufler-filter-buffer-fns'."
         (setf bufler-cache nil))
       (pcase-let* ((inhibit-read-only t)
                    (bufler-vc-refresh arg)
-                   (groups (bufler-buffers :filter-fns (unless (>= arg 16)
+                   (groups (bufler-buffers :filter-fns (unless (and (numberp arg) (>= arg 16))
                                                          bufler-filter-buffer-fns)))
                    (`(,*format-table . ,column-sizes) (bufler-format-buffer-groups groups))
                    (header (concat (format (format " %%-%ss" (cdar column-sizes)) (caar column-sizes))
