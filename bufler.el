@@ -539,7 +539,9 @@ FILTER-FNS, remove buffers that match any of them."
                                  ;; Different filters.
                                  (setf (map-elt (cdr bufler-cache) filter-fns) (buffers)))
                            ;; Buffer list has changed.
-                           (cddr (setf bufler-cache (cons key (cons filter-fns (buffers)))))))
+                           (let ((buffers (buffers)))
+                             (setf bufler-cache (cons key (list (cons filter-fns buffers))))
+                             buffers)))
                      (buffers))))
       (if path
           (bufler-group-tree-at path buffers)
