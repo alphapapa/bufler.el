@@ -268,7 +268,7 @@ After installing the package (see [[#installation][installation instructions]] a
 
 ** Ivy support
 
-Bufler does not require nor depend on Ivy, but because it uses =completing-read=, Bufler requires no special configuration to work with =ivy-mode= for selecting buffers.  For example, this shows =bufler-switch-buffers= with =ivy-mode= activated (in the =spacemacs-dark= theme):
+Bufler does not require nor depend on Ivy, but because it uses =completing-read=, Bufler requires no special configuration to work with =ivy-mode= for selecting buffers.  For example, this shows =bufler-switch-buffer= with =ivy-mode= activated (in the =spacemacs-dark= theme):
 
 [[images/ivy-mode-spacemacs-dark-theme.png]]
 
