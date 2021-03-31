@@ -42,6 +42,24 @@
 
 ;;;; Functions
 
+(defun bufler-group-tree-seq-group-by (function sequence)
+  "Specialization of `seq-group-by' that puts elements of SEQUENCES in each of
+the workspaces returned by FUNCTION."
+  (seq-reduce
+   (lambda (acc elt)
+     (let ((keys (funcall function elt))
+           (add-to-group (lambda (key)
+                           (let ((cell (assoc key acc)))
+                             (if cell
+                                 (setcdr cell (push elt (cdr cell)))
+                               (push (list key elt) acc))))))
+       (if (listp keys)
+           (mapc add-to-group keys)
+         (funcall add-to-group keys))
+       acc))
+   (seq-reverse sequence)
+   nil))
+
 (defun bufler-group-tree (fns sequence)
   "Return SEQUENCE grouped according to FNS."
   (declare (indent defun))
@@ -49,7 +67,7 @@
   (cl-typecase fns
     (function
      ;; "Regular" subgroups (naming things is hard).
-     (seq-group-by fns sequence))
+     (bufler-group-tree-seq-group-by fns sequence))
     (list (cl-typecase (car fns)
             (function
              ;; "Regular" subgroups (naming things is hard).
@@ -59,7 +77,7 @@
                              (cons (car it)
                                    (bufler-group-tree (cdr fns) (cdr it))))
                            groups))
-               (seq-group-by (car fns) sequence)))
+               (bufler-group-tree-seq-group-by (car fns) sequence)))
             (list
              ;; "Recursive sub-subgroups" (naming things is hard).
              ;; First, separate all the buffers that match the

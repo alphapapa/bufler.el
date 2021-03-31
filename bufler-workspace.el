@@ -55,6 +55,11 @@ with prefix arguments."
   "Functions called when the workspace is set."
   :type 'hook)
 
+(defcustom bufler-workspace-name-prefix
+  "Workspace: "
+  "Prefix of named workspaces"
+  :type 'string)
+
 (defcustom bufler-workspace-format-path-fn #'bufler-format-path
   "Function to format group paths for display in mode line and frame title.
 May be customized to, e.g. only return the last element of a path."
@@ -160,21 +165,67 @@ act as if SET-WORKSPACE-P is non-nil."
     (switch-to-buffer selected-buffer)))
 
 ;;;###autoload
+(defun bufler-workspace-list-named-workspaces ()
+  "Return the list of current named workspaces."
+  (seq-uniq
+   (cl-loop for buffer in (buffer-list)
+            when (buffer-local-value 'bufler-workspace-names buffer)
+            append it)))
+
+;;;###autoload
+(defun bufler-workspace-list-buffers-in-named-workspace (&optional name)
+  "Return the list of buffers in named workspace NAME.
+
+If NAME is nil, list the buffers in current frame workspace."
+  ;; This might get fused with `bufler-workspace-buffers'
+  (let ((buffers))
+    (--tree-map-nodes
+     (bufferp it)
+     (push it buffers)
+     (bufler-buffers :path (list (concat bufler-workspace-name-prefix (or name (frame-parameter nil 'bufler-workspace-path))))))
+    (cl-sort buffers #'string< :key #'buffer-name)))
+
+;;;###autoload
 (defun bufler-workspace-buffer-name-workspace (&optional name)
   "Set current buffer's workspace to NAME.
 If NAME is nil (interactively, with prefix), unset the buffer's
-workspace name.  This sets the buffer-local variable
-`bufler-workspace-name'.  Note that, in order for a buffer to
+workspace name.  This prepends to the buffer-local variable
+`bufler-workspace-names'.  Note that, in order for a buffer to
 appear in a named workspace, the buffer must be matched by an
 `auto-workspace' group before any other group."
   (interactive (list (unless current-prefix-arg
                        (completing-read "Named workspace: "
-                                        (seq-uniq
-                                         (cl-loop for buffer in (buffer-list)
-                                                  when (buffer-local-value 'bufler-workspace-name buffer)
-                                                  collect it))))))
+                                        (bufler-workspace-list-named-workspaces)))))
   (setf bufler-cache nil)
-  (setq-local bufler-workspace-name name))
+  (if (and name (not (string= "" name)))
+      (add-to-list (make-local-variable 'bufler-workspace-names) name)
+    (setq-local bufler-workspace-names nil)))
+
+;;;###autoload
+(defun bufler-workspace-buffer-remove-maybe-kill (name)
+  "Remove NAME from current buffer's workspace list.
+
+If NAME was the last named workspace for the buffer, or the buffer
+had no named workspace associated, then current buffer is killed."
+  (interactive (list
+                (completing-read "Unmark workspace: "
+                                 bufler-workspace-names)))
+  (if-let ((ws (remove name bufler-workspace-names)))
+      (setq-local bufler-workspace-names ws)
+    (kill-buffer (current-buffer))))
+
+;;;###autoload
+(defun bufler-workspace-kill-named-workspace (name)
+  "Remove all references to workspace NAME from buffers.
+
+Kill buffers that had NAME as their last named workspace."
+  ;; This might get fused with `bufler-workspace-buffers'
+  (interactive (list (completing-read "Named workspace: "
+                                      (bufler-workspace-list-named-workspaces))))
+  (cl-mapc
+   (lambda (buffer) (with-current-buffer buffer (bufler-workspace-buffer-remove-maybe-kill name)))
+   (bufler-workspace-list-buffers-in-named-workspace name)))
+
 
 ;;;###autoload
 (define-minor-mode bufler-workspace-mode
@@ -207,7 +258,7 @@ Works as `tab-line-tabs-function'."
 (defun bufler-workspace-set-frame-name (path)
   "Set current frame's name according to PATH."
   (set-frame-name (when path
-                    (format "Workspace: %s" (funcall bufler-workspace-format-path-fn path)))))
+                    (format "%s" (funcall bufler-workspace-format-path-fn path)))))
 
 (cl-defun bufler-workspace-read-item (tree &key (leaf-key #'identity))
   "Return a leaf read from TREE with completion.
