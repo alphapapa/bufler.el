@@ -55,7 +55,6 @@ This mimics `bufler-workspace-switch-buffer'."
      (bufler-buffer-workspace-path buffer)))
   (switch-to-buffer buffer))
 
-;;;###autoload
 (defvar helm-bufler-source
   (helm-make-source "Bufler's workspace buffers" 'helm-source-sync
     :header-name (lambda (_name)
@@ -77,6 +76,11 @@ This mimics `bufler-workspace-switch-buffer'."
     :action (cons (cons "Switch to buffer with Bufler" 'helm-bufler-switch-buffer)
                   helm-type-buffer-actions))
   "Helm source for `bufler'.")
+
+;;;###autoload
+(eval-after-load 'bufler '(and (featurep 'helm) (or (featurep 'helm-bufler) (require 'helm-bufler))))
+;;;###autoload
+(eval-after-load 'helm '(and (featurep 'bufler)(or (featurep 'helm-bufler) (require 'helm-bufler))))
 
 ;;;; Footer
 
