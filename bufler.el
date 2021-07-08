@@ -530,29 +530,31 @@ NAME, okay, `checkdoc'?"
   "Return buffers grouped by GROUPS.
 If PATH, return only buffers from the group at PATH.  If
 FILTER-FNS, remove buffers that match any of them."
-  (cl-flet ((buffers
-             () (bufler-group-tree groups
-                  (if filter-fns
-                      (cl-loop with buffers = (cl-delete-if-not #'buffer-live-p (buffer-list))
-                               for fn in filter-fns
-                               do (setf buffers (cl-remove-if fn buffers))
-                               finally return buffers)
-                    (buffer-list)))))
-    (let ((buffers (if bufler-use-cache
-                       (let ((key (sxhash (buffer-list))))
-                         (if (eq key (car bufler-cache))
-                             ;; Buffer list unchanged.
-                             (or (map-elt (cdr bufler-cache) filter-fns)
-                                 ;; Different filters.
-                                 (setf (map-elt (cdr bufler-cache) filter-fns) (buffers)))
-                           ;; Buffer list has changed.
-                           (let ((buffers (buffers)))
-                             (setf bufler-cache (cons key (list (cons filter-fns buffers))))
-                             buffers)))
-                     (buffers))))
-      (if path
-          (bufler-group-tree-at path buffers)
-        buffers))))
+  (cl-labels ((grouped-buffers
+               () (bufler-group-tree groups
+                    (if filter-fns
+                        (cl-loop with buffers = (cl-delete-if-not #'buffer-live-p (buffer-list))
+                                 for fn in filter-fns
+                                 do (setf buffers (cl-remove-if fn buffers))
+                                 finally return buffers)
+                      (buffer-list))))
+              (cached-buffers
+               (key) (when (eql key (car bufler-cache))
+                       ;; Buffer list unchanged: return cached result.
+                       (or (map-elt (cdr bufler-cache) filter-fns)
+                           ;; Different filters: group and filter and return cached result.
+                           (setf (map-elt (cdr bufler-cache) filter-fns) (grouped-buffers)))))
+              (buffers
+               () (if bufler-use-cache
+                      (let ((key (sxhash (buffer-list))))
+                        (or (cached-buffers key)
+                            ;; Buffer list has changed: group buffers and cache result.
+                            (cdadr
+                             (setf bufler-cache (cons key (list (cons filter-fns (grouped-buffers))))))))
+                    (grouped-buffers))))
+    (if path
+        (bufler-group-tree-at path (buffers))
+      (buffers))))
 
 (cl-defun bufler-buffer-alist-at (path &key filter-fns)
   "Return alist of (display . buffer) cells at PATH.
