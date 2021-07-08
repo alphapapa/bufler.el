@@ -230,6 +230,13 @@ cleared with a timer that runs this many seconds after the last
 `bufler-list' command."
   :type 'boolean)
 
+(defcustom bufler-list-display-buffer-action
+  '((display-buffer-reuse-window display-buffer-in-previous-window display-buffer-same-window))
+  "The ACTION argument passed to `display-buffer' (which see).
+Used when `bufler-list' is called."
+  :type '(cons (repeat :tag "Action functions" function)
+               (alist :tag "Action alist")))
+
 (defcustom bufler-list-mode-hook
   '(hl-line-mode)
   "Hook run on entering `bufler-list'."
@@ -382,7 +389,7 @@ which are otherwise filtered by `bufler-filter-buffer-fns'."
               (insert-thing it nil 0)))
           (setf header-line-format header)
           (setf buffer-read-only t)
-          (pop-to-buffer (current-buffer))
+          (pop-to-buffer (current-buffer) bufler-list-display-buffer-action)
           (goto-char pos))
         ;; Cancel cache-clearing idle timer and start a new one.
         (when bufler-cache-related-dirs-timer

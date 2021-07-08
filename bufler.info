@@ -549,6 +549,8 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
      be hidden in ‘bufler-list’ and ‘bufler-switch-buffer’, and filters
      may be disabled by calling those commands with universal prefix
      arguments.
+   • Option ‘bufler-list-display-buffer-action’, which controls how the
+     ‘bufler-list’ buffer is displayed.
 
    *Fixed*
    • Option ‘bufler-filter-buffer-modes’ had the wrong customization
@@ -624,11 +626,11 @@ Node: Prism support18181
 Node: Compared to Ibuffer18621
 Node: Changelog20371
 Node: 03-pre20540
-Node: 0222038
-Node: 0122183
-Node: Credits22282
-Node: Development22971
-Node: License23141
+Node: 0222160
+Node: 0122305
+Node: Credits22404
+Node: Development23093
+Node: License23263
 
 End Tag Table
 
