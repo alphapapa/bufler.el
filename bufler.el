@@ -1136,17 +1136,15 @@ See documentation for details."
                (mode-match "*Help*" (rx bos "help-"))
                (mode-match "*Info*" (rx bos "info-"))))
     (group
-     ;; Subgroup collecting all special buffers (i.e. ones that are not
-     ;; file-backed), except `magit-status-mode' buffers (which are allowed to fall
+     ;; Subgroup collecting all special buffers (i.e. ones that are not file-backed), except
+     ;; certain ones like Dired, Forge, or Magit Status buffers (which are allowed to fall
      ;; through to other groups, so they end up grouped with their project buffers).
-     (group-and "*Special*"
-                (lambda (buffer)
-                  (unless (or (funcall (mode-match "Magit" (rx bos "magit-status"))
-                                       buffer)
-                              (funcall (mode-match "Dired" (rx bos "dired"))
-                                       buffer)
-                              (funcall (auto-file) buffer))
-                    "*Special*")))
+     (group-not "*Special"
+                (group-or "*Special*"
+                          (mode-match "Magit" (rx bos "magit-status"))
+                          (mode-match "Forge" (rx bos "forge-"))
+                          (mode-match "Dired" (rx bos "dired"))
+                          (auto-file)))
      (group
       ;; Subgroup collecting these "special special" buffers
       ;; separately for convenience.
@@ -1154,7 +1152,7 @@ See documentation for details."
                   (rx bos "*" (or "Messages" "Warnings" "scratch" "Backtrace") "*")))
      (group
       ;; Subgroup collecting all other Magit buffers, grouped by directory.
-      (mode-match "*Magit* (non-status)" (rx bos (or "magit" "forge") "-"))
+      (mode-match "*Magit* (non-status)" (rx bos "magit-"))
       (auto-directory))
      ;; Subgroup for Helm buffers.
      (mode-match "*Helm*" (rx bos "helm-"))
