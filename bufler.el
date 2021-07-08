@@ -543,12 +543,24 @@ FILTER-FNS, remove buffers that match any of them."
                        ;; Buffer list unchanged: return cached result.
                        (or (map-elt (cdr bufler-cache) filter-fns)
                            ;; Different filters: group and filter and return cached result.
-                           (setf (map-elt (cdr bufler-cache) filter-fns) (grouped-buffers)))))
+
+                           ;; NOTE: (setf (map-elt (cdr CACHE) VALUE) ought to be returning the
+                           ;; VALUE, but it seems to be returning (cdr CACHE) instead, so we have to
+                           ;; work around that.  The `setf' docstring says, "The return value is the
+                           ;; last VAL in the list," so this may be a bug in the `map-elt' expander.
+
+                           ;; TODO: Compare against behavior of (setf (alist-get ...)) and report a bug if necessary.
+                           (let ((grouped-buffers (grouped-buffers)))
+                             (setf (map-elt (cdr bufler-cache) filter-fns) grouped-buffers)
+                             grouped-buffers))))
               (buffers
                () (if bufler-use-cache
                       (let ((key (sxhash (buffer-list))))
                         (or (cached-buffers key)
                             ;; Buffer list has changed: group buffers and cache result.
+
+                            ;; NOTE: See above, but here we don't use `map-elt', because the cache is being
+                            ;; reset, so there's only one cache entry, so we access its value with `cdadr'.
                             (cdadr
                              (setf bufler-cache (cons key (list (cons filter-fns (grouped-buffers))))))))
                     (grouped-buffers))))
