@@ -460,7 +460,7 @@ File: README.info,  Node: Ivy support,  Next: Prism support,  Prev: Helm support
 Bufler does not require nor depend on Ivy, but because it uses
 ‘completing-read’, Bufler requires no special configuration to work with
 ‘ivy-mode’ for selecting buffers.  For example, this shows
-‘bufler-switch-buffers’ with ‘ivy-mode’ activated (in the
+‘bufler-switch-buffer’ with ‘ivy-mode’ activated (in the
 ‘spacemacs-dark’ theme):
 
 
@@ -622,15 +622,15 @@ Node: Default groups example11134
 Node: Group types14061
 Node: Helm support17007
 Node: Ivy support17753
-Node: Prism support18181
-Node: Compared to Ibuffer18621
-Node: Changelog20371
-Node: 03-pre20540
-Node: 0222160
-Node: 0122305
-Node: Credits22404
-Node: Development23093
-Node: License23263
+Node: Prism support18180
+Node: Compared to Ibuffer18620
+Node: Changelog20370
+Node: 03-pre20539
+Node: 0222159
+Node: 0122304
+Node: Credits22403
+Node: Development23092
+Node: License23262
 
 End Tag Table
 
