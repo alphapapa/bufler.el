@@ -165,7 +165,7 @@ must be called to get up-to-date results."
                      magit-diff-mode magit-process-mode magit-revision-mode magit-section-mode
                      special-mode timer-list-mode)
   "List of major modes whose buffers are not shown by default."
-  :type '(repeat string))
+  :type '(repeat symbol))
 
 (defcustom bufler-filter-buffer-name-regexps
   (list (rx "*Compile-Log*") (rx "*Disabled Command*")

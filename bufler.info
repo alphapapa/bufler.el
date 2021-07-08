@@ -550,6 +550,10 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
      may be disabled by calling those commands with universal prefix
      arguments.
 
+   *Fixed*
+   • Option ‘bufler-filter-buffer-modes’ had the wrong customization
+     type.
+
 
 File: README.info,  Node: 02,  Next: 01,  Prev: 03-pre,  Up: Changelog
 
@@ -620,11 +624,11 @@ Node: Prism support18181
 Node: Compared to Ibuffer18621
 Node: Changelog20371
 Node: 03-pre20540
-Node: 0221940
-Node: 0122085
-Node: Credits22184
-Node: Development22873
-Node: License23043
+Node: 0222038
+Node: 0122183
+Node: Credits22282
+Node: Development22971
+Node: License23141
 
 End Tag Table
 
