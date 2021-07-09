@@ -114,6 +114,8 @@ See `bufler-cache-related-dirs-p'.")
   :link '(custom-manual "(Bufler)Top")
   :group 'convenience)
 
+;;;;; Options
+
 (defcustom bufler-use-cache t
   "Cache computed buffer groups.
 Since a buffer's directory, mode, project directory, etc rarely
@@ -713,34 +715,52 @@ That is, if its name starts with \"*\"."
 Each function takes two arguments, the buffer and its depth in
 the group tree, and returns a string as its column value.")
 
-(defcustom bufler-column-name-width nil
-  "Maximum width of buffer name column."
-  :type '(choice (integer :tag "Number of characters")
-                 (const :tag "Unlimited" nil)))
-
 (defcustom bufler-column-name-modified-buffer-sigil "*"
   "Displayed after the name of modified, file-backed buffers."
   :type 'string)
 
-(defmacro bufler-define-column (name face &rest body)
+(defmacro bufler-define-column (name plist &rest body)
   "Define a column formatting function with NAME.
-NAME should be a string.  BODY should return a string or nil.
-FACE, if non-nil, is applied to the string.  In the BODY,
-`buffer' is bound to the buffer, and `depth' is bound to the
-buffer's depth in the group tree."
+NAME should be a string.  BODY should return a string or nil.  In
+the BODY, `buffer' is bound to the buffer, and `depth' is bound
+to the buffer's depth in the group tree.
+
+PLIST may be a plist setting the following options:
+
+  `:face' is a face applied to the string.
+
+  `:max-width' defines a customization option for the column's
+  maximum width with the specified value as its default: an
+  integer limits the width, while nil does not."
   (declare (indent defun))
   (cl-check-type name string)
-  (let ((fn-name (intern (concat "bufler-column-format-" (downcase name)))))
+  (pcase-let* ((fn-name (intern (concat "bufler-column-format-" (downcase name))))
+               ((map :face :max-width) plist)
+               (max-width-variable (intern (concat "bufler-column-" name "-max-width")))
+               (max-width-docstring (format "Maximum width of the %s column." name)))
     `(progn
+       ,(when (plist-member plist :max-width)
+          `(defcustom ,max-width-variable
+             ,max-width
+             ,max-width-docstring
+             :type '(choice (integer :tag "Maximum width")
+                            (const :tag "Unlimited width" nil))))
        (defun ,fn-name (buffer depth)
          (if-let ((string (progn ,@body)))
-             (if ,face
-                 (propertize string 'face ,face)
+             (progn
+               ,(when max-width
+                  `(when ,max-width-variable
+                     (setf string (truncate-string-to-width string ,max-width-variable))))
+               ,(when face
+                  ;; Faces are not defined until load time, while this checks type at expansion
+                  ;; time, so we can only test that the argument is a symbol, not a face.
+                  (cl-check-type face symbol ":face must be a face symbol")
+                  `(setf string (propertize string 'face ',face)))
                string)
            ""))
        (setf (map-elt bufler-column-format-fns ,name) #',fn-name))))
 
-(bufler-define-column "Name" nil
+(bufler-define-column "Name" (:max-width nil)
   ;; MAYBE: Move indentation back to `bufler-list'.  But this seems to
   ;; work well, and that might be more complicated.
   (let ((indentation (make-string (* 2 depth) ? ))
@@ -752,20 +772,18 @@ buffer's depth in the group tree."
                                                 t t)
                                                " ")
                                        'face 'bufler-mode)))
-        (buffer-name (if bufler-column-name-width
-                         (truncate-string-to-width (buffer-name buffer) bufler-column-name-width)
-                       (buffer-name buffer)))
+        (buffer-name (buffer-name buffer))
         (modified (when (and (buffer-file-name buffer)
                              (buffer-modified-p buffer))
                     (propertize bufler-column-name-modified-buffer-sigil
                                 'face 'font-lock-warning-face))))
     (concat indentation mode-annotation buffer-name modified)))
 
-(bufler-define-column "Size" 'bufler-size
+(bufler-define-column "Size" (:face bufler-size)
   (ignore depth)
   (file-size-human-readable (buffer-size buffer)))
 
-(bufler-define-column "Mode" 'bufler-mode
+(bufler-define-column "Mode" (:face bufler-mode)
   (ignore depth)
   (string-remove-suffix
    "-mode" (symbol-name (buffer-local-value 'major-mode buffer))))
@@ -778,7 +796,7 @@ accessed via TRAMP) can be slow, which delays the displaying of
 have their state displayed."
   :type 'boolean)
 
-(bufler-define-column "VC" nil
+(bufler-define-column "VC" ()
   (ignore depth)
   (when (and (buffer-file-name buffer)
              (or (not (file-remote-p (buffer-file-name buffer)))
@@ -793,7 +811,7 @@ have their state displayed."
       ((and 'edited it) (propertize (symbol-name it) 'face 'bufler-vc))
       (it (propertize (symbol-name it) 'face 'bufler-dim)))))
 
-(bufler-define-column "Path" 'bufler-path
+(bufler-define-column "Path" (:face bufler-path :max-width nil)
   (ignore depth)
   (or (buffer-file-name buffer)
       (buffer-local-value 'list-buffers-directory buffer)
