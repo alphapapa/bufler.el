@@ -545,12 +545,13 @@ FILTER-FNS, remove buffers that match any of them."
                        (or (map-elt (cdr bufler-cache) filter-fns)
                            ;; Different filters: group and filter and return cached result.
 
-                           ;; NOTE: (setf (map-elt (cdr CACHE) VALUE) ought to be returning the
-                           ;; VALUE, but it seems to be returning (cdr CACHE) instead, so we have to
-                           ;; work around that.  The `setf' docstring says, "The return value is the
-                           ;; last VAL in the list," so this may be a bug in the `map-elt' expander.
+                           ;; NOTE: (setf (map-elt ...) VALUE), when used with alists, has a bug
+                           ;; that does not return the VALUE, so we must return it explicitly.
+                           ;; The bug is fixed in Emacs commit 896384b of 6 May 2021, and the
+                           ;; fix will also be in the next stable release of map.el on ELPA.  See
+                           ;; <https://debbugs.gnu.org/cgi/bugreport.cgi?bug=47572>.
 
-                           ;; TODO: Compare against behavior of (setf (alist-get ...)) and report a bug if necessary.
+                           ;; TODO: Remove workaround when we can target the fixed version of map.
                            (let ((grouped-buffers (grouped-buffers)))
                              (setf (map-elt (cdr bufler-cache) filter-fns) grouped-buffers)
                              grouped-buffers))))
@@ -559,9 +560,6 @@ FILTER-FNS, remove buffers that match any of them."
                       (let ((key (sxhash (buffer-list))))
                         (or (cached-buffers key)
                             ;; Buffer list has changed: group buffers and cache result.
-
-                            ;; NOTE: See above, but here we don't use `map-elt', because the cache is being
-                            ;; reset, so there's only one cache entry, so we access its value with `cdadr'.
                             (cdadr
                              (setf bufler-cache (cons key (list (cons filter-fns (grouped-buffers))))))))
                     (grouped-buffers))))
