@@ -65,7 +65,7 @@ May be customized to, e.g. only return the last element of a path."
 
 (defcustom bufler-workspace-switch-buffer-filter-fns
   '(bufler--buffer-hidden-p bufler--buffer-mode-filtered-p bufler--buffer-name-filtered-p)
-  "Buffers that match these functions are not shown when offering buffers for switching."
+  "Buffers matching these functions are hidden when offering buffers for switching."
   :type '(repeat
           (choice (function-item bufler--buffer-hidden-p)
                   (function-item bufler--buffer-mode-filtered-p)
