@@ -531,6 +531,7 @@ NAME, okay, `checkdoc'?"
   "Return buffers grouped by GROUPS.
 If PATH, return only buffers from the group at PATH.  If
 FILTER-FNS, remove buffers that match any of them."
+  ;; TODO: Probably would be clearer to call it IGNORE-FNS or REJECT-FNS rather than FILTER-FNS.
   (cl-labels ((grouped-buffers
                () (bufler-group-tree groups
                     (if filter-fns
