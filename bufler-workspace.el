@@ -197,7 +197,11 @@ Works as `tab-line-tabs-function'."
   (let (buffers)
     (--tree-map-nodes (bufferp it)
                       (push it buffers)
-                      (bufler-buffers :path (frame-parameter frame 'bufler-workspace-path)))
+                      (bufler-buffers :path (frame-parameter frame 'bufler-workspace-path)
+                                      ;; Like the default function, `tab-line-tabs-buffer-list',
+                                      ;; we remove hidden buffers.
+                                      :filter-fns (list (lambda (buffer)
+                                                          (= (aref (buffer-name buffer) 0) ?\s)))))
     (cl-sort buffers #'string< :key #'buffer-name)))
 
 (defun bufler-workspace-mode-lighter ()
