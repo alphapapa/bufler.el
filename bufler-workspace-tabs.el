@@ -82,9 +82,12 @@
 ;;;; Variables
 
 (defvar bufler-workspace-tabs-mode-saved-settings
-  '((tab-bar-separator . nil) (tab-bar-close-button-show . nil))
+  '((tab-bar-separator . nil) (tab-bar-close-button-show . nil)
+    (tab-bar-tabs-function . nil) (tab-line-tabs-function . nil))
   "Settings saved from before `bufler-workspace-tabs-mode' was activated.
 Used to restore them when the mode is disabled.")
+
+(defvar bufler-workspace-)
 
 ;;;; Customization
 
@@ -101,6 +104,10 @@ This string can be anything, including an image using display
 properties.  See the default value of `tab-bar-close-button'."
   :type 'string
   :group 'bufler-workspace)
+
+(defcustom bufler-workspace-tabs-tab-prefix "Bflr:"
+  "FIXME: Docstring."
+  :type 'string)
 
 ;;;; Commands
 
@@ -126,8 +133,6 @@ properties.  See the default value of `tab-bar-close-button'."
               tab-bar-close-button-show nil))
     (advice-remove 'tab-bar-select-tab #'bufler-workspace-tabs--tab-bar-select-tab)
     (advice-remove 'tab-bar-switch-to-tab #'bufler-workspace-frame-set)
-    (setf tab-bar-tabs-function #'tab-bar-tabs
-          tab-line-tabs-function #'tab-line-tabs-window-buffers)
     ;; Restore settings.
     (cl-loop for (symbol . value) in bufler-workspace-tabs-mode-saved-settings
              do (set symbol value)
@@ -192,7 +197,7 @@ FRAME defaults to the selected frame.  Works as
                 (workspace-to-tab
                  (workspace &optional type) (-let* (((&plist :name :path) workspace))
                                               (list (or type (tab-type path))
-                                                    (cons 'name (car name))
+                                                    (cons 'name (concat bufler-workspace-tabs-tab-prefix (car name)))
                                                     (cons 'path path))))
                 (path-top-level
                  (path) (pcase-exhaustive path
@@ -230,10 +235,13 @@ FRAME defaults to the selected frame.  Works as
                          for tab-path = (alist-get 'path tab)
                          thereis (equal tab-path current-path))
           (push (list 'current-tab
-                      (cons 'name (bufler-format-path (frame-parameter nil 'bufler-workspace-path)))
+                      (cons 'name (concat bufler-workspace-tabs-tab-prefix
+                                          (bufler-format-path (frame-parameter nil 'bufler-workspace-path))))
                       (cons 'path (frame-parameter nil 'bufler-workspace-path)))
                 tabs))
-        tabs))))
+        ;; Return Bufler tabs appended to ones from default function.
+        (append (funcall (map-elt bufler-workspace-tabs-mode-saved-settings 'tab-bar-tabs-function) frame)
+                tabs)))))
 
 ;;;; Footer
 
