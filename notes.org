@@ -1,5 +1,11 @@
 #+TITLE: Bufler notes
 
+* Contents
+:CONTENTS:
+
+:END:
+
+
 * [#A] Plans
 
 ** DONE 0.2
@@ -92,10 +98,6 @@ Here's a common scenario:
 
 Unfortunately, calling =vc-state-refresh= every time =bufler-list= is updated seems far too slow.
 
-*** TODO Pass ACTION argument to =pop-to-buffer=
-
-As Mike Zamansky mentioned, it would be nice to be able to control how the =bufler-list= window opens.
-
 *** TODO Depend on =project= 0.3.0 and use =project-root= instead of =project-roots=
 
 =project= is on ELPA, and the version there is newer than the one included with Emacs 26.3, and it declares =project-roots= obsolete.
@@ -122,6 +124,10 @@ In these functions.  I'd expect =cl-loop= to be faster.
                     (when (-any? (-cut funcall <> x) preds)
                       name))))
 #+END_SRC
+
+*** DONE Pass ACTION argument to =pop-to-buffer=
+
+As Mike Zamansky mentioned, it would be nice to be able to control how the =bufler-list= window opens.
 
 ** 0.4
 
@@ -150,6 +156,14 @@ From [[https://github.com/alphapapa/bufler.el/pull/32#issuecomment-742928816][co
 There should be a companion library to =group-tree= that provides the section-based view with columns.
 
 * Ideas
+
+** Integrate =bufler-workspace-mode= with =tab-bar-mode=
+
+Rather than replacing the =tab-bar-tabs-function= and having Bufler groups be the only tabs displayed in the tab bar, selecting a Bufler group would add a tab to the bar, prefixed with =Bflr:=.  Selecting that tab would set the frame's =bufler-workspace-path= (probably by advising =tab-bar-switch-to-tab=).  There also needs to be an easy way to make a new tab for a Bufler group.
+
+I think this would generally be more useful than the current implementation, but it means completely changing the design.
+
+Also, I'm noticing that the tab bar redisplays from scratch every time Emacs does (i.e. on every keystroke, scroll event, etc.), so having =bufler-workspace-mode= active makes redisplay slow.  The code will need to be very optimized, and it might need another cache of some kind.
 
 ** Use =tree-widget= for displaying hierarchies
 
