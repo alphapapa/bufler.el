@@ -1143,6 +1143,7 @@ See documentation for details."
                  (auto-project () `(bufler-group 'auto-project))
                  (auto-parent-project () `(bufler-group 'auto-parent-project))
                  (auto-projectile () `(bufler-group 'auto-projectile))
+                 (auto-special () `(bufler-group 'auto-special))
                  (auto-tramp () `(bufler-group 'auto-tramp))
                  (auto-workspace () `(bufler-group 'auto-workspace)))
      (list ,@groups)))
