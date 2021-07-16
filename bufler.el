@@ -1069,9 +1069,8 @@ NAME, okay, `checkdoc'?"
     "*indirect*"))
 
 (bufler-defauto-group special
-  (if (bufler--buffer-special-p buffer)
-      "*special*"
-    "non-special buffers"))
+  (when (bufler--buffer-special-p buffer)
+    "*special*"))
 
 (bufler-defauto-group project
   (when-let* ((project (with-current-buffer buffer
