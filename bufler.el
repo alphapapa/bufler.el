@@ -1173,6 +1173,7 @@ See documentation for details."
                           (mode-match "Forge" (rx bos "forge-"))
                           (mode-match "Dired" (rx bos "dired"))
                           (mode-match "grep" (rx bos "grep-"))
+                          (mode-match "compilation" (rx bos "compilation-"))
                           (auto-file)))
      (group
       ;; Subgroup collecting these "special special" buffers
