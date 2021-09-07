@@ -725,7 +725,9 @@ the group tree, and returns a string as its column value.")
 (eval-when-compile
   (save-excursion
     (message "MAP VERSION IS: %S"
-             (package-desc-version (car (alist-get 'map package-alist))))))
+             (package-desc-version (car (alist-get 'map package-alist))))
+    (message "MAP IS AT: %S"
+             (locate-library "map"))))
 
 (defmacro bufler-define-column (name plist &rest body)
   "Define a column formatting function with NAME.
