@@ -63,11 +63,7 @@
     (declare-function bufler-workspace-tabs--tab-bar-select-tab "ext:bufler-workspace" t t)
     (declare-function bufler-workspace-buffers "ext:bufler-workspace" t t)
     (declare-function bufler-workspace-tabs "ext:bufler-workspace" t t)
-    (declare-function bufler-workspace-tabs-mode "ext:bufler-workspace" t t))
-
-  ;; This file is loaded at runtime by bufler-workspace, so only load
-  ;; bufler-workspace here at compile time.
-  (require 'bufler-workspace nil t))
+    (declare-function bufler-workspace-tabs-mode "ext:bufler-workspace" t t)))
 
 ;;;; Functionality
 
