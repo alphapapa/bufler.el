@@ -26,7 +26,7 @@
 
 ;;;; Requirements
 
-(require 'taxy)
+(require 'taxy-magit-section)
 
 ;;;; Variables
 
@@ -67,7 +67,7 @@ function symbol."
 
 ;;;; Keys
 
-(bufler-taxy-define-key directory (&optional directory &key descendant-p)
+(bufler-taxy-define-key directory (&optional directory &key descendant-p name)
   "Return key string for BUFFER's directory, or nil.
 If DIRECTORY is specified, return key string if BUFFER's
 `default-directory' is DIRECTORY.  If DESCENDANT-P, return key
@@ -82,9 +82,9 @@ DIRECTORY.  DIRECTORY should end in a slash."
      (setf directory (expand-file-name directory))
      (pcase descendant-p
        ('nil (when (equal directory (expand-file-name (buffer-local-value 'default-directory buffer)))
-               (concat "Directory: " directory)))
+               (or name (concat "Directory: " directory))))
        (_ (when (string-prefix-p directory (expand-file-name (buffer-local-value 'default-directory buffer)))
-            (concat "Directory: " directory)))))))
+            (or name (concat "Directory: " directory))))))))
 
 (bufler-taxy-define-key mode (&key mode regexp name)
   "Return key string for BUFFER's mode.
@@ -134,44 +134,61 @@ A buffer is special if it is not file-backed."
     mode)
   "Default key functions.")
 
+;;;; Columns
+
+
 ;;;; Commands
 
 (cl-defun bufler-taxy-list (&key (keys bufler-taxy-default-keys))
   "FIXME: Docstring."
   (declare (indent defun))
   (interactive)
-  (cl-labels ((heading-face
-               (depth) (list :inherit (list 'bufler-group (bufler-level-face depth))))
-              (make-fn (&rest args)
-                       (apply #'make-taxy-magit-section
-                              :make #'make-fn
-                              :format-fn #'buffer-name
-                              :heading-face #'heading-face
-                              args)))
-    (let ((taxy (make-taxy-magit-section
-                 :name "Bufler" :description "Buffers grouped by Bufler:"
-                 :make #'make-fn
-                 :heading-face #'heading-face
-                 :take (bufler-taxy-take-fn keys)))
-          (buffer-name "*Bufler Taxy List*")
-          (buffers (cl-reduce #'cl-remove-if
-                              bufler-filter-buffer-fns
-                              :initial-value (buffer-list)
-                              :from-end t)))
-      (when (get-buffer buffer-name)
-        (kill-buffer buffer-name))
-      (with-current-buffer (get-buffer-create buffer-name)
-        (magit-section-mode)
-        (let ((inhibit-read-only t))
-          (save-excursion
-            (taxy-magit-section-insert
-             (thread-last taxy
-               (taxy-fill buffers)
-               (taxy-mapc* (lambda (taxy)
-                             (setf (taxy-taxys taxy)
-                                   (cl-sort (taxy-taxys taxy) #'string< :key #'taxy-name)))))
-             :items 'last :initial-depth -1 :space-between-depth 0))))
-      (pop-to-buffer buffer-name))))
+  (let (format-table column-sizes)
+    (cl-labels ((heading-face
+                 (depth) (list :inherit (list 'bufler-group (bufler-level-face depth))))
+                (format-item (item) (gethash item format-table))
+                (make-fn (&rest args)
+                         (apply #'make-taxy-magit-section
+                                :make #'make-fn
+                                :format-fn #'format-item
+                                :heading-face #'heading-face
+                                :indent 0
+                                args)))
+      (let* ((buffer-name "*Bufler Taxy List*")
+             (buffers (cl-reduce #'cl-remove-if
+                                 bufler-filter-buffer-fns
+                                 :initial-value (buffer-list)
+                                 :from-end t))
+             (taxy (thread-last (make-taxy-magit-section
+                                 :name "Bufler" :description "Buffers grouped by Bufler:"
+                                 :indent 0
+                                 :make #'make-fn
+                                 :format-fn #'format-item
+                                 :heading-face #'heading-face
+                                 :take (bufler-taxy-take-fn keys))
+                     (taxy-fill buffers)
+                     (taxy-mapc* (lambda (taxy)
+                                   (setf (taxy-taxys taxy)
+                                         (cl-sort (taxy-taxys taxy) #'string< :key #'taxy-name))))))
+             format-cons header)
+        (setf format-cons (taxy-magit-section-format-items
+                           bufler-columns bufler-column-format-fns taxy)
+              format-table (car format-cons)
+              column-sizes (cdr format-cons)
+              header (concat (format (format " %%-%ss" (cdar column-sizes)) (caar column-sizes))
+                             (cl-loop for (name . size) in (cdr column-sizes)
+                                      for spec = (format " %%-%ss" size)
+                                      concat (format spec name))))
+        (when (get-buffer buffer-name)
+          (kill-buffer buffer-name))
+        (with-current-buffer (get-buffer-create buffer-name)
+          (bufler-list-mode)
+          (setf header-line-format header)
+          (let ((inhibit-read-only t))
+            (save-excursion
+              (taxy-magit-section-insert taxy
+                :items 'first :initial-depth -1 :blank-between-depth 0))))
+        (pop-to-buffer buffer-name)))))
 
 ;;;; Functions
 
