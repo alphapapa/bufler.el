@@ -749,7 +749,10 @@ PLIST may be a plist setting the following options:
   (declare (indent defun))
   (cl-check-type name string)
   (pcase-let* ((fn-name (intern (concat "bufler-column-format-" (downcase name))))
-               ((map :face :max-width) plist)
+               ;; NOTE: Emacs 27 inexplicably fails to expand this `pcase' binding form correctly at compile time,
+               ;; so we use the more explicit form.  See <https://github.com/alphapapa/bufler.el/issues/70>.
+               ;;  ((map :face :max-width) plist)
+               ((map (:face face) (:max-width max-width)) plist)
                (max-width-variable (intern (concat "bufler-column-" name "-max-width")))
                (max-width-docstring (format "Maximum width of the %s column." name)))
     `(progn
