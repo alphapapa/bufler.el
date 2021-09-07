@@ -551,10 +551,14 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
      arguments.
    • Option ‘bufler-list-display-buffer-action’, which controls how the
      ‘bufler-list’ buffer is displayed.
+   • Option ‘bufler-indent-per-level’, which sets the indentation
+     applied per level of depth.
 
    *Fixed*
    • Option ‘bufler-filter-buffer-modes’ had the wrong customization
      type.
+   • Depend on at least version 2.1 of the ‘map’ package (required for
+     ‘pcase’ macro expansion).
 
 
 File: README.info,  Node: 02,  Next: 01,  Prev: 03-pre,  Up: Changelog
@@ -626,11 +630,11 @@ Node: Prism support18180
 Node: Compared to Ibuffer18620
 Node: Changelog20370
 Node: 03-pre20539
-Node: 0222161
-Node: 0122306
-Node: Credits22405
-Node: Development23094
-Node: License23264
+Node: 0222378
+Node: 0122523
+Node: Credits22622
+Node: Development23311
+Node: License23481
 
 End Tag Table
 
