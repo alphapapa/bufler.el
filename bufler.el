@@ -722,6 +722,11 @@ the group tree, and returns a string as its column value.")
   "Displayed after the name of modified, file-backed buffers."
   :type 'string)
 
+(eval-when-compile
+  (save-excursion
+    (message "MAP VERSION IS: %S"
+             (package-desc-version (car (alist-get 'map package-alist))))))
+
 (defmacro bufler-define-column (name plist &rest body)
   "Define a column formatting function with NAME.
 NAME should be a string.  BODY should return a string or nil.  In
