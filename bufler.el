@@ -44,6 +44,7 @@
 (require 'cl-lib)
 (require 'eieio)
 (require 'map)
+(require 'pcase)
 (require 'project)
 (require 'subr-x)
 (require 'vc)
