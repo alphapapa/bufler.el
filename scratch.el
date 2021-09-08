@@ -37,7 +37,10 @@
 
           directory
           mode))
-(let ((bufler-indent-per-level 1))
+(let ((bufler-taxy-level-indent 1)
+      (bufler-taxy-item-indent 1)
+      (bufler-taxy-initial-depth 0)
+      (bufler-taxy-blank-between-depth 1))
   (bufler-taxy-list
     :keys '(((and :name "*special*"
                   :keys (special
@@ -47,7 +50,10 @@
             ((directory "~/org/" :name "Org" :descendant-p t)
              indirect)
 
-            ((directory "~/src/emacs/" :name "Emacs" :descendant-p t)
+            ((or :name "Emacs"
+                 :keys ((directory "~/src/emacs/" :descendant-p t)
+                        (directory "~/.emacs.d/" :descendant-p t)
+                        (directory "~/tmp/src/emacs/" :descendant-p t)))
              parent-project)
 
             (parent-project

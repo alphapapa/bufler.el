@@ -34,7 +34,32 @@
   "Alist mapping aliases to Taxy key function names.
 Functions defined with `bufler-taxy-define-key'.")
 
+(defvar taxy-magit-section-depth)
+
 ;;;; Customization
+
+(defgroup bufler-taxy nil
+  "Options for `bufler-taxy'."
+  :group 'bufler)
+
+(defcustom bufler-taxy-blank-between-depth 1
+  "Insert blank lines between groups up to this depth."
+  :type 'integer)
+
+(defcustom bufler-taxy-initial-depth 0
+  "Effective initial depth of first-level groups.
+Sets at which depth groups and items begin to be indented.  For
+example, setting to -1 prevents indentation of the first and
+second levels."
+  :type 'integer)
+
+(defcustom bufler-taxy-level-indent 1
+  "Indentation per level of depth."
+  :type 'integer)
+
+(defcustom bufler-taxy-item-indent 1
+  "Indentation of items relative to their level's indentation."
+  :type 'integer)
 
 ;;;; Compatibility
 
@@ -73,17 +98,17 @@ If DIRECTORY is specified, return key string if BUFFER's
 `default-directory' is DIRECTORY.  If DESCENDANT-P, return key
 string if BUFFER's `default-directory' is a descendant of
 DIRECTORY.  DIRECTORY should end in a slash."
-  ;; It seems like undesirable overhead to `expand-file-name' every
+  ;; It seems like undesirable overhead to `file-truename' every
   ;; time this function is called, but avoiding that wouldn't be easy.
   (pcase directory
     ('nil (concat "Directory: " (buffer-local-value 'default-directory buffer)))
     (_
      (cl-assert (directory-name-p directory) t "DIRECTORY should end in a directory separator character (i.e. a slash)")
-     (setf directory (expand-file-name directory))
+     (setf directory (file-truename directory))
      (pcase descendant-p
-       ('nil (when (equal directory (expand-file-name (buffer-local-value 'default-directory buffer)))
+       ('nil (when (equal directory (file-truename (buffer-local-value 'default-directory buffer)))
                (or name (concat "Directory: " directory))))
-       (_ (when (string-prefix-p directory (expand-file-name (buffer-local-value 'default-directory buffer)))
+       (_ (when (string-prefix-p directory (file-truename (buffer-local-value 'default-directory buffer)))
             (or name (concat "Directory: " directory))))))))
 
 (bufler-taxy-define-key mode (&key mode regexp name)
@@ -136,10 +161,33 @@ A buffer is special if it is not file-backed."
 
 ;;;; Columns
 
+(bufler-define-column "Name" (:max-width nil)
+  ;; MAYBE: Move indentation back to `bufler-list'.  But this seems to
+  ;; work well, and that might be more complicated.
+  ;; FIXME: Remove or change DEPTH argument in `bufler-define-column'.
+  (let ((indentation (make-string (+ (* depth bufler-taxy-level-indent)
+                                     bufler-taxy-item-indent)
+                                  ? ))
+        (mode-annotation (when (cl-loop for fn in bufler-buffer-mode-annotate-preds
+                                        thereis (funcall fn buffer))
+                           (propertize (concat (replace-regexp-in-string
+                                                (rx "-mode" eos) ""
+                                                (symbol-name (buffer-local-value 'major-mode buffer))
+                                                t t)
+                                               " ")
+                                       'face 'bufler-mode)))
+        (buffer-name (buffer-name buffer))
+        (modified (when (and (buffer-file-name buffer)
+                             (buffer-modified-p buffer))
+                    (propertize bufler-column-name-modified-buffer-sigil
+                                'face 'font-lock-warning-face))))
+    (concat indentation mode-annotation buffer-name modified)))
 
 ;;;; Commands
 
-(cl-defun bufler-taxy-list (&key (keys bufler-taxy-default-keys))
+(cl-defun bufler-taxy-list (&key (buffers (buffer-list))
+                                 (buffer-name "*Bufler Taxy List*")
+                                 (keys bufler-taxy-default-keys))
   "FIXME: Docstring."
   (declare (indent defun))
   (interactive)
@@ -151,30 +199,29 @@ A buffer is special if it is not file-backed."
                          (apply #'make-taxy-magit-section
                                 :make #'make-fn
                                 :format-fn #'format-item
-                                :heading-face #'heading-face
-                                :indent 0
+                                :heading-face-fn #'heading-face
+                                :heading-indent bufler-taxy-heading-indent
+                                :item-indent 0
                                 args)))
-      (let* ((buffer-name "*Bufler Taxy List*")
-             (buffers (cl-reduce #'cl-remove-if
+      (let* ((buffers (cl-reduce #'cl-remove-if
                                  bufler-filter-buffer-fns
-                                 :initial-value (buffer-list)
+                                 :initial-value buffers
                                  :from-end t))
-             (taxy (thread-last (make-taxy-magit-section
-                                 :name "Bufler" :description "Buffers grouped by Bufler:"
-                                 :indent 0
-                                 :make #'make-fn
-                                 :format-fn #'format-item
-                                 :heading-face #'heading-face
-                                 :take (bufler-taxy-take-fn keys))
+             (taxy (thread-last
+                       (make-fn
+                        :name "Bufler" :description "Buffers grouped by Bufler:"
+                        :take (bufler-taxy-take-fn keys))
                      (taxy-fill buffers)
                      (taxy-mapc* (lambda (taxy)
                                    (setf (taxy-taxys taxy)
-                                         (cl-sort (taxy-taxys taxy) #'string< :key #'taxy-name))))))
+                                         (cl-sort (taxy-taxys taxy) #'string<
+                                                  :key #'taxy-name))))))
              format-cons header)
         (setf format-cons (taxy-magit-section-format-items
                            bufler-columns bufler-column-format-fns taxy)
               format-table (car format-cons)
               column-sizes (cdr format-cons)
+              ;; NOTE: The first column is handled differently.
               header (concat (format (format " %%-%ss" (cdar column-sizes)) (caar column-sizes))
                              (cl-loop for (name . size) in (cdr column-sizes)
                                       for spec = (format " %%-%ss" size)
@@ -186,13 +233,15 @@ A buffer is special if it is not file-backed."
           (setf header-line-format header)
           (let ((inhibit-read-only t))
             (save-excursion
-              (taxy-magit-section-insert taxy
-                :items 'first :initial-depth -1 :blank-between-depth 0))))
+              (taxy-magit-section-insert taxy :items 'last
+                :initial-depth bufler-taxy-initial-depth
+                :blank-between-depth bufler-taxy-blank-between-depth))))
         (pop-to-buffer buffer-name)))))
 
 ;;;; Functions
 
 (defun bufler-taxy-take-fn (keys)
+  ;; TODO: Upstream this into taxy.
   "Return a `taxy' \"take\" function for KEYS.
 Each of KEYS should be a function alias defined in
 `bufler-taxy-keys', or a list of such KEY-FNS (recursively, ad
