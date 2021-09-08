@@ -200,7 +200,7 @@ A buffer is special if it is not file-backed."
                                 :make #'make-fn
                                 :format-fn #'format-item
                                 :heading-face-fn #'heading-face
-                                :heading-indent bufler-taxy-heading-indent
+                                :heading-indent bufler-taxy-level-indent
                                 :item-indent 0
                                 args)))
       (let* ((buffers (cl-reduce #'cl-remove-if

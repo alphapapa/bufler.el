@@ -40,7 +40,8 @@
 (let ((bufler-taxy-level-indent 1)
       (bufler-taxy-item-indent 1)
       (bufler-taxy-initial-depth 0)
-      (bufler-taxy-blank-between-depth 1))
+      (bufler-taxy-blank-between-depth 1)
+      (taxy-magit-section-insert-indent-items nil))
   (bufler-taxy-list
     :keys '(((and :name "*special*"
                   :keys (special
