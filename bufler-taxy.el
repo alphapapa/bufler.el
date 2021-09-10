@@ -212,10 +212,11 @@ A buffer is special if it is not file-backed."
                         :name "Bufler" :description "Buffers grouped by Bufler:"
                         :take (bufler-taxy-take-fn keys))
                      (taxy-fill buffers)
-                     (taxy-mapc* (lambda (taxy)
-                                   (setf (taxy-taxys taxy)
-                                         (cl-sort (taxy-taxys taxy) #'string<
-                                                  :key #'taxy-name))))))
+                     (taxy-sort* #'string< #'taxy-name)
+                     (taxy-sort #'string< #'buffer-name)
+                     (taxy-sort #'string<
+                                (lambda (buffer)
+                                  (symbol-name (buffer-local-value 'major-mode buffer))))))
              format-cons header)
         (setf format-cons (taxy-magit-section-format-items
                            bufler-columns bufler-column-format-fns taxy)
