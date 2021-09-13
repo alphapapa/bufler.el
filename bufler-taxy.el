@@ -192,7 +192,6 @@ A buffer is special if it is not file-backed."
       ""))
 
 (unless bufler-taxy-columns
-  ;; TODO: Automate this or document it.
   (setq-default bufler-taxy-columns
 		(get 'bufler-taxy-columns 'standard-value)))
 
