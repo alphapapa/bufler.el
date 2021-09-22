@@ -1,93 +1,39 @@
 #+TITLE: Bufler notes
 
-* Contents
+* [#A] Contents
 :CONTENTS:
 
 :END:
 
 
-* [#A] Plans
+* [#B] Ideas
 
-** DONE 0.2
+** TODO Add Mike Zamansky's video to readme
 
-*** DONE Release 0.2
++  https://cestlaz.github.io/post/using-emacs-75-bufler/
++  https://www.reddit.com/r/emacs/comments/ixs73j/using_emacs_75_bufler/
 
-+  [X] Check comment TODOs (using =magit-todos=).
-+  [X] Check issues.
-+  [X] Check plans (in this file).
-+  [X] Check linters.
-+  [X] Check tests.
-+  [X] Update version numbers in file headers.
-     -  [X] bufler.el
-     -  [X] helm-bufler.el
-+  [X] Tag and sign new version (using Magit's =t r=).
-+  [X] Push =master=.
-+  [X] Push tags.
-+  [X] Post-release changes:
-     -  [X] Bump version numbers to n+1-pre:
-          +  [X] bufler.el
-          +  [X] helm-bufler.el
-          +  [X] README.org
-
-*** DONE Prefix to =bufler-list= to clear cache
-
-Sometimes changing =bufler-groups= doesn't seem to take effect because =buffer-list= hasn't changed and =bufler-buffers= is cached.
-
-*** DONE Explain the big 4 features
+** TODO Multiple Bufler buffers
 :PROPERTIES:
-:ID:       2f7ddcb5-906d-4586-8a86-d21a09b2cf36
+:milestone: 0.5
+:ID:       2abcb8f2-33f8-4ee8-8d96-352d8b8708a8
 :END:
-
-I think the big 4 features now are basically:
-
-1.  =bufler-list=
-2.  =bufler-switch-buffer=
-3.  =bufler-workspace-mode=
-4.  =bufler-tabs-mode=
-
-And while they all work together, they can also be used independently.  =bufler-list= and =bufler-switch-buffer= don't even require =bufler-workspace-mode= to be activated.
-
-** 0.3
-
-*** TODO Testing
-
-Can probably use =with-simulated-input= to do some testing, which will help with refactoring.
-
-*** TODO Multiple Bufler buffers
 
 i.e. call Bufler like ~(bufler :groups GROUPS :buffer-name "*Matrix Bufler*")~, and those variables should be set buffer-locally, and refreshing should use those values instead of the global ones.  That would allow multiple, unique Bufler buffers.
 
-*** TODO Rename some things
+** TODO Rename some things
+:PROPERTIES:
+:milestone: 0.4
+:ID:       f1261c3a-d2d4-452c-8cc3-391313adb54a
+:END:
 
 e.g. the grouping rules should probably be =rules= rather than =groups=, to distinguish the rules from the groups of buffers that they produce.
 
-*** TODO Use =group-tree-defmacro=
-
-Was working fine in the prototype, so it should work fine here too.  But I want to release 0.2 before making any changes like this.
-
-*** TODO Keyword arguments to groups
-
-e.g. instead of:
-
-#+BEGIN_SRC elisp
-(group-not "*Special*" (group ...) ...)
-#+END_SRC
-
-Something like:
-
-#+BEGIN_SRC elisp
-(group-not :name "*Special*" (group ...) ...)
-#+END_SRC
-
-Which should also allow:
-
-#+BEGIN_SRC elisp
-(group-not (group ...) ...)
-#+END_SRC
-
-That would provide a lot of flexibility.
-
-*** TODO Try to improve vc-state
+** TODO Try to improve vc-state
+:PROPERTIES:
+:milestone: 0.4
+:ID:       29cbc05e-ede1-43f0-9dd5-9e6d577f92e8
+:END:
 
 Here's a common scenario:
 
@@ -98,64 +44,39 @@ Here's a common scenario:
 
 Unfortunately, calling =vc-state-refresh= every time =bufler-list= is updated seems far too slow.
 
-*** TODO Depend on =project= 0.3.0 and use =project-root= instead of =project-roots=
+** TODO Depend on =project= 0.3.0 and use =project-root= instead of =project-roots=
+:PROPERTIES:
+:milestone: 0.4
+:ID:       52ad5fcb-f82c-469d-b6e9-95a460f42683
+:END:
 
 =project= is on ELPA, and the version there is newer than the one included with Emacs 26.3, and it declares =project-roots= obsolete.
 
-*** TODO Use =cl-loop= instead of =-any?= and =-all?=
+** TODO Testing
+:PROPERTIES:
+:milestone: future
+:ID:       0a0afb4e-8dab-4256-b630-283e6943671d
+:END:
 
-In these functions.  I'd expect =cl-loop= to be faster.
+Can probably use =with-simulated-input= to do some testing, which will help with refactoring.
 
-#+BEGIN_SRC elisp
-  (defun bufler-and (name &rest preds)
-    ;; Copied from dash-functional.el.
-    "Return a grouping function that groups buffers matching all of PREDS.
-  The resulting group is named NAME. This can also be used with a
-  single predicate to apply a name to a group."
-    (byte-compile (lambda (x)
-                    (when (-all? (-cut funcall <> x) preds)
-                      name))))
-
-  (defun bufler-or (name &rest preds)
-    ;; Copied from dash-functional.el.
-    "Return a grouping function that groups buffers matching any of PREDS.
-  The resulting group is named NAME."
-    (byte-compile (lambda (x)
-                    (when (-any? (-cut funcall <> x) preds)
-                      name))))
-#+END_SRC
-
-*** DONE Pass ACTION argument to =pop-to-buffer=
-
-As Mike Zamansky mentioned, it would be nice to be able to control how the =bufler-list= window opens.
-
-** 0.4
-
-*** TODO Buffer/group sorting
+** TODO Buffer/group sorting
+:PROPERTIES:
+:milestone: 0.4
+:ID:       26b258e5-048b-4fd8-9417-027afb8f6464
+:END:
 
 The WIP branch works pretty well already.
 
-*** PROJECT ~bufler-defpred~
+[2021-09-22 Wed 02:49]  Using =taxy= will make this much simpler.
 
-From [[https://github.com/alphapapa/bufler.el/pull/32#issuecomment-742928816][comment]]:
+** TODO Sortable columns
+:PROPERTIES:
+:milestone: future
+:ID:       38fa6c87-0eea-44fa-907f-ae1445759532
+:END:
 
-+ A macro like ~bufler-defpred~ would define a grouping predicate.  It would define a function like ~bufler--predicate-NAME~, and it would add its ~macrolet~ form to a variable like ~bufler-predicates~.
-+ A function like ~bufler-define-expand-groups~ would define a function ~bufler-expand-groups~ which would splice in the predicate ~macrolet~ forms into the ~cl-macrolet~ form.
-+ Users would do something like ~(setf bufler-groups (bufler-expand-groups ...))~.
-+ New groups could be added with ~bufler-defpred~, which would also call ~bufler-define-expand-groups~ to redefine the expansion function to include the new predicate.
-
-** 0.5
-
-*** TODO Sortable columns
-
-
-** 0.6
-
-*** TODO Factor out GUI code
-
-There should be a companion library to =group-tree= that provides the section-based view with columns.
-
-* Ideas
+Should be covered with =taxy-magit-section=, when sorting columns is added to it.
 
 ** Integrate =bufler-workspace-mode= with =tab-bar-mode=
 
@@ -223,10 +144,92 @@ The idea to have buffers appear in multiple groups which they match was mentione
   ;;  (evenp 0 2 4 6 8))
 #+END_SRC
 
-** TODO Add Mike Zamansky's video to readme
+** CANCELED Use =group-tree-defmacro=
+:PROPERTIES:
+:ID:       0eab1338-4a19-411b-8f33-3b7e3a9915df
+:END:
 
-+  https://cestlaz.github.io/post/using-emacs-75-bufler/
-+  https://www.reddit.com/r/emacs/comments/ixs73j/using_emacs_75_bufler/
+Was working fine in the prototype, so it should work fine here too.  But I want to release 0.2 before making any changes like this.
+
+[2021-09-22 Wed 02:44]  Will be covered by using =taxy=.
+
+** CANCELED Keyword arguments to groups
+:PROPERTIES:
+:ID:       7e5558f1-7af9-448a-b311-aee53889955e
+:END:
+
+e.g. instead of:
+
+#+BEGIN_SRC elisp
+(group-not "*Special*" (group ...) ...)
+#+END_SRC
+
+Something like:
+
+#+BEGIN_SRC elisp
+(group-not :name "*Special*" (group ...) ...)
+#+END_SRC
+
+Which should also allow:
+
+#+BEGIN_SRC elisp
+(group-not (group ...) ...)
+#+END_SRC
+
+That would provide a lot of flexibility.
+
+[2021-09-22 Wed 02:44]  Will be covered by using =taxy=.
+
+** CANCELED Use =cl-loop= instead of =-any?= and =-all?=
+:PROPERTIES:
+:ID:       56cf5511-cf4d-4a89-be0e-3f4e2fa6a418
+:END:
+
+In these functions.  I'd expect =cl-loop= to be faster.
+
+#+BEGIN_SRC elisp
+  (defun bufler-and (name &rest preds)
+    ;; Copied from dash-functional.el.
+    "Return a grouping function that groups buffers matching all of PREDS.
+  The resulting group is named NAME. This can also be used with a
+  single predicate to apply a name to a group."
+    (byte-compile (lambda (x)
+                    (when (-all? (-cut funcall <> x) preds)
+                      name))))
+
+  (defun bufler-or (name &rest preds)
+    ;; Copied from dash-functional.el.
+    "Return a grouping function that groups buffers matching any of PREDS.
+  The resulting group is named NAME."
+    (byte-compile (lambda (x)
+                    (when (-any? (-cut funcall <> x) preds)
+                      name))))
+#+END_SRC
+
+[2021-09-22 Wed 02:45]  Will be covered by using =taxy=.
+
+** CANCELED ~bufler-defpred~
+:PROPERTIES:
+:ID:       ee90aa46-a272-4001-a9a6-551ff15aea4a
+:END:
+
+From [[https://github.com/alphapapa/bufler.el/pull/32#issuecomment-742928816][comment]]:
+
++ A macro like ~bufler-defpred~ would define a grouping predicate.  It would define a function like ~bufler--predicate-NAME~, and it would add its ~macrolet~ form to a variable like ~bufler-predicates~.
++ A function like ~bufler-define-expand-groups~ would define a function ~bufler-expand-groups~ which would splice in the predicate ~macrolet~ forms into the ~cl-macrolet~ form.
++ Users would do something like ~(setf bufler-groups (bufler-expand-groups ...))~.
++ New groups could be added with ~bufler-defpred~, which would also call ~bufler-define-expand-groups~ to redefine the expansion function to include the new predicate.
+
+[2021-09-22 Wed 02:49]  Will be covered using =taxy=.
+
+** CANCELED Factor out GUI code
+:PROPERTIES:
+:ID:       d2ac3b88-c21f-460e-a795-81b6f49725c2
+:END:
+
+There should be a companion library to =group-tree= that provides the section-based view with columns.
+
+[2021-09-22 Wed 02:52]  Covered by =taxy-magit-section=.
 
 ** DONE Name
 
@@ -239,6 +242,54 @@ Sort of like "buffer butler."  Maybe a buffalo for a mascot?
 *** Mr. Buffer
 
 Sort of cute and catchy.  Maybe some clip art available.
+
+** DONE Pass ACTION argument to =pop-to-buffer=
+:PROPERTIES:
+:ID:       ab955011-c817-4cbd-b1c4-c6d644e27e0c
+:END:
+
+As Mike Zamansky mentioned, it would be nice to be able to control how the =bufler-list= window opens.
+
+* [#B] Plans
+
+** DONE 0.2
+
+*** DONE Release 0.2
+
++  [X] Check comment TODOs (using =magit-todos=).
++  [X] Check issues.
++  [X] Check plans (in this file).
++  [X] Check linters.
++  [X] Check tests.
++  [X] Update version numbers in file headers.
+     -  [X] bufler.el
+     -  [X] helm-bufler.el
++  [X] Tag and sign new version (using Magit's =t r=).
++  [X] Push =master=.
++  [X] Push tags.
++  [X] Post-release changes:
+     -  [X] Bump version numbers to n+1-pre:
+          +  [X] bufler.el
+          +  [X] helm-bufler.el
+          +  [X] README.org
+
+*** DONE Prefix to =bufler-list= to clear cache
+
+Sometimes changing =bufler-groups= doesn't seem to take effect because =buffer-list= hasn't changed and =bufler-buffers= is cached.
+
+*** DONE Explain the big 4 features
+:PROPERTIES:
+:ID:       2f7ddcb5-906d-4586-8a86-d21a09b2cf36
+:END:
+
+I think the big 4 features now are basically:
+
+1.  =bufler-list=
+2.  =bufler-switch-buffer=
+3.  =bufler-workspace-mode=
+4.  =bufler-tabs-mode=
+
+And while they all work together, they can also be used independently.  =bufler-list= and =bufler-switch-buffer= don't even require =bufler-workspace-mode= to be activated.
 
 * References
 
