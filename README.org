@@ -304,6 +304,7 @@ Of course, Ibuffer is a mature tool with many features, so Bufler doesn't replac
 +  Column ~Mode~ shows buffer's major mode, sans ~-mode~ suffix.
 +  More filtering options: ~bufler-filter-buffer-fns~, ~bufler-workspace-switch-buffer-filter-fns~, ~bufler-filter-buffer-modes~, and ~bufler-filter-buffer-name-regexps~.  By default, more buffers will be hidden in ~bufler-list~ and ~bufler-switch-buffer~, and filters may be disabled by calling those commands with universal prefix arguments.
 +  Option =bufler-list-display-buffer-action=, which controls how the =bufler-list= buffer is displayed.
++  Option =bufler-list-switch-buffer-action=, which controls how buffers are displayed when switched to from the buffer list.  (Fixes [[https://github.com/alphapapa/bufler.el/issues/76][#76]].  Thanks to [[https://github.com/jmburgos][Julian M. Burgos]], [[https://github.com/WorldsEndless][Tory S. Anderson]], and [[https://github.com/jcalve][jcalve]] for reporting.)
 +  Option =bufler-indent-per-level=, which sets the indentation applied per level of depth.
 
 *Fixed*

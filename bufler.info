@@ -1,4 +1,4 @@
-This is README.info, produced by makeinfo version 6.5 from README.texi.
+This is README.info, produced by makeinfo version 5.2 from README.texi.
 
 INFO-DIR-SECTION Emacs
 START-INFO-DIR-ENTRY
@@ -57,9 +57,9 @@ Defining groups
 
 Changelog
 
-* 0.3-pre: 03-pre.
-* 0.2: 02.
-* 0.1: 01.
+* 0.3-pre: 03-pre. 
+* 0.2: 02. 
+* 0.1: 01. 
 
 
 
@@ -517,9 +517,9 @@ File: README.info,  Node: Changelog,  Next: Credits,  Prev: Compared to Ibuffer,
 
 * Menu:
 
-* 0.3-pre: 03-pre.
-* 0.2: 02.
-* 0.1: 01.
+* 0.3-pre: 03-pre. 
+* 0.2: 02. 
+* 0.1: 01. 
 
 
 File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
@@ -551,6 +551,12 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
      arguments.
    • Option ‘bufler-list-display-buffer-action’, which controls how the
      ‘bufler-list’ buffer is displayed.
+   • Option ‘bufler-list-switch-buffer-action’, which controls how
+     buffers are displayed when switched to from the buffer list.
+     (Fixes #76 (https://github.com/alphapapa/bufler.el/issues/76).
+     Thanks to Julian M.  Burgos (https://github.com/jmburgos), Tory S.
+     Anderson (https://github.com/WorldsEndless), and jcalve
+     (https://github.com/jcalve) for reporting.)
    • Option ‘bufler-indent-per-level’, which sets the indentation
      applied per level of depth.
 
@@ -613,28 +619,28 @@ GPLv3
 
 Tag Table:
 Node: Top258
-Node: Screenshots1359
-Node: Installation2429
-Node: Quelpa2638
-Node: Usage3217
-Node: Workflow4788
-Node: Commands7010
-Node: Bindings8474
-Node: Tips9406
-Node: Defining groups9747
-Node: Default groups example11134
-Node: Group types14061
-Node: Helm support17007
-Node: Ivy support17753
-Node: Prism support18180
-Node: Compared to Ibuffer18620
-Node: Changelog20370
-Node: 03-pre20539
-Node: 0222378
-Node: 0122523
-Node: Credits22622
-Node: Development23311
-Node: License23481
+Node: Screenshots1362
+Node: Installation2432
+Node: Quelpa2641
+Node: Usage3220
+Node: Workflow4791
+Node: Commands7013
+Node: Bindings8477
+Node: Tips9409
+Node: Defining groups9750
+Node: Default groups example11137
+Node: Group types14064
+Node: Helm support17010
+Node: Ivy support17756
+Node: Prism support18183
+Node: Compared to Ibuffer18623
+Node: Changelog20373
+Node: 03-pre20545
+Node: 0222773
+Node: 0122918
+Node: Credits23017
+Node: Development23706
+Node: License23876
 
 End Tag Table
 
