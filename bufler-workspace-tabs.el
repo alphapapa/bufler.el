@@ -37,47 +37,13 @@
 ;;;;; Compatibility
 
 (eval-when-compile
-
-  (when (version< emacs-version "27.1")
-    ;; Since tab-bar and tab-line are only present on Emacs 27+, we have to
-    ;; declare several variables and functions to avoid byte-compiler warnings.
-    ;; NOTE: Some compile warnings will happen on Emacs 26, but that's okay.
-    (defvar tab-bar-tabs-function)
-    (defvar tab-bar-close-button)
-    (defvar tab-bar-close-button-show)
-    (defvar tab-bar-separator)
-    (defvar tab-line-tabs-function)
-
-    ;; Because the mode isn't necessarily defined.
-    (defvar bufler-workspace-tabs-mode)
-    (defvar bufler-workspace-tabs-mode-saved-settings)
-    (defvar bufler-workspace-tabs-tab-separator)
-
-    (declare-function tab-bar-mode "ext:tab-bar" t t)
-    (declare-function tab-bar--current-tab-index "ext:tab-bar" t t)
-    (declare-function tab-bar--tab "ext:tab-bar" t t)
-    (declare-function tab-bar-tabs "ext:tab-bar" t t)
-    (declare-function global-tab-line-mode "ext:tab-line" t t)
-    (declare-function tab-line-tabs-window-buffers "ext:tab-line" t t)
-
-    (declare-function bufler-workspace-tabs--tab-bar-select-tab "ext:bufler-workspace" t t)
-    (declare-function bufler-workspace-buffers "ext:bufler-workspace" t t)
-    (declare-function bufler-workspace-tabs "ext:bufler-workspace" t t)
-    (declare-function bufler-workspace-tabs-mode "ext:bufler-workspace" t t))
-
   ;; This file is loaded at runtime by bufler-workspace, so only load
   ;; bufler-workspace here at compile time.
-  (require 'bufler-workspace nil t))
-
-;;;; Functionality
-
-;; FIXME: Autoloading this whole form causes the generated autoloads
-;; file to be considered the source file for everything defined in it.
-;; I wonder if something like this could work in bufler-workspace.el:
-
-;; ;;;###autoload
-;; (when (require 'tab-bar nil t)
-;;   (require 'bufler-workspace-tabs))
+  (require 'bufler-workspace nil t)
+  (declare-function bufler-format-path "bufler")
+  (declare-function bufler-buffers "bufler")
+  (declare-function bufler-group-tree-paths "bufler-group-tree")
+  (declare-function bufler-workspace-buffers "bufler-workspace"))
 
 ;;;; Variables
 
@@ -104,12 +70,15 @@ properties.  See the default value of `tab-bar-close-button'."
 
 ;;;; Commands
 
+;;;###autoload
 (define-minor-mode bufler-workspace-tabs-mode
   "Use Bufler workspaces for `tab-bar-mode' and `tab-line-mode'."
   :group 'bufler-workspace
   :global t
   (if bufler-workspace-tabs-mode
       (progn
+        (unless (version<= "27.1" emacs-version)
+          (user-error "`bufler-workspace-tabs-mode' requires Emacs version 27.1 or later"))
         ;; Save settings.
         (cl-loop for (symbol . _value) in bufler-workspace-tabs-mode-saved-settings
                  do (setf (map-elt bufler-workspace-tabs-mode-saved-settings symbol)
@@ -136,6 +105,7 @@ properties.  See the default value of `tab-bar-close-button'."
     (global-tab-line-mode -1))
   (force-mode-line-update 'all))
 
+;;;###autoload
 (defalias 'bufler-tabs-mode #'bufler-workspace-tabs-mode)
 
 (defun bufler-workspace-tabs--tab-bar-select-tab (&optional arg)

@@ -237,18 +237,6 @@ Completion is done in steps when descending into branches."
         (list path)
         (atom (list path))))))
 
-;;;; Autoload bufler-workspace-tabs on Emacs 27+
-
-;; This is better than autoloading all the forms in bufler-workspace-tabs.el,
-;; because that causes the generated autoloads file to be the source file for
-;; the forms defined in it (and it loads them all into memory as autoloads
-;; unnecessarily).
-
-;;;###autoload
-(cl-eval-when (load)
-  (when (require 'tab-bar nil t)
-    (require 'bufler-workspace-tabs)))
-
 ;;;; Footer
 
 (provide 'bufler-workspace)

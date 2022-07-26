@@ -446,8 +446,7 @@ NAME, okay, `checkdoc'?"
 
 (bufler-define-buffer-command switch "Switch to buffer."
   (lambda (buffer)
-    (let ((bufler-window (selected-window)))
-      (pop-to-buffer buffer bufler-list-switch-buffer-action)))
+    (pop-to-buffer buffer bufler-list-switch-buffer-action))
   :refresh-p nil)
 
 (bufler-define-buffer-command peek "Peek at buffer in another window."
@@ -769,6 +768,7 @@ PLIST may be a plist setting the following options:
 (bufler-define-column "Name" (:max-width nil)
   ;; MAYBE: Move indentation back to `bufler-list'.  But this seems to
   ;; work well, and that might be more complicated.
+  (ignore depth)
   (let ((indentation (make-string (* 2 bufler-indent-per-level) ? ))
         (mode-annotation (when (cl-loop for fn in bufler-buffer-mode-annotate-preds
                                         thereis (funcall fn buffer))
