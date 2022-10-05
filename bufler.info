@@ -173,11 +173,14 @@ A workflow using Bufler could be something like this:
      The buffers are presented by group with their "outline paths,"
      which makes it easier to find the buffer you’re looking for, since
      they’re organized by project, directory, mode, etc.
-  5. If you want to focus on a certain group’s buffers: a.  Use ‘C-u C-u
-     M-x bufler-switch-buffer RET’ and select a buffer; or b.  Use ‘M-x
-     bufler-workspace-frame-set RET’ and select a workspace; or c.  Use
-     ‘M-x bufler RET’ and press ‘f’ to focus the current frame on a
-     workspace, or ‘F’ to open a new frame focused on a workspace.
+  5. If you want to focus on a certain group’s buffers:
+       1. Use ‘C-u C-u M-x bufler-switch-buffer RET’ and select a
+          buffer; or
+       2. Use ‘M-x bufler-workspace-frame-set RET’ and select a
+          workspace; or
+       3. Use ‘M-x bufler RET’ and press ‘f’ to focus the current frame
+          on a workspace, or ‘F’ to open a new frame focused on a
+          workspace.
   6. The next time you call ‘bufler-switch-buffer’ in that frame, it
      will only offer buffers from that frame’s buffer group, making it
      easier to find buffers related to the current project.  (Of course,
@@ -566,6 +569,9 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
    • Depend on at least version 2.1 of the ‘map’ package (required for
      ‘pcase’ macro expansion).
 
+   *Changed*
+   • Don’t show ‘*xref*’ buffers by default.
+
 
 File: README.info,  Node: 02,  Next: 01,  Prev: 03-pre,  Up: Changelog
 
@@ -624,23 +630,23 @@ Node: Installation2432
 Node: Quelpa2641
 Node: Usage3220
 Node: Workflow4791
-Node: Commands7013
-Node: Bindings8477
-Node: Tips9409
-Node: Defining groups9750
-Node: Default groups example11137
-Node: Group types14064
-Node: Helm support17010
-Node: Ivy support17756
-Node: Prism support18183
-Node: Compared to Ibuffer18623
-Node: Changelog20373
-Node: 03-pre20545
-Node: 0222773
-Node: 0122918
-Node: Credits23017
-Node: Development23706
-Node: License23876
+Node: Commands7051
+Node: Bindings8515
+Node: Tips9447
+Node: Defining groups9788
+Node: Default groups example11175
+Node: Group types14102
+Node: Helm support17048
+Node: Ivy support17794
+Node: Prism support18221
+Node: Compared to Ibuffer18661
+Node: Changelog20411
+Node: 03-pre20583
+Node: 0222878
+Node: 0123023
+Node: Credits23122
+Node: Development23811
+Node: License23981
 
 End Tag Table
 

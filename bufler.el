@@ -171,7 +171,8 @@ must be called to get up-to-date results."
 (defcustom bufler-filter-buffer-name-regexps
   (list (rx "*Compile-Log*") (rx "*Disabled Command*")
         ;; Org export logs.
-        (rx "*Org " (1+ anything) "Output*"))
+        (rx "*Org " (1+ anything) "Output*")
+        (rx "*xref*"))
   "Regular expressions matched against buffer names.
 Buffers whose names match are hidden when function
 `bufler--buffer-name-filtered-p' is in `bufler-filter-buffer-fns'

@@ -311,6 +311,9 @@ Of course, Ibuffer is a mature tool with many features, so Bufler doesn't replac
 +  Option =bufler-filter-buffer-modes= had the wrong customization type.
 +  Depend on at least version 2.1 of the =map= package (required for ~pcase~ macro expansion).
 
+*Changed*
++ Don't show ~*xref*~ buffers by default.
+
 ** 0.2
 
 Project expanded and renamed from Sbuffer to Bufler.
