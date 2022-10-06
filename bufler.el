@@ -429,12 +429,13 @@ universal prefixes, prompt for side and slot."
     (save-window-excursion
       (bufler-list)
       (setf buffer (window-buffer (selected-window))))
-    (display-buffer buffer
-                    `(display-buffer-in-side-window
-                      (side . ,side)
-                      (slot . ,slot)
-                      (window-parameters
-		       (no-delete-other-windows . t))))))
+    (select-window
+     (display-buffer buffer
+                     `(display-buffer-in-side-window
+                       (side . ,side)
+                       (slot . ,slot)
+                       (window-parameters
+		        (no-delete-other-windows . t)))))))
 
 (declare-function bufler-workspace-switch-buffer "bufler-workspace")
 ;;;###autoload
