@@ -410,6 +410,32 @@ which are otherwise filtered by `bufler-filter-buffer-fns'."
 ;;;###autoload
 (defalias 'bufler #'bufler-list)
 
+;;;###autoload
+(cl-defun bufler-sidebar (&key (side 'right) (slot 0))
+  "Display Bufler list in dedicated side window.
+With universal prefix, use left SIDE instead of right.  With two
+universal prefixes, prompt for side and slot."
+  (interactive (list :side (pcase current-prefix-arg
+                             ('nil 'right)
+                             ('(0) left)
+                             (_ (intern (completing-read "Side: " '(left right top bottom) nil t))))
+                     :slot (pcase current-prefix-arg
+                             ('nil 0)
+                             ('(0) 0)
+                             (_ (read-number "Slot: ")))))
+
+  (let ((display-buffer-mark-dedicated t)
+        buffer)
+    (save-window-excursion
+      (bufler-list)
+      (setf buffer (window-buffer (selected-window))))
+    (display-buffer buffer
+                    `(display-buffer-in-side-window
+                      (side . ,side)
+                      (slot . ,slot)
+                      (window-parameters
+		       (no-delete-other-windows . t))))))
+
 (declare-function bufler-workspace-switch-buffer "bufler-workspace")
 ;;;###autoload
 (defalias 'bufler-switch-buffer #'bufler-workspace-switch-buffer)

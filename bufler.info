@@ -562,6 +562,7 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
      (https://github.com/jcalve) for reporting.)
    • Option ‘bufler-indent-per-level’, which sets the indentation
      applied per level of depth.
+   • Command ‘bufler-sidebar’ displays the Bufler list in a side window.
 
    *Fixed*
    • Option ‘bufler-filter-buffer-modes’ had the wrong customization
@@ -642,11 +643,11 @@ Node: Prism support18221
 Node: Compared to Ibuffer18661
 Node: Changelog20411
 Node: 03-pre20583
-Node: 0222878
-Node: 0123023
-Node: Credits23122
-Node: Development23811
-Node: License23981
+Node: 0222957
+Node: 0123102
+Node: Credits23201
+Node: Development23890
+Node: License24060
 
 End Tag Table
 
