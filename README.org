@@ -314,6 +314,7 @@ Of course, Ibuffer is a mature tool with many features, so Bufler doesn't replac
 
 *Changed*
 + Don't show ~*xref*~ buffers by default.
++ Command ~bufler-switch-buffer~ allows entering a non-existent buffer name to create a buffer and switch to it (like ~switch-to-buffer~).
 
 ** 0.2
 

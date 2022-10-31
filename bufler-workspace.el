@@ -143,11 +143,12 @@ act as if SET-WORKSPACE-P is non-nil."
                              (bufler-buffers) (other-buffer (current-buffer))))
          (other-buffer-cons (cons (buffer-name (-last-item other-buffer-path))
                                   other-buffer-path))
-         (selected-buffer (alist-get (completing-read "Buffer: " (mapcar #'car buffers)
-                                                      nil t nil nil other-buffer-cons)
-                                     buffers nil nil #'string=)))
-    (when (or bufler-workspace-switch-buffer-sets-workspace
-              set-workspace-p)
+         (buffer-name (completing-read "Buffer: " (mapcar #'car buffers)
+                                       nil nil nil nil other-buffer-cons))
+         (selected-buffer (alist-get buffer-name buffers nil nil #'string=)))
+    (when (and (or bufler-workspace-switch-buffer-sets-workspace
+                   set-workspace-p)
+               selected-buffer)
       (bufler-workspace-frame-set
        ;; FIXME: Ideally we wouldn't call `bufler-buffers' again
        ;; here, but `bufler-buffer-alist-at' returns a slightly
@@ -157,7 +158,7 @@ act as if SET-WORKSPACE-P is non-nil."
        ;; that difference has been the source of some other
        ;; confusion too...
        (bufler-buffer-workspace-path selected-buffer)))
-    (switch-to-buffer selected-buffer)))
+    (switch-to-buffer (or selected-buffer buffer-name))))
 
 ;;;###autoload
 (defun bufler-workspace-buffer-name-workspace (&optional name)

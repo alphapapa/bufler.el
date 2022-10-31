@@ -572,6 +572,9 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
 
    *Changed*
    • Don’t show ‘*xref*’ buffers by default.
+   • Command ‘bufler-switch-buffer’ allows entering a non-existent
+     buffer name to create a buffer and switch to it (like
+     ‘switch-to-buffer’).
 
 
 File: README.info,  Node: 02,  Next: 01,  Prev: 03-pre,  Up: Changelog
@@ -643,11 +646,11 @@ Node: Prism support18221
 Node: Compared to Ibuffer18661
 Node: Changelog20411
 Node: 03-pre20583
-Node: 0222957
-Node: 0123102
-Node: Credits23201
-Node: Development23890
-Node: License24060
+Node: 0223119
+Node: 0123264
+Node: Credits23363
+Node: Development24052
+Node: License24222
 
 End Tag Table
 
