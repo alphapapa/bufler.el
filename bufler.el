@@ -417,7 +417,7 @@ With universal prefix, use left SIDE instead of right.  With two
 universal prefixes, prompt for side and slot."
   (interactive (list :side (pcase current-prefix-arg
                              ('nil 'right)
-                             ('(0) left)
+                             ('(0) 'left)
                              (_ (intern (completing-read "Side: " '(left right top bottom) nil t))))
                      :slot (pcase current-prefix-arg
                              ('nil 0)
