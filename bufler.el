@@ -950,25 +950,34 @@ TYPE, okay, `checkdoc'?"
   "Return a grouping function that groups buffers matching all of PREDS.
 The resulting group is named NAME.  This can also be used with a
 single predicate to apply a name to a group."
-  (byte-compile (lambda (x)
+  (let ((and-fn (lambda (x)
                   (when (-all? (-cut funcall <> x) preds)
                     name))))
+    (if (byte-code-function-p and-fn)
+        and-fn
+      (byte-compile and-fn))))
 
 (defun bufler-or (name &rest preds)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups buffers matching any of PREDS.
 The resulting group is named NAME."
-  (byte-compile (lambda (x)
-                  (when (-any? (-cut funcall <> x) preds)
-                    name))))
+  (let ((or-fn (lambda (x)
+                 (when (-any? (-cut funcall <> x) preds)
+                   name))))
+    (if (byte-code-function-p or-fn)
+        or-fn
+      (byte-compile or-fn))))
 
 (defun bufler-not (name pred)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups buffers which do not match PRED.
 The resulting group is named NAME."
-  (byte-compile (lambda (x)
+  (let ((not-fn (lambda (x)
                   (unless (funcall pred x)
                     name))))
+    (if (byte-code-function-p not-fn)
+        not-fn
+      (byte-compile not-fn))))
 
 ;;;;;; Grouping predicates
 
