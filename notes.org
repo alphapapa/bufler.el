@@ -8,6 +8,10 @@
 
 * [#B] Ideas
 
+** TODO Automatically detect current buffer's workspace and prioritize its buffers when using ~bufler-switch-buffer~
+
+For the case where the user hasn't set the current frame's workspace, the ~bufler-switch-buffer~ command could automatically find the group the current buffer is in and sort other buffers from that group first.
+
 ** TODO Add Mike Zamansky's video to readme
 
 +  https://cestlaz.github.io/post/using-emacs-75-bufler/
