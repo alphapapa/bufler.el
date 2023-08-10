@@ -781,7 +781,7 @@ PLIST may be a plist setting the following options:
        (defun ,fn-name (buffer depth)
          (if-let ((string (progn ,@body)))
              (progn
-               ,(when max-width
+               ,(when (plist-member plist :max-width)
                   `(when ,max-width-variable
                      (setf string (truncate-string-to-width string ,max-width-variable))))
                ,(when face

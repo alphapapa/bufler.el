@@ -1,4 +1,4 @@
-This is README.info, produced by makeinfo version 5.2 from README.texi.
+This is README.info, produced by makeinfo version 6.7 from README.texi.
 
 INFO-DIR-SECTION Emacs
 START-INFO-DIR-ENTRY
@@ -57,9 +57,9 @@ Defining groups
 
 Changelog
 
-* 0.3-pre: 03-pre. 
-* 0.2: 02. 
-* 0.1: 01. 
+* 0.3-pre: 03-pre.
+* 0.2: 02.
+* 0.1: 01.
 
 
 
@@ -520,9 +520,9 @@ File: README.info,  Node: Changelog,  Next: Credits,  Prev: Compared to Ibuffer,
 
 * Menu:
 
-* 0.3-pre: 03-pre. 
-* 0.2: 02. 
-* 0.1: 01. 
+* 0.3-pre: 03-pre.
+* 0.2: 02.
+* 0.1: 01.
 
 
 File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
@@ -569,6 +569,9 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
      type.
    • Depend on at least version 2.1 of the ‘map’ package (required for
      ‘pcase’ macro expansion).
+   • Columns’ ‘max-width’ options.  (Fixes #79
+     (https://github.com/alphapapa/bufler.el/issues/79).  Thanks to Tory
+     S.  Anderson (https://github.com/WorldsEndless) for reporting.)
 
    *Changed*
    • Don’t show ‘*xref*’ buffers by default.
@@ -629,28 +632,28 @@ GPLv3
 
 Tag Table:
 Node: Top258
-Node: Screenshots1362
-Node: Installation2432
-Node: Quelpa2641
-Node: Usage3220
-Node: Workflow4791
-Node: Commands7051
-Node: Bindings8515
-Node: Tips9447
-Node: Defining groups9788
-Node: Default groups example11175
-Node: Group types14102
-Node: Helm support17048
-Node: Ivy support17794
-Node: Prism support18221
-Node: Compared to Ibuffer18661
-Node: Changelog20411
-Node: 03-pre20583
-Node: 0223119
-Node: 0123264
-Node: Credits23363
-Node: Development24052
-Node: License24222
+Node: Screenshots1359
+Node: Installation2429
+Node: Quelpa2638
+Node: Usage3217
+Node: Workflow4788
+Node: Commands7048
+Node: Bindings8512
+Node: Tips9444
+Node: Defining groups9785
+Node: Default groups example11172
+Node: Group types14099
+Node: Helm support17045
+Node: Ivy support17791
+Node: Prism support18218
+Node: Compared to Ibuffer18658
+Node: Changelog20408
+Node: 03-pre20577
+Node: 0223310
+Node: 0123455
+Node: Credits23554
+Node: Development24243
+Node: License24413
 
 End Tag Table
 

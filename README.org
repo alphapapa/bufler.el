@@ -309,8 +309,9 @@ Of course, Ibuffer is a mature tool with many features, so Bufler doesn't replac
 +  Command ~bufler-sidebar~ displays the Bufler list in a side window.
 
 *Fixed*
-+  Option =bufler-filter-buffer-modes= had the wrong customization type.
-+  Depend on at least version 2.1 of the =map= package (required for ~pcase~ macro expansion).
++ Option =bufler-filter-buffer-modes= had the wrong customization type.
++ Depend on at least version 2.1 of the =map= package (required for ~pcase~ macro expansion).
++ Columns' ~max-width~ options.  (Fixes [[https://github.com/alphapapa/bufler.el/issues/79][#79]].  Thanks to [[https://github.com/WorldsEndless][Tory S. Anderson]] for reporting.)
 
 *Changed*
 + Don't show ~*xref*~ buffers by default.
