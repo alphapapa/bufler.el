@@ -326,7 +326,7 @@ clear `bufler-cache', and regenerate buffer groups (which can be
 useful after changing `bufler-groups' if the buffer list has not
 yet changed).  With two universal prefix args, also show buffers
 which are otherwise filtered by `bufler-filter-buffer-fns'."
-  (interactive "p")
+  (interactive "P")
   (let (format-table)
     (cl-labels
         ;; This gets a little hairy because we have to wrap `-group-by'
