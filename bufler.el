@@ -373,7 +373,7 @@ which are otherwise filtered by `bufler-filter-buffer-fns'."
          (format< (test-dir buffer-dir)
                   (string< (as-string test-dir) (as-string buffer-dir))))
       (when arg
-        (setf bufler-cache nil))
+        (bufler--reset-caches))
       (pcase-let* ((inhibit-read-only t)
                    (bufler-vc-refresh arg)
                    (groups (bufler-buffers :filter-fns (unless (and (numberp arg) (>= arg 16))
@@ -399,13 +399,8 @@ which are otherwise filtered by `bufler-filter-buffer-fns'."
           (setf buffer-read-only t)
           (pop-to-buffer (current-buffer) bufler-list-display-buffer-action)
           (goto-char pos))
-        ;; Cancel cache-clearing idle timer and start a new one.
-        (when bufler-cache-related-dirs-timer
-          (cancel-timer bufler-cache-related-dirs-timer))
-        (setf bufler-cache-related-dirs-timer
-              (run-with-idle-timer bufler-cache-related-dirs-timeout nil
-                                   (lambda ()
-                                     (setf bufler-cache-related-dirs (make-hash-table :test #'equal)))))))))
+        (unless (timerp bufler-cache-timer)
+          (setf bufler-cache-timer (run-with-idle-timer bufler-cache-timeout nil #'bufler--reset-caches)))))))
 
 ;;;###autoload
 (defalias 'bufler #'bufler-list)
@@ -708,6 +703,12 @@ omit buffers that match any of them."
                          ;; FIXME: This clause should be obsolete since adding `bufler-group'.
                          (list (mapc #'do-thing thing)))))
     (mapc #'do-section sections)))
+
+(defun bufler--reset-caches ()
+  "Reset Bufler's caches."
+  (setf bufler-cache nil
+        bufler-cache-related-dirs (make-hash-table :test #'equal)
+        bufler-project-cache (make-hash-table :test #'equal)))
 
 ;;;;; Buffer predicates
 
