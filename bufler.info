@@ -563,6 +563,9 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
    • Option ‘bufler-indent-per-level’, which sets the indentation
      applied per level of depth.
    • Command ‘bufler-sidebar’ displays the Bufler list in a side window.
+   • Project metadata cache (because the ‘project-current’ function can
+     be slow when called for many paths in rapid succession, as when
+     many buffers are open).
 
    *Fixed*
    • Option ‘bufler-filter-buffer-modes’ had the wrong customization
@@ -649,11 +652,11 @@ Node: Prism support18218
 Node: Compared to Ibuffer18658
 Node: Changelog20408
 Node: 03-pre20577
-Node: 0223310
-Node: 0123455
-Node: Credits23554
-Node: Development24243
-Node: License24413
+Node: 0223486
+Node: 0123631
+Node: Credits23730
+Node: Development24419
+Node: License24589
 
 End Tag Table
 

@@ -99,12 +99,16 @@ Usually this will be something like \"/usr/share/emacs/VERSION\".")
 (defvar bufler-workspace-name nil
   "The buffer's named workspace, if any.")
 
+(defvar bufler-project-cache (make-hash-table :test #'equal)
+  "Cache mapping directories to projects.
+Used by `bufler-project-current', which see.")
+
 (defvar bufler-cache-related-dirs (make-hash-table :test #'equal)
   "Cache of relations between directories.
 See `bufler-cache-related-dirs-p'.")
 
-(defvar bufler-cache-related-dirs-timer nil
-  "Timer used to clear `bufler-dir-related-cache'.")
+(defvar bufler-cache-timer nil
+  "Timer used to clear Bufler's caches.")
 
 ;;;; Customization
 
@@ -228,12 +232,12 @@ makes the performance impact virtually unnoticable.
 
 This should always be accurate except in the rare case that a
 path is a symlink whose target is changed.  See
-`bufler-cache-related-dirs-timeout'."
+`bufler-cache-timeout'."
   :type 'boolean)
 
-(defcustom bufler-cache-related-dirs-timeout 3600
-  "How often to reset the cache, in seconds.
-The cache should not be allowed to grow unbounded, so it's
+(defcustom bufler-cache-timeout 3600
+  "How often to reset caches, in seconds.
+Caches should not be allowed to grow unbounded, so they're
 cleared with a timer that runs this many seconds after the last
 `bufler-list' command."
   :type 'boolean)
@@ -286,6 +290,26 @@ Used when `bufler-list' is called."
 
 ;; Silence byte-compiler.  This is defined later in the file.
 (defvar bufler-groups)
+
+;;;; Inline functions
+
+(define-inline bufler-project-current (&optional maybe-prompt directory)
+  "Call `project-current' with memoization.
+Passes MAYBE-PROMPT and DIRECTORY to `project-current', which
+see.
+
+The `project-current' function can be slow when called for many
+buffers' files in rapid succession, so we memoize it in variable
+`bufler-project-cache'."
+  ;; Unfortunately, `with-memoization' doesn't work for hash-tables,
+  ;; because it can't distinguish between a nil value and key-not-found.
+  (inline-letevals ((directory (expand-file-name directory))
+                    maybe-prompt)
+    (inline-quote
+     (pcase (gethash ,directory bufler-project-cache :bufler-notfound)
+       (:bufler-notfound (setf (gethash ,directory bufler-project-cache)
+                               (project-current ,maybe-prompt ,directory)))
+       (else else)))))
 
 ;;;; Commands
 
@@ -1109,17 +1133,16 @@ NAME, okay, `checkdoc'?"
     "*special*"))
 
 (bufler-defauto-group project
-  (when-let* ((project (with-current-buffer buffer
-                         (project-current)))
+  (when-let* ((project (bufler-project-current nil (buffer-local-value 'default-directory buffer)))
               (project-root (bufler-project-root project)))
     (concat "Project: " project-root)))
 
 (bufler-defauto-group parent-project
-  (when-let* ((project (project-current nil (buffer-local-value 'default-directory buffer))))
+  (when-let* ((project (bufler-project-current nil (buffer-local-value 'default-directory buffer))))
     (let* ((project-root (bufler-project-root project))
            ;; Emacs needs a built-in function like `f-parent'.
            (parent-dir (file-name-directory (directory-file-name project-root)))
-           (parent-dir-project (project-current nil parent-dir)))
+           (parent-dir-project (bufler-project-current nil parent-dir)))
       (concat "Project: "
               (if parent-dir-project
                   (bufler-project-root parent-dir-project)

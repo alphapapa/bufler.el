@@ -307,6 +307,7 @@ Of course, Ibuffer is a mature tool with many features, so Bufler doesn't replac
 +  Option =bufler-list-switch-buffer-action=, which controls how buffers are displayed when switched to from the buffer list.  (Fixes [[https://github.com/alphapapa/bufler.el/issues/76][#76]].  Thanks to [[https://github.com/jmburgos][Julian M. Burgos]], [[https://github.com/WorldsEndless][Tory S. Anderson]], and [[https://github.com/jcalve][jcalve]] for reporting.)
 +  Option =bufler-indent-per-level=, which sets the indentation applied per level of depth.
 +  Command ~bufler-sidebar~ displays the Bufler list in a side window.
++  Project metadata cache (because the ~project-current~ function can be slow when called for many paths in rapid succession, as when many buffers are open).
 
 *Fixed*
 + Option =bufler-filter-buffer-modes= had the wrong customization type.
