@@ -44,6 +44,16 @@
   "Ignore case when completing buffer paths and names."
   :type 'boolean)
 
+(defcustom bufler-workspace-switch-buffer-and-tab t
+  "Automatically change to a buffer's associated workspace tab.
+When using `bufler-workspace-mode' and `tab-bar-mode',
+`bufler-switch-buffer' will automatically switch to a buffer's
+associated workspace tab, if it has one.
+
+To some, this option may be the one that binds them all
+together..."
+  :type 'boolean)
+
 (defcustom bufler-workspace-switch-buffer-sets-workspace nil
   "Whether to always set the workspace when using `bufler-switch-buffer'.
 This setting overrides whether `bufler-switch-buffer' is called
@@ -160,7 +170,10 @@ would otherwise be filtered by
 `bufler-workspace-switch-buffer-filter-fns'.
 
 If `bufler-workspace-switch-buffer-sets-workspace' is non-nil,
-act as if SET-WORKSPACE-P is non-nil."
+act as if SET-WORKSPACE-P is non-nil.  And if
+`bufler-workspace-switch-buffer-and-tab' is non-nil,
+automatically switch to the buffer's workspace's tab, if it has
+one."
   (interactive (list current-prefix-arg
                      (and current-prefix-arg
                           (>= (car current-prefix-arg) 16))
@@ -194,6 +207,13 @@ act as if SET-WORKSPACE-P is non-nil."
        ;; that difference has been the source of some other
        ;; confusion too...
        (bufler-buffer-workspace-path selected-buffer)))
+    (when-let ((bufler-workspace-switch-buffer-and-tab)
+               (workspace-tab (cl-find (bufler-buffer-workspace-path selected-buffer) (tab-bar-tabs)
+                                       :key (lambda (tab)
+                                              (bufler-workspace--tab-parameter 'bufler-workspace-path tab))
+                                       :test #'equal))
+               (tab-name (bufler-workspace--tab-parameter 'name workspace-tab)))
+      (tab-bar-switch-to-tab tab-name))
     (switch-to-buffer (or selected-buffer buffer-name))))
 
 ;;;###autoload

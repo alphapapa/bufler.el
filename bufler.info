@@ -558,6 +558,11 @@ concept._)
 
    • Command ‘bufler-workspace-set’ sets the workspace of the current
      ‘tab-bar’ tab or frame.
+   • Option ‘bufler-workspace-switch-buffer-and-tab’ (enabled by
+     default) automatically switches to a buffer’s workspace’s tab, if
+     it has one, when using ‘bufler-switch-buffer’.  (This tries to
+     solve the age-old problem of buffers not "staying in their
+     workspace.")
 
    *Changes*
 
@@ -696,12 +701,12 @@ Node: Prism support18229
 Node: Compared to Ibuffer18669
 Node: Changelog20419
 Node: 04-pre20599
-Node: 0322449
-Node: 0225361
-Node: 0125502
-Node: Credits25601
-Node: Development26290
-Node: License26460
+Node: 0322749
+Node: 0225661
+Node: 0125802
+Node: Credits25901
+Node: Development26590
+Node: License26760
 
 End Tag Table
 

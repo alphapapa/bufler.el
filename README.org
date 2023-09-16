@@ -302,6 +302,7 @@ Note as well that the existing ~bufler-workspace-tabs-mode~ /overrides/ some asp
 *Additions*
 
 + Command ~bufler-workspace-set~ sets the workspace of the current ~tab-bar~ tab or frame.
++ Option ~bufler-workspace-switch-buffer-and-tab~ (enabled by default) automatically switches to a buffer's workspace's tab, if it has one, when using ~bufler-switch-buffer~.  (This tries to solve the age-old problem of buffers not "staying in their workspace.")
 
 *Changes*
 
