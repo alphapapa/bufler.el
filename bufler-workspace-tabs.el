@@ -24,6 +24,15 @@
 ;; and `tab-line-mode' in Emacs 27+ to show Bufler workspaces and
 ;; buffers, respectively.
 
+;; NOTE: `bufler-workspace-tabs-mode' *OVERRIDES* some parts of
+;; `tab-bar-mode' and `tab-line-mode': It shows each top-level Bufler
+;; group as a `tab-bar' tab, and each buffer in a group as a
+;; `tab-line' tab, rather than allowing the user to make and delete
+;; tabs normally.  (The user can still effectively make a tab manually
+;; by adding a buffer to a named Bufler workspace.)  This
+;; functionality is still somewhat experimental, and it may not suit
+;; every user's taste.
+
 ;;; Code:
 
 ;;;; Requirements
@@ -43,7 +52,8 @@
   (declare-function bufler-format-path "bufler")
   (declare-function bufler-buffers "bufler")
   (declare-function bufler-group-tree-paths "bufler-group-tree")
-  (declare-function bufler-workspace-buffers "bufler-workspace"))
+  (declare-function bufler-workspace-buffers "bufler-workspace")
+  (declare-function bufler-workspace-set "bufler-workspace"))
 
 ;;;; Variables
 
@@ -125,7 +135,7 @@ ARG is the position of the tab in the tab bar."
       (let* ((_from-tab (tab-bar--tab))
              (to-tab (nth to-index tabs))
              (workspace-path (alist-get 'path to-tab)))
-        (bufler-workspace-frame-set workspace-path)
+        (bufler-workspace-set workspace-path)
         (force-mode-line-update 'all)))))
 
 ;;;; Functions

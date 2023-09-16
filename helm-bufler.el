@@ -44,7 +44,7 @@
 With two universal prefixes, also set the frame's workspace.
 This mimics `bufler-workspace-switch-buffer'."
   (when (equal '(16) current-prefix-arg)
-    (bufler-workspace-frame-set
+    (bufler-workspace-set
      ;; FIXME: Ideally we wouldn't call `bufler-buffers' again
      ;; here, but `bufler-buffer-alist-at' returns a slightly
      ;; different structure, and `bufler-group-tree-leaf-path'
