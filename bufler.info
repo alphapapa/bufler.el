@@ -57,7 +57,7 @@ Defining groups
 
 Changelog
 
-* 0.3-pre: 03-pre.
+* 0.3: 03.
 * 0.2: 02.
 * 0.1: 01.
 
@@ -520,15 +520,15 @@ File: README.info,  Node: Changelog,  Next: Credits,  Prev: Compared to Ibuffer,
 
 * Menu:
 
-* 0.3-pre: 03-pre.
+* 0.3: 03.
 * 0.2: 02.
 * 0.1: 01.
 
 
-File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
+File: README.info,  Node: 03,  Next: 02,  Up: Changelog
 
-5.1 0.3-pre
-===========
+5.1 0.3
+=======
 
 *Added*
    • Group type ‘auto-parent-project’.
@@ -583,7 +583,7 @@ File: README.info,  Node: 03-pre,  Next: 02,  Up: Changelog
      ‘switch-to-buffer’).
 
 
-File: README.info,  Node: 02,  Next: 01,  Prev: 03-pre,  Up: Changelog
+File: README.info,  Node: 02,  Next: 01,  Prev: 03,  Up: Changelog
 
 5.2 0.2
 =======
@@ -635,28 +635,28 @@ GPLv3
 
 Tag Table:
 Node: Top258
-Node: Screenshots1359
-Node: Installation2429
-Node: Quelpa2638
-Node: Usage3217
-Node: Workflow4788
-Node: Commands7048
-Node: Bindings8512
-Node: Tips9444
-Node: Defining groups9785
-Node: Default groups example11172
-Node: Group types14099
-Node: Helm support17045
-Node: Ivy support17791
-Node: Prism support18218
-Node: Compared to Ibuffer18658
-Node: Changelog20408
-Node: 03-pre20577
-Node: 0223486
-Node: 0123631
-Node: Credits23730
-Node: Development24419
-Node: License24589
+Node: Screenshots1351
+Node: Installation2421
+Node: Quelpa2630
+Node: Usage3209
+Node: Workflow4780
+Node: Commands7040
+Node: Bindings8504
+Node: Tips9436
+Node: Defining groups9777
+Node: Default groups example11164
+Node: Group types14091
+Node: Helm support17037
+Node: Ivy support17783
+Node: Prism support18210
+Node: Compared to Ibuffer18650
+Node: Changelog20400
+Node: 0320561
+Node: 0223458
+Node: 0123599
+Node: Credits23698
+Node: Development24387
+Node: License24557
 
 End Tag Table
 
