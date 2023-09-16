@@ -303,13 +303,13 @@ buffers' files in rapid succession, so we memoize it in variable
 `bufler-project-cache'."
   ;; Unfortunately, `with-memoization' doesn't work for hash-tables,
   ;; because it can't distinguish between a nil value and key-not-found.
-  (inline-letevals ((directory (expand-file-name directory))
-                    maybe-prompt)
+  (inline-letevals (directory maybe-prompt)
     (inline-quote
-     (pcase (gethash ,directory bufler-project-cache :bufler-notfound)
-       (:bufler-notfound (setf (gethash ,directory bufler-project-cache)
-                               (project-current ,maybe-prompt ,directory)))
-       (else else)))))
+     (let ((directory (expand-file-name ,directory)))
+       (pcase (gethash directory bufler-project-cache :bufler-notfound)
+         (:bufler-notfound (setf (gethash directory bufler-project-cache)
+                                 (project-current ,maybe-prompt directory)))
+         (else else))))))
 
 ;;;; Commands
 
