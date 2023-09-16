@@ -207,6 +207,8 @@ one."
        ;; that difference has been the source of some other
        ;; confusion too...
        (bufler-buffer-workspace-path selected-buffer)))
+    ;; TODO: If selected-buffer has no associated workspace tab, try
+    ;; to use a tab that has a window that most recently displayed it.
     (when-let ((bufler-workspace-switch-buffer-and-tab)
                (workspace-tab (cl-find (bufler-buffer-workspace-path selected-buffer) (tab-bar-tabs)
                                        :key (lambda (tab)
