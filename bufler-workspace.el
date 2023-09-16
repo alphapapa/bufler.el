@@ -214,7 +214,9 @@ one."
                                        :test #'equal))
                (tab-name (bufler-workspace--tab-parameter 'name workspace-tab)))
       (tab-bar-switch-to-tab tab-name))
-    (switch-to-buffer (or selected-buffer buffer-name))))
+    (if-let ((window (get-buffer-window selected-buffer)))
+        (select-window window)
+      (switch-to-buffer (or selected-buffer buffer-name)))))
 
 ;;;###autoload
 (defun bufler-workspace-buffer-name-workspace (&optional name)
