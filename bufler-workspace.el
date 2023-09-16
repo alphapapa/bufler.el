@@ -216,7 +216,8 @@ Works as `tab-line-tabs-function'."
 
 (cl-defun bufler-workspace-read-item (tree &key (leaf-key #'identity))
   "Return a leaf read from TREE with completion.
-Completion is done in steps when descending into branches."
+LEAF-KEY is applied to each leaf in TREE.  Completion is done in
+steps when descending into branches."
   (cl-labels ((read-item
                (tree) (cl-typecase (car tree)
                         (list (let ((key (completing-read "Group: " (mapcar #'car tree))))
