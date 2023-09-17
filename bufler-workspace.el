@@ -202,7 +202,8 @@ one."
          (other-buffer-path (bufler-group-tree-leaf-path
                              (bufler-buffers) (other-buffer (current-buffer))))
          (other-buffer-cons (cons (buffer-name (-last-item other-buffer-path))
-                                  other-buffer-path))
+                                  (other-buffer (current-buffer))))
+         (buffers (cons other-buffer-cons buffers))
          (buffer-name (completing-read "Buffer: " (mapcar #'car buffers)
                                        nil nil nil nil other-buffer-cons))
          (selected-buffer (alist-get buffer-name buffers nil nil #'string=)))
