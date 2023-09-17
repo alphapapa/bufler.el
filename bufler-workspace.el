@@ -59,22 +59,6 @@ with the string."
                        (string :tag "Replacement string"  "𝕎: "))
                  (const :tag "Don't abbreviate" nil)))
 
-(defcustom bufler-workspace-switch-buffer-and-tab t
-  "Automatically change to a buffer's associated workspace tab.
-When using `bufler-workspace-mode' and `tab-bar-mode',
-`bufler-switch-buffer' will automatically switch to a buffer's
-associated workspace tab, if it has one.
-
-To some, this option may be the one that binds them all
-together..."
-  :type 'boolean)
-
-(defcustom bufler-workspace-switch-buffer-sets-workspace nil
-  "Whether to always set the workspace when using `bufler-switch-buffer'.
-This setting overrides whether `bufler-switch-buffer' is called
-with prefix arguments."
-  :type 'boolean)
-
 (defcustom bufler-workspace-set-hook
   (list #'bufler-workspace-set-frame-name)
   "Functions called when the workspace is set.
@@ -184,15 +168,15 @@ use current buffer."
   (bufler-workspace-set (bufler-buffer-workspace-path buffer) :title title))
 
 ;;;###autoload
-(defun bufler-workspace-switch-buffer (&optional all-p set-workspace-p no-filter)
+(cl-defun bufler-workspace-switch-buffer (&key all-p no-filter (switch-workspace-p t))
   "Switch to another buffer in the current group.
 Without any input, switch to the previous buffer, like
 `switch-to-buffer'.  If ALL-P (interactively, with universal
 prefix) or if the frame has no workspace, select from all
-buffers.  If SET-WORKSPACE-P (with two universal prefixes),
-select from all buffers and set the frame's workspace.  If
-NO-FILTER (with three universal prefixes), include buffers that
-would otherwise be filtered by
+buffers.  If SWITCH-WORKSPACE-P (disable with two universal
+prefixes), select from all buffers and switch to that buffer's
+workspace.  If NO-FILTER (with three universal prefixes), include
+buffers that would otherwise be filtered by
 `bufler-workspace-switch-buffer-filter-fns'.
 
 If `bufler-workspace-switch-buffer-sets-workspace' is non-nil,
@@ -200,11 +184,12 @@ act as if SET-WORKSPACE-P is non-nil.  And if
 `bufler-workspace-switch-buffer-and-tab' is non-nil,
 automatically switch to the buffer's workspace's tab, if it has
 one."
-  (interactive (list current-prefix-arg
-                     (and current-prefix-arg
-                          (>= (car current-prefix-arg) 16))
-                     (and current-prefix-arg
-                          (>= (car current-prefix-arg) 64))))
+  (interactive
+   (list :all-p current-prefix-arg
+         :no-filter (and current-prefix-arg
+                         (>= (car current-prefix-arg) 64))
+         :switch-workspace-p (not (and current-prefix-arg
+                                       (>= (car current-prefix-arg) 16)))))
   (let* ((bufler-vc-state nil)
          (completion-ignore-case bufler-workspace-ignore-case)
          (path (unless all-p
@@ -221,26 +206,16 @@ one."
          (buffer-name (completing-read "Buffer: " (mapcar #'car buffers)
                                        nil nil nil nil other-buffer-cons))
          (selected-buffer (alist-get buffer-name buffers nil nil #'string=)))
-    (when (and (or bufler-workspace-switch-buffer-sets-workspace
-                   set-workspace-p)
-               selected-buffer)
-      (bufler-workspace-set
-       ;; FIXME: Ideally we wouldn't call `bufler-buffers' again
-       ;; here, but `bufler-buffer-alist-at' returns a slightly
-       ;; different structure, and `bufler-group-tree-leaf-path'
-       ;; doesn't accept it.  Maybe the issue is related to using
-       ;; `map-nested-elt' in `bufler-buffer-alist-at'.  Maybe
-       ;; that difference has been the source of some other
-       ;; confusion too...
-       (bufler-buffer-workspace-path selected-buffer)))
     ;; TODO: If selected-buffer has no associated workspace tab, try
     ;; to use a tab that has a window that most recently displayed it.
-    (when-let ((bufler-workspace-switch-buffer-and-tab)
+    (when-let ((switch-workspace-p)
                (workspace-tab (cl-find (bufler-buffer-workspace-path selected-buffer) (tab-bar-tabs)
                                        :key (lambda (tab)
                                               (bufler-workspace--tab-parameter 'bufler-workspace-path tab))
                                        :test #'equal))
                (tab-name (bufler-workspace--tab-parameter 'name workspace-tab)))
+      ;; TODO: Try to switch to a frame when not using tab-bar-mode
+      ;; (or just ignore frames and focus on supporting tab-bar best).
       (tab-bar-switch-to-tab tab-name))
     (if-let ((window (get-buffer-window selected-buffer)))
         (select-window window)
