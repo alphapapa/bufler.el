@@ -167,12 +167,13 @@ workspace path."
   path)
 
 ;;;###autoload
-(defun bufler-workspace-focus-buffer (buffer)
+(cl-defun bufler-workspace-focus-buffer (buffer &key title)
   "Set current tab's or frame's workspace to BUFFER's workspace.
-If `tab-bar-mode' is active, set the tab's; otherwise, the
-frame's.  Interactively, use current buffer."
+If TITLE, pass it to `bufler-workspace-set'.  If `tab-bar-mode'
+is active, set the tab's; otherwise, the frame's.  Interactively,
+use current buffer."
   (interactive (list (current-buffer)))
-  (bufler-workspace-set (bufler-buffer-workspace-path buffer)))
+  (bufler-workspace-set (bufler-buffer-workspace-path buffer) :title title))
 
 ;;;###autoload
 (defun bufler-workspace-switch-buffer (&optional all-p set-workspace-p no-filter)
