@@ -138,15 +138,15 @@ workspace path."
              (grouped-buffers (bufler-buffers))
              (buffer-paths (bufler-group-tree-paths grouped-buffers))
              group-paths alist)
-        (cl-labels ((push-subpaths
-                     (path) (when path
-                              (push path group-paths)
-                              (push-subpaths (butlast path))))
-                    (path-cons
-                     (path) (cons (bufler-format-path path) path)))
+        (cl-labels ((push-subpaths (path)
+                      (when path
+                        (push path group-paths)
+                        (push-subpaths (butlast path))))
+                    (path-cons (path)
+                      (cons (bufler-format-path path) path)))
           (thread-last buffer-paths
-            (mapcar #'butlast)
-            (mapc #'push-subpaths))
+                       (mapcar #'butlast)
+                       (mapc #'push-subpaths))
           (setf group-paths (seq-uniq group-paths)
                 alist (mapcar #'path-cons group-paths))
           (when (string-empty-p (caar alist))
@@ -345,22 +345,21 @@ But if `tab-bar-mode' is active, do nothing."
   "Return a leaf read from TREE with completion.
 LEAF-KEY is applied to each leaf in TREE.  Completion is done in
 steps when descending into branches."
-  (cl-labels ((read-item
-               (tree) (cl-typecase (car tree)
-                        (list (let ((key (completing-read "Group: " (mapcar #'car tree))))
-                                (read-item (alist-get key tree nil nil #'string=))))
-                        (atom (completing-read "Buffer: " (mapcar leaf-key tree))))))
+  (cl-labels ((read-item (tree)
+                (cl-typecase (car tree)
+                  (list (let ((key (completing-read "Group: " (mapcar #'car tree))))
+                          (read-item (alist-get key tree nil nil #'string=))))
+                  (atom (completing-read "Buffer: " (mapcar leaf-key tree))))))
     (read-item tree)))
 
 (defun bufler-workspace-read-group-path (groups)
   "Return a path to a group in GROUPS read with completion."
-  (cl-labels ((read-path
-               (items &optional last-key)
-               (cl-typecase (car items)
-                 (list (list last-key
-                             (let ((key (completing-read "Group: " (mapcar #'car items))))
-                               (read-path (alist-get key items nil nil #'string=) key))))
-                 (atom last-key))))
+  (cl-labels ((read-path (items &optional last-key)
+                (cl-typecase (car items)
+                  (list (list last-key
+                              (let ((key (completing-read "Group: " (mapcar #'car items))))
+                                (read-path (alist-get key items nil nil #'string=) key))))
+                  (atom last-key))))
     (let ((path (cadr (read-path groups))))
       (cl-typecase path
         (list path)

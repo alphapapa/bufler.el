@@ -75,14 +75,14 @@
 
 (defun bufler-group-tree-leaf-path (tree leaf)
   "Return path to LEAF in TREE."
-  (cl-labels ((leaf-path
-               (leaf path tree) (pcase-let* ((`(,name . ,nodes) tree))
-                                  (dolist (node nodes)
-                                    (if (equal leaf node)
-                                        (throw :found (append path (list name leaf)))
-                                      (when (listp node)
-                                        (leaf-path leaf (append path (list name))
-                                                   node)))))))
+  (cl-labels ((leaf-path (leaf path tree)
+                (pcase-let* ((`(,name . ,nodes) tree))
+                  (dolist (node nodes)
+                    (if (equal leaf node)
+                        (throw :found (append path (list name leaf)))
+                      (when (listp node)
+                        (leaf-path leaf (append path (list name))
+                                   node)))))))
     (catch :found
       (dolist (node tree)
         (leaf-path leaf nil node)))))
@@ -109,13 +109,13 @@
 (cl-defun bufler-group-tree-paths (tree)
   "Return list of paths to nodes in TREE."
   (let (paths)
-    (cl-labels ((collect-paths
-                 (path node) (pcase-let* ((`(,name . ,nodes) node))
-                               (dolist (node nodes)
-                                 (cl-typecase node
-                                   (list (collect-paths (append path (list name)) node))
-                                   (buffer (push (append path (list name node))
-                                                 paths)))))))
+    (cl-labels ((collect-paths (path node)
+                  (pcase-let* ((`(,name . ,nodes) node))
+                    (dolist (node nodes)
+                      (cl-typecase node
+                        (list (collect-paths (append path (list name)) node))
+                        (buffer (push (append path (list name node))
+                                      paths)))))))
       (dolist (node tree)
         (cl-typecase node
           (atom (push (list node) paths))
@@ -192,11 +192,11 @@ See documentation for details."
      `(cl-macrolet ((group (&rest groups) `(list ,@groups))
                     (group-by (fn &rest args) `(apply-partially ,fn ,@args))
                     (group-and (name &rest groups)
-                               `(group-tree-and ,name ,@groups))
+                      `(group-tree-and ,name ,@groups))
                     (group-or (name &rest groups)
-                              `(group-tree-or ,name ,@groups))
+                      `(group-tree-or ,name ,@groups))
                     (group-not (name group)
-                               `(group-tree-not ,name ,group))
+                      `(group-tree-not ,name ,group))
                     ,@,vocabulary)
         (list ,@groups))))
 

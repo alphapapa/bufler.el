@@ -159,40 +159,41 @@ FRAME defaults to the selected frame.  Works as
   ;; the actual grouping logic, which may say more about me than the
   ;; code.
   (with-selected-frame (or frame (selected-frame))
-    (cl-labels ((tab-type
-                 (path) (if (equal path (frame-parameter nil 'bufler-workspace-path))
-                            'current-tab
-                          'tab))
-                (path-first ;; CAR, or CADR if CAR is nil.
-                 (path) (cl-typecase path
-                          (string (list path))
-                          (list (if (car path)
-                                    (list (car path))
-                                  (list (cadr path))))))
-                (workspace-to-tab
-                 (workspace &optional type) (-let* (((&plist :name :path) workspace))
-                                              (list (or type (tab-type path))
-                                                    (cons 'name (car name))
-                                                    (cons 'path path))))
-                (path-top-level
-                 (path) (pcase-exhaustive path
-                          (`(,(and first (guard (not first)))
-                             ,(and second (guard second)) . ,_rest)
-                           ;; If I use _ in the variable names, it complains that they are not
-                           ;; unused.  The test in (guard) doesn't count as using them, so it
-                           ;; complains either way.  So use `ignore'.  I hope it compiles out.
-                           (ignore first second)
-                           (cl-subseq path 0 2))
-                          ;; The path should always be a list!
-                          (`(,first . ,_rest)
-                           (list first))))
-                (path-to-workspace
-                 ;; This gets too complicated.  We need to preserve the real path, but
-                 ;; if the first element is nil, we need to ignore that and display
-                 ;; the string after the nil.  We sort-of cheat here by using
-                 ;; `path-first' in this function.
-                 (path) (list :name (path-first path)
-                              :path path)))
+    (cl-labels ((tab-type (path)
+                  (if (equal path (frame-parameter nil 'bufler-workspace-path))
+                      'current-tab
+                    'tab))
+                (path-first (path)
+                  ;; CAR, or CADR if CAR is nil.
+                  (cl-typecase path
+                    (string (list path))
+                    (list (if (car path)
+                              (list (car path))
+                            (list (cadr path))))))
+                (workspace-to-tab (workspace &optional type)
+                  (-let* (((&plist :name :path) workspace))
+                    (list (or type (tab-type path))
+                          (cons 'name (car name))
+                          (cons 'path path))))
+                (path-top-level (path)
+                  (pcase-exhaustive path
+                    (`(,(and first (guard (not first)))
+                       ,(and second (guard second)) . ,_rest)
+                     ;; If I use _ in the variable names, it complains that they are not
+                     ;; unused.  The test in (guard) doesn't count as using them, so it
+                     ;; complains either way.  So use `ignore'.  I hope it compiles out.
+                     (ignore first second)
+                     (cl-subseq path 0 2))
+                    ;; The path should always be a list!
+                    (`(,first . ,_rest)
+                     (list first))))
+                (path-to-workspace (path)
+                  ;; This gets too complicated.  We need to preserve the real path, but
+                  ;; if the first element is nil, we need to ignore that and display
+                  ;; the string after the nil.  We sort-of cheat here by using
+                  ;; `path-first' in this function.
+                  (list :name (path-first path)
+                        :path path)))
       ;; We bind all these lists to make understanding and debugging easier.  And because
       ;; Edebug seems somewhat broken in Emacs 28 in that breakpoints don't seem to work
       ;; at all, so stepping through to the relevant point is practically impossible.
