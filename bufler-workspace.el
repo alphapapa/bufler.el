@@ -110,12 +110,14 @@ May be customized to, e.g. only return the last element of a path."
     (call-interactively #'bufler-workspace-set)))
 
 ;;;###autoload
-(defun bufler-workspace-set (&optional path)
+(cl-defun bufler-workspace-set (&optional path &key title)
   "Set workspace for the current tab or frame to the one at PATH.
 Interactively, choose workspace path with completion.  If PATH is
 nil (interactively, with prefix), unset the frame's workspace.
 Sets tab's workspace if `tab-bar-mode' is active, otherwise the
-frame's.  Return the workspace path."
+frame's.  If TITLE, use it as the tab's/frame's name (note that
+this is not the same as using a named workspace).  Return the
+workspace path."
   (interactive
    (list
     (unless current-prefix-arg
@@ -145,7 +147,9 @@ frame's.  Return the workspace path."
               (funcall bufler-workspace-format-path-fn path)))
     (set-frame-parameter nil 'bufler-workspace-path path)
     (set-frame-parameter nil 'bufler-workspace-path-formatted (funcall bufler-workspace-format-path-fn path)))
-  (run-hook-with-args 'bufler-workspace-set-hook path)
+  (run-hook-with-args 'bufler-workspace-set-hook
+                      (or title
+                          (format "Workspace: %s" (funcall bufler-workspace-format-path-fn path))))
   (force-mode-line-update 'all)
   path)
 
@@ -271,13 +275,13 @@ Works as `tab-line-tabs-function'."
                       (bufler-workspace--tab-parameter 'bufler-workspace-path-formatted (tab-bar--current-tab-find))
                     (frame-parameter nil 'bufler-workspace-path-formatted))))
 
-(defun bufler-workspace-set-frame-name (path)
-  "Set current frame's name according to PATH.
+(defun bufler-workspace-set-frame-name (name)
+  "Set current frame's name according to NAME.
 But if `tab-bar-mode' is active, do nothing."
-  ;; HACK: Do nothing if tab-bar-mode is on.  (It doesn't seem worth it to use separate hooks for when tab-bar-mode is on or off.)
-  (unless tab-bar-mode
-    (set-frame-name (when path
-                      (format "Workspace: %s" (funcall bufler-workspace-format-path-fn path))))))
+  ;; TODO: Rename this function?
+  (if tab-bar-mode
+      (tab-rename (or name ""))
+    (set-frame-name name)))
 
 (cl-defun bufler-workspace-read-item (tree &key (leaf-key #'identity))
   "Return a leaf read from TREE with completion.
