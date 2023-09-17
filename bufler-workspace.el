@@ -28,6 +28,8 @@
 
 ;;;; Requirements
 
+(require 'burly)
+
 (require 'bufler)
 
 ;;;; Variables
@@ -43,6 +45,11 @@
 (defcustom bufler-workspace-ignore-case t
   "Ignore case when completing buffer paths and names."
   :type 'boolean)
+
+(defcustom bufler-workspace-prefix "Workspace: "
+  "Prefix for workspace names.
+Applied when saving a workspace."
+  :type 'string)
 
 (defcustom bufler-workspace-switch-buffer-and-tab t
   "Automatically change to a buffer's associated workspace tab.
@@ -84,6 +91,10 @@ May be customized to, e.g. only return the last element of a path."
                   (function-item bufler--buffer-name-filtered-p)
                   (function-item bufler--buffer-special-p)
                   (function :tag "Custom function"))))
+
+;;;; Variables
+
+(defvar burly-buffer-local-variables)
 
 ;;;; Macros
 
@@ -254,7 +265,52 @@ appear in a named workspace, the buffer must be matched by an
       (setf mode-line-misc-info
             (delete lighter mode-line-misc-info)))))
 
+;;;###autoload
+(defun bufler-workspace-save (name)
+  "Save current Bufler workspace as NAME.
+Also sets current tab/frame's workspace to the current buffer's."
+  (interactive (list (completing-read "Save workspace: " (bufler-workspace-names)
+                                      nil nil bufler-workspace-prefix)))
+  (let ((burly-buffer-local-variables '(bufler-workspace-name)))
+    (let ((record (list (cons 'url (burly-windows-url))
+                        (cons 'handler #'burly-bookmark-handler)
+                        (cons 'bufler-workspace-name name))))
+      (bookmark-store name record nil)))
+  (bufler-workspace-set (bufler-buffer-workspace-path (current-buffer))
+                        :title name))
+
+;;;###autoload
+(defun bufler-workspace-open (name)
+  "Open the workspace NAME.
+NAME should be the name of a bookmark (this just calls
+`bookmark-jump').  Interactively, prompt for a Bufler workspace."
+  (interactive (list (completing-read "Open workspace: " (bufler-workspace-names :active nil))))
+  (bookmark-jump name)
+  ;; HACK: Use an immediate timer for this so that, e.g. the
+  ;; `burly-tabs-mode' advice has a chance to run first, otherwise the
+  ;; newly opened tab won't be active when this happens.
+  (run-at-time nil nil
+               (lambda ()
+                 (bufler-workspace-set (bufler-buffer-workspace-path (current-buffer)) :title name))))
+
 ;;;; Functions
+
+(cl-defun bufler-workspace-names (&key (saved t) (active t))
+  "Return list of workspace names.
+When SAVED, include names of saved workspaces.  When ACTIVE,
+include names of active ones."
+  (bookmark-maybe-load-default-file)
+  (delete-dups
+   (append (when saved
+             (cl-loop for bookmark in bookmark-alist
+                      for (_name . params) = bookmark
+                      when (and (equal #'burly-bookmark-handler (alist-get 'handler params))
+                                (alist-get 'bufler-workspace-name params))
+                      collect (car bookmark)))
+           (when active
+             (cl-loop for buffer in (buffer-list)
+                      when (buffer-local-value 'bufler-workspace-name buffer)
+                      collect it)))))
 
 (cl-defun bufler-workspace-buffers (&optional (frame (selected-frame)))
   "Return list of buffers for FRAME's workspace.

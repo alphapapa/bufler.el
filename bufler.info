@@ -563,6 +563,12 @@ concept._)
      it has one, when using ‘bufler-switch-buffer’.  (This tries to
      solve the age-old problem of buffers not "staying in their
      workspace.")
+   • Commands ‘bufler-workspace-open’ and ‘bufler-workspace-save’.
+     These open and save workspaces using Burly
+     (https://github.com/alphapapa/burly.el) as a backend (which is now
+     a dependency).  (This is basically like calling
+     ‘burly-open-bookmark’ and ‘burly-bookmark-windows’, but integrating
+     some ‘bufler-workspace’ features automatically.)
 
    *Changes*
 
@@ -701,12 +707,12 @@ Node: Prism support18229
 Node: Compared to Ibuffer18669
 Node: Changelog20419
 Node: 04-pre20599
-Node: 0322749
-Node: 0225661
-Node: 0125802
-Node: Credits25901
-Node: Development26590
-Node: License26760
+Node: 0323138
+Node: 0226050
+Node: 0126191
+Node: Credits26290
+Node: Development26979
+Node: License27149
 
 End Tag Table
 
