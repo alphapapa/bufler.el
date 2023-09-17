@@ -569,6 +569,8 @@ concept._)
      a dependency).  (This is basically like calling
      ‘burly-open-bookmark’ and ‘burly-bookmark-windows’, but integrating
      some ‘bufler-workspace’ features automatically.)
+   • Option ‘bufler-workspace-prefix-abbreviation’, which abbreviates
+     workspace names in tab/frame names.
 
    *Changes*
 
@@ -707,12 +709,12 @@ Node: Prism support18229
 Node: Compared to Ibuffer18669
 Node: Changelog20419
 Node: 04-pre20599
-Node: 0323138
-Node: 0226050
-Node: 0126191
-Node: Credits26290
-Node: Development26979
-Node: License27149
+Node: 0323255
+Node: 0226167
+Node: 0126308
+Node: Credits26407
+Node: Development27096
+Node: License27266
 
 End Tag Table
 

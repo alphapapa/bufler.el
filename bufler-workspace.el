@@ -51,6 +51,14 @@
 Applied when saving a workspace."
   :type 'string)
 
+(defcustom bufler-workspace-prefix-abbreviation (cons (rx bos "Workspace: ") "𝕎: ")
+  "How to abbreviate workspace names.
+Applied to tab/frame names.  The regular expression is replaced
+with the string."
+  :type '(choice (cons (regexp :tag "Removal regexp" "\\`Workspace: ")
+                       (string :tag "Replacement string"  "𝕎: "))
+                 (const :tag "Don't abbreviate" nil)))
+
 (defcustom bufler-workspace-switch-buffer-and-tab t
   "Automatically change to a buffer's associated workspace tab.
 When using `bufler-workspace-mode' and `tab-bar-mode',
@@ -336,8 +344,13 @@ Works as `tab-line-tabs-function'."
 
 (defun bufler-workspace-set-frame-name (name)
   "Set current frame's name according to NAME.
-But if `tab-bar-mode' is active, do nothing."
+But if `tab-bar-mode' is active, do nothing.  Abbreviates NAME
+according to `bufler-workspace-prefix-abbreviation'."
   ;; TODO: Rename this function?
+  (when bufler-workspace-prefix-abbreviation
+    (setf name (replace-regexp-in-string
+                (car bufler-workspace-prefix-abbreviation) (cdr bufler-workspace-prefix-abbreviation)
+                name)))
   (if tab-bar-mode
       (tab-rename (or name ""))
     (set-frame-name name)))
