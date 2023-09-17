@@ -257,7 +257,7 @@ Also sets current tab/frame's workspace to the current buffer's."
                                       nil nil bufler-workspace-prefix)))
   (let ((burly-buffer-local-variables '(bufler-workspace-name)))
     (let ((record (list (cons 'url (burly-windows-url))
-                        (cons 'handler #'burly-bookmark-handler)
+                        (cons 'handler #'bufler-workspace-bookmark-handler)
                         (cons 'bufler-workspace-name name))))
       (bookmark-store name record nil)))
   (bufler-workspace-set (bufler-buffer-workspace-path (current-buffer))
@@ -269,15 +269,21 @@ Also sets current tab/frame's workspace to the current buffer's."
 NAME should be the name of a bookmark (this just calls
 `bookmark-jump').  Interactively, prompt for a Bufler workspace."
   (interactive (list (completing-read "Open workspace: " (bufler-workspace-names :active nil))))
-  (bookmark-jump name)
+  (bookmark-jump name))
+
+;;;; Functions
+
+;;;###autoload
+(defun bufler-workspace-bookmark-handler (bookmark)
+  "Handler function for `bufler-workspace' BOOKMARK."
+  (burly-bookmark-handler bookmark)
   ;; HACK: Use an immediate timer for this so that, e.g. the
   ;; `burly-tabs-mode' advice has a chance to run first, otherwise the
   ;; newly opened tab won't be active when this happens.
-  (run-at-time nil nil
-               (lambda ()
-                 (bufler-workspace-set (bufler-buffer-workspace-path (current-buffer)) :title name))))
-
-;;;; Functions
+  (let ((name (bookmark-prop-get bookmark 'bufler-workspace-name)))
+    (run-at-time nil nil
+                 (lambda ()
+                   (bufler-workspace-set (bufler-buffer-workspace-path (current-buffer)) :title name)))))
 
 (cl-defun bufler-workspace-names (&key (saved t) (active t))
   "Return list of workspace names.
@@ -288,7 +294,7 @@ include names of active ones."
    (append (when saved
              (cl-loop for bookmark in bookmark-alist
                       for (_name . params) = bookmark
-                      when (and (equal #'burly-bookmark-handler (alist-get 'handler params))
+                      when (and (equal #'bufler-workspace-bookmark-handler (alist-get 'handler params))
                                 (alist-get 'bufler-workspace-name params))
                       collect (car bookmark)))
            (when active
