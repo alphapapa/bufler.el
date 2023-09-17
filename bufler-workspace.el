@@ -62,7 +62,9 @@ with prefix arguments."
 
 (defcustom bufler-workspace-set-hook
   (list #'bufler-workspace-set-frame-name)
-  "Functions called when the workspace is set."
+  "Functions called when the workspace is set.
+Functions are called with one argument, the workspace's name or
+path."
   :type 'hook)
 
 (defcustom bufler-workspace-format-path-fn #'bufler-format-path
