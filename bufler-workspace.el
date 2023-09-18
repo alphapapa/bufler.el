@@ -330,9 +330,7 @@ But if `tab-bar-mode' is active, do nothing.  Abbreviates NAME
 according to `bufler-workspace-prefix-abbreviation'."
   ;; TODO: Rename this function?
   (when bufler-workspace-prefix-abbreviation
-    (setf name (replace-regexp-in-string
-                (car bufler-workspace-prefix-abbreviation) (cdr bufler-workspace-prefix-abbreviation)
-                name)))
+    (setf name (bufler-workspace--abbreviate-name name)))
   (if tab-bar-mode
       (tab-rename (or name ""))
     (set-frame-name name)))
@@ -360,6 +358,13 @@ steps when descending into branches."
       (cl-typecase path
         (list path)
         (atom (list path))))))
+
+(defun bufler-workspace--abbreviate-name (name)
+  "Return NAME having been abbreviated.
+Abbreviates according to `bufler-workspace-prefix-abbreviation'."
+  (replace-regexp-in-string
+   (car bufler-workspace-prefix-abbreviation) (cdr bufler-workspace-prefix-abbreviation)
+   name))
 
 ;;;; Footer
 
