@@ -35,6 +35,9 @@
 ;;;; Variables
 
 (defvar bufler-mode)
+(defvar burly-tabs-mode)
+
+(declare-function burly-tabs-mode "burly-tabs")
 
 ;;;; Customization
 
@@ -89,6 +92,18 @@ May be customized to, e.g. only return the last element of a path."
 (defvar burly-buffer-local-variables)
 
 ;;;; Macros
+
+(defmacro bufler-without-mode (mode &rest body)
+  "Evaluate BODY without MODE enabled.
+Re-enable MODE afterward if it was already enabled."
+  (declare (indent defun))
+  `(let (was-enabled-p)
+     (when ,mode
+       (setf was-enabled-p t)
+       (,mode -1))
+     ,@body
+     (when was-enabled-p
+       (,mode 1))))
 
 ;; These follow the examples in `tab-bar'.
 
@@ -277,7 +292,14 @@ NAME should be the name of a bookmark (this just calls
 ;;;###autoload
 (defun bufler-workspace-bookmark-handler (bookmark)
   "Handler function for `bufler-workspace' BOOKMARK."
-  (burly-bookmark-handler bookmark)
+  (bufler-without-mode burly-tabs-mode
+    (let ((name (bufler-workspace--abbreviate-name (car bookmark))))
+      (when tab-bar-mode
+        (if-let ((tab (cl-find name (tab-bar-tabs) :test #'equal
+                               :key (apply-partially #'bufler-workspace--tab-parameter 'name))))
+            (tab-bar-select-tab-by-name name)
+          (tab-new)))
+      (burly-bookmark-handler bookmark)))
   ;; HACK: Use an immediate timer for this so that, e.g. the
   ;; `burly-tabs-mode' advice has a chance to run first, otherwise the
   ;; newly opened tab won't be active when this happens.
