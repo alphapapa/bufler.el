@@ -287,6 +287,14 @@ NAME should be the name of a bookmark (this just calls
   (interactive (list (completing-read "Open workspace: " (bufler-workspace-names :active nil))))
   (bookmark-jump name))
 
+(defun bufler-workspace-reset ()
+  "Reset the current tab's workspace."
+  (interactive)
+  (cl-assert tab-bar-mode nil "Only supported for `tab-bar-mode'")
+  (if-let ((name (bufler-workspace--tab-parameter 'bufler-workspace-bookmark-name (tab-bar--current-tab-find))))
+      (bufler-workspace-open name)
+    (error "Current tab has no Bufler workspace name")))
+
 ;;;; Functions
 
 ;;;###autoload
@@ -299,6 +307,10 @@ NAME should be the name of a bookmark (this just calls
                                :key (apply-partially #'bufler-workspace--tab-parameter 'name))))
             (tab-bar-select-tab-by-name name)
           (tab-new)))
+      ;; TODO: Also do this for frames when not using tab-bar?
+      (setf (bufler-workspace--tab-parameter
+             'bufler-workspace-bookmark-name (tab-bar--current-tab-find))
+            (car bookmark))
       (burly-bookmark-handler bookmark)))
   ;; HACK: Use an immediate timer for this so that, e.g. the
   ;; `burly-tabs-mode' advice has a chance to run first, otherwise the
