@@ -225,10 +225,10 @@ one."
     ;; TODO: If selected-buffer has no associated workspace tab, try
     ;; to use a tab that has a window that most recently displayed it.
     (when-let ((switch-workspace-p)
-               (workspace-tab (cl-find (bufler-buffer-workspace-path selected-buffer) (tab-bar-tabs)
+               (workspace-path (bufler-buffer-workspace-path selected-buffer))
+               (workspace-tab (cl-find workspace-path (tab-bar-tabs) :test #'equal
                                        :key (lambda (tab)
-                                              (bufler-workspace--tab-parameter 'bufler-workspace-path tab))
-                                       :test #'equal))
+                                              (bufler-workspace--tab-parameter 'bufler-workspace-path tab))))
                (tab-name (bufler-workspace--tab-parameter 'name workspace-tab)))
       ;; TODO: Try to switch to a frame when not using tab-bar-mode
       ;; (or just ignore frames and focus on supporting tab-bar best).
