@@ -233,7 +233,8 @@ one."
       ;; TODO: Try to switch to a frame when not using tab-bar-mode
       ;; (or just ignore frames and focus on supporting tab-bar best).
       (tab-bar-switch-to-tab tab-name))
-    (if-let ((window (get-buffer-window selected-buffer)))
+    (if-let ((selected-buffer)
+             (window (get-buffer-window selected-buffer)))
         (select-window window)
       (switch-to-buffer (or selected-buffer buffer-name)))))
 
