@@ -568,6 +568,7 @@ NAME, okay, `checkdoc'?"
   "Make a new frame for the group at point."
   (lambda (_group path)
     (with-selected-frame (make-frame)
+      ;; FIXME: `bufler-workspace-frame-set' no longer takes an argument.
       (bufler-workspace-frame-set path)))
   :refresh-p nil)
 
