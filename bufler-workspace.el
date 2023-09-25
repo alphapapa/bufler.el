@@ -341,8 +341,8 @@ include names of active ones."
 (cl-defun bufler-workspace-buffers (&optional (frame (selected-frame)))
   "Return list of buffers for FRAME's workspace.
 Works as `tab-line-tabs-function'."
-  ;; This is specifically for `bufler-workspace-tabs-mode', but it
-  ;; needn't be only for that, so it probably belongs here.
+  ;; This is specifically for `bufler-workspace-workspaces-as-tabs-mode',
+  ;; but it needn't be only for that, so it probably belongs here.
   (let (buffers)
     (--tree-map-nodes (bufferp it)
                       (push it buffers)

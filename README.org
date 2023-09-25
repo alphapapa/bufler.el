@@ -297,7 +297,7 @@ This release includes additional support for Emacs's ~tab-bar-mode~.  Basically,
 
 Notably, these changes are also designed to facilitate integration with [[https://github.com/alphapapa/burly.el][Burly]]'s ~burly-tabs-mode~ (e.g. when a Burly bookmark is opened in a ~tab-bar~ tab, the tab's Bufler workspace can be set to the workspace containing the buffer, so that ~bufler-switch-buffer~ automatically offers buffers relevant to the tab).
 
-Note as well that the existing ~bufler-workspace-tabs-mode~ /overrides/ some aspects of Emacs's ~tab-bar-mode~ and ~tab-line-mode~; this functionality is still somewhat experimental and may not suit every user's taste.  But while that mode may remain disabled, Bufler's other features are still useful with standard ~tab-bar-mode~.  (/Yes, all these names and modes and features do get confusing.  The term "workspaces" is vague, encompassing a variety of ideas envisioned by a range of users.  Bufler's implementation is just one iteration of the concept./)
+Note as well that the existing ~bufler-workspace-workspaces-as-tabs-mode~ /overrides/ some aspects of Emacs's ~tab-bar-mode~ and ~tab-line-mode~; this functionality is still somewhat experimental and may not suit every user's taste.  But while that mode may remain disabled, Bufler's other features are still useful with standard ~tab-bar-mode~.  (/Yes, all these names and modes and features do get confusing.  The term "workspaces" is vague, encompassing a variety of ideas envisioned by a range of users.  Bufler's implementation is just one iteration of the concept./)
 
 *Additions*
 

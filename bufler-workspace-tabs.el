@@ -24,12 +24,12 @@
 ;; and `tab-line-mode' in Emacs 27+ to show Bufler workspaces and
 ;; buffers, respectively.
 
-;; NOTE: `bufler-workspace-tabs-mode' *OVERRIDES* some parts of
-;; `tab-bar-mode' and `tab-line-mode': It shows each top-level Bufler
-;; group as a `tab-bar' tab, and each buffer in a group as a
-;; `tab-line' tab, rather than allowing the user to make and delete
-;; tabs normally.  (The user can still effectively make a tab manually
-;; by adding a buffer to a named Bufler workspace.)  This
+;; NOTE: `bufler-workspace-workspaces-as-tabs-mode' *OVERRIDES* some
+;; parts of `tab-bar-mode' and `tab-line-mode': It shows each
+;; top-level Bufler group as a `tab-bar' tab, and each buffer in a
+;; group as a `tab-line' tab, rather than allowing the user to make
+;; and delete tabs normally.  (The user can still effectively make a
+;; tab manually by adding a buffer to a named Bufler workspace.)  This
 ;; functionality is still somewhat experimental, and it may not suit
 ;; every user's taste.
 
@@ -57,9 +57,9 @@
 
 ;;;; Variables
 
-(defvar bufler-workspace-tabs-mode-saved-settings
+(defvar bufler-workspace-workspaces-as-tabs-mode-saved-settings
   '((tab-bar-separator . nil) (tab-bar-close-button-show . nil))
-  "Settings saved from before `bufler-workspace-tabs-mode' was activated.
+  "Settings saved from before `bufler-workspace-workspaces-as-tabs-mode' was activated.
 Used to restore them when the mode is disabled.")
 
 ;;;; Customization
@@ -80,18 +80,17 @@ properties.  See the default value of `tab-bar-close-button'."
 
 ;;;; Commands
 
-;;;###autoload
-(define-minor-mode bufler-workspace-tabs-mode
+(define-minor-mode bufler-workspace-workspaces-as-tabs-mode
   "Use Bufler workspaces for `tab-bar-mode' and `tab-line-mode'."
   :group 'bufler-workspace
   :global t
-  (if bufler-workspace-tabs-mode
+  (if bufler-workspace-workspaces-as-tabs-mode
       (progn
         (unless (version<= "27.1" emacs-version)
-          (user-error "`bufler-workspace-tabs-mode' requires Emacs version 27.1 or later"))
+          (user-error "`bufler-workspace-workspaces-as-tabs-mode' requires Emacs version 27.1 or later"))
         ;; Save settings.
-        (cl-loop for (symbol . _value) in bufler-workspace-tabs-mode-saved-settings
-                 do (setf (map-elt bufler-workspace-tabs-mode-saved-settings symbol)
+        (cl-loop for (symbol . _value) in bufler-workspace-workspaces-as-tabs-mode-saved-settings
+                 do (setf (map-elt bufler-workspace-workspaces-as-tabs-mode-saved-settings symbol)
                           (symbol-value symbol)))
         (advice-add 'tab-bar-select-tab :override #'bufler-workspace-tabs--tab-bar-select-tab)
         (advice-add 'tab-bar-switch-to-tab :override #'bufler-workspace-frame-set)
@@ -108,15 +107,12 @@ properties.  See the default value of `tab-bar-close-button'."
     (setf tab-bar-tabs-function #'tab-bar-tabs
           tab-line-tabs-function #'tab-line-tabs-window-buffers)
     ;; Restore settings.
-    (cl-loop for (symbol . value) in bufler-workspace-tabs-mode-saved-settings
+    (cl-loop for (symbol . value) in bufler-workspace-workspaces-as-tabs-mode-saved-settings
              do (set symbol value)
-             do (setf (map-elt bufler-workspace-tabs-mode-saved-settings symbol) nil))
+             do (setf (map-elt bufler-workspace-workspaces-as-tabs-mode-saved-settings symbol) nil))
     (tab-bar-mode -1)
     (global-tab-line-mode -1))
   (force-mode-line-update 'all))
-
-;;;###autoload
-(defalias 'bufler-tabs-mode #'bufler-workspace-tabs-mode)
 
 (defun bufler-workspace-tabs--tab-bar-select-tab (&optional arg)
   "Set the frame's workspace to the selected tab's workspace.
