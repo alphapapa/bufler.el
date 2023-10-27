@@ -313,6 +313,10 @@ Note as well that the existing ~bufler-workspace-workspaces-as-tabs-mode~ /overr
 + Command ~bufler-workspace-switch-buffer~ offers buffers from the workspace of the current ~tab-bar~ tab or frame.
 + Mode ~bufler-workspace-mode~'s mode-line lighter shows the path of the current ~tab-bar~ tab or frame.
 
+*Fixes*
+
++ The ~dir~ buffer group uses the base buffer's directory for indirect buffers.
+
 ** 0.3
 
 *Added*

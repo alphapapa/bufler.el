@@ -1020,7 +1020,8 @@ FEATURE MAY BE BUGGY AT THE MOMENT.)
 
 Note that directory paths are canonicalized before comparing, so,
 e.g. symlinks are resolved."
-  (let* ((buffer-dir (buffer-local-value 'default-directory buffer))
+  (let* ((buffer-dir (buffer-local-value 'default-directory
+                                         (or (buffer-base-buffer buffer) buffer)))
          (dirs (if (listp dirs) dirs (list dirs)))
          (group-name (concat "Dir: " (car dirs))))
     (unless (listp dirs)

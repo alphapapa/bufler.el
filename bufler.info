@@ -584,6 +584,11 @@ implementation is just one iteration of the concept._)
    • Mode ‘bufler-workspace-mode’’s mode-line lighter shows the path of
      the current ‘tab-bar’ tab or frame.
 
+   *Fixes*
+
+   • The ‘dir’ buffer group uses the base buffer’s directory for
+     indirect buffers.
+
 
 File: README.info,  Node: 03,  Next: 02,  Prev: 04-pre,  Up: Changelog
 
@@ -712,12 +717,12 @@ Node: Prism support18229
 Node: Compared to Ibuffer18669
 Node: Changelog20419
 Node: 04-pre20599
-Node: 0323438
-Node: 0226350
-Node: 0126491
-Node: Credits26590
-Node: Development27279
-Node: License27449
+Node: 0323547
+Node: 0226459
+Node: 0126600
+Node: Credits26699
+Node: Development27388
+Node: License27558
 
 End Tag Table
 
