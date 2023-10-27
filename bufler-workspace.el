@@ -87,6 +87,12 @@ May be customized to, e.g. only return the last element of a path."
                   (function-item bufler--buffer-special-p)
                   (function :tag "Custom function"))))
 
+(defcustom bufler-switch-buffer-include-recent-buffers t
+  "Include recently shown buffers when offering buffers for switching.
+Includes buffers from `window-prev-buffers' at the top of the
+list of buffers in `bufler-switch-buffer'."
+  :type 'boolean)
+
 ;;;; Variables
 
 (defvar burly-buffer-local-variables)
@@ -183,16 +189,25 @@ use current buffer."
   (bufler-workspace-set (bufler-buffer-workspace-path buffer) :title title))
 
 ;;;###autoload
-(cl-defun bufler-workspace-switch-buffer (&key all-p no-filter (switch-workspace-p t))
+(cl-defun bufler-workspace-switch-buffer
+    (&key all-p no-filter (include-recent-buffers bufler-switch-buffer-include-recent-buffers) (switch-workspace-p t))
   "Switch to another buffer in the current group.
 Without any input, switch to the previous buffer, like
-`switch-to-buffer'.  If ALL-P (interactively, with universal
-prefix) or if the frame has no workspace, select from all
-buffers.  If SWITCH-WORKSPACE-P (disable with two universal
-prefixes), select from all buffers and switch to that buffer's
-workspace.  If NO-FILTER (with three universal prefixes), include
-buffers that would otherwise be filtered by
+`switch-to-buffer'.
+
+If ALL-P (interactively, with universal prefix) or if the frame
+has no workspace, select from all buffers.
+
+If SWITCH-WORKSPACE-P (disable with two universal prefixes),
+select from all buffers and switch to that buffer's workspace.
+
+If NO-FILTER (with three universal prefixes), include buffers
+that would otherwise be filtered by
 `bufler-workspace-switch-buffer-filter-fns'.
+
+If INCLUDE-RECENT-BUFFERS, include recently shown buffers in the
+selected window at the top of the list of buffers (see option
+`bufler-switch-buffer-include-recent-buffers').
 
 If `bufler-workspace-switch-buffer-sets-workspace' is non-nil,
 act as if SET-WORKSPACE-P is non-nil.  And if
@@ -218,7 +233,10 @@ one."
                              (bufler-buffers) (other-buffer (current-buffer))))
          (other-buffer-cons (cons (buffer-name (-last-item other-buffer-path))
                                   (other-buffer (current-buffer))))
-         (buffers (cons other-buffer-cons buffers))
+         (recent-buffers (when include-recent-buffers
+                           (cl-loop for (buffer _ _) in (window-prev-buffers)
+                                    collect (cons (buffer-name buffer) buffer))))
+         (buffers (cons other-buffer-cons (append recent-buffers buffers)))
          (buffer-name (completing-read "Buffer: " (mapcar #'car buffers)
                                        nil nil nil nil other-buffer-cons))
          (selected-buffer (alist-get buffer-name buffers nil nil #'string=)))

@@ -305,6 +305,7 @@ Note as well that the existing ~bufler-workspace-workspaces-as-tabs-mode~ /overr
 + Option ~bufler-workspace-switch-buffer-and-tab~ (enabled by default) automatically switches to a buffer's workspace's tab, if it has one, when using ~bufler-switch-buffer~.  (This tries to solve the age-old problem of buffers not "staying in their workspace.")
 + Commands ~bufler-workspace-open~ and ~bufler-workspace-save~.  These open and save workspaces using [[https://github.com/alphapapa/burly.el][Burly]] as a backend (which is now a dependency).  (This is basically like calling ~burly-open-bookmark~ and ~burly-bookmark-windows~, but integrating some ~bufler-workspace~ features automatically.)
 + Option ~bufler-workspace-prefix-abbreviation~, which abbreviates workspace names in tab/frame names.
++ Option ~bufler-switch-buffer-include-recent-buffers~ includes recently shown buffers in the ~bufler-switch-buffer~ command's list of buffers.
 
 *Changes*
 

@@ -544,15 +544,15 @@ Bufler workspace can be set to the workspace containing the buffer, so
 that ‘bufler-switch-buffer’ automatically offers buffers relevant to the
 tab).
 
-   Note as well that the existing ‘bufler-workspace-tabs-mode’
-_overrides_ some aspects of Emacs’s ‘tab-bar-mode’ and ‘tab-line-mode’;
-this functionality is still somewhat experimental and may not suit every
-user’s taste.  But while that mode may remain disabled, Bufler’s other
-features are still useful with standard ‘tab-bar-mode’.  (_Yes, all
-these names and modes and features do get confusing.  The term
-"workspaces" is vague, encompassing a variety of ideas envisioned by a
-range of users.  Bufler’s implementation is just one iteration of the
-concept._)
+   Note as well that the existing
+‘bufler-workspace-workspaces-as-tabs-mode’ _overrides_ some aspects of
+Emacs’s ‘tab-bar-mode’ and ‘tab-line-mode’; this functionality is still
+somewhat experimental and may not suit every user’s taste.  But while
+that mode may remain disabled, Bufler’s other features are still useful
+with standard ‘tab-bar-mode’.  (_Yes, all these names and modes and
+features do get confusing.  The term "workspaces" is vague, encompassing
+a variety of ideas envisioned by a range of users.  Bufler’s
+implementation is just one iteration of the concept._)
 
    *Additions*
 
@@ -571,6 +571,9 @@ concept._)
      some ‘bufler-workspace’ features automatically.)
    • Option ‘bufler-workspace-prefix-abbreviation’, which abbreviates
      workspace names in tab/frame names.
+   • Option ‘bufler-switch-buffer-include-recent-buffers’ includes
+     recently shown buffers in the ‘bufler-switch-buffer’ command’s list
+     of buffers.
 
    *Changes*
 
@@ -709,12 +712,12 @@ Node: Prism support18229
 Node: Compared to Ibuffer18669
 Node: Changelog20419
 Node: 04-pre20599
-Node: 0323255
-Node: 0226167
-Node: 0126308
-Node: Credits26407
-Node: Development27096
-Node: License27266
+Node: 0323438
+Node: 0226350
+Node: 0126491
+Node: Credits26590
+Node: Development27279
+Node: License27449
 
 End Tag Table
 
