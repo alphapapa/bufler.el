@@ -54,7 +54,7 @@
 Applied when saving a workspace."
   :type 'string)
 
-(defcustom bufler-workspace-prefix-abbreviation (cons (rx bos "Workspace: ") "𝕎: ")
+(defcustom bufler-workspace-prefix-abbreviation (cons (rx bos "Workspace: ") "𝕎 ")
   "How to abbreviate workspace names.
 Applied to tab/frame names.  The regular expression is replaced
 with the string."
