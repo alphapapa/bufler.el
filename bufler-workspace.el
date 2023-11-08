@@ -295,6 +295,9 @@ Also sets current tab/frame's workspace to the current buffer's."
                         (cons 'handler #'bufler-workspace-bookmark-handler)
                         (cons 'bufler-workspace-name name))))
       (bookmark-store name record nil)))
+  (setf (bufler-workspace--tab-parameter
+         'bufler-workspace-bookmark-name (tab-bar--current-tab-find))
+        name)
   (bufler-workspace-set (bufler-buffer-workspace-path (current-buffer))
                         :title name))
 
