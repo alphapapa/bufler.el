@@ -296,6 +296,7 @@ Also sets current tab/frame's workspace to the current buffer's."
                         (cons 'bufler-workspace-name name))))
       (bookmark-store name record nil)))
   (setf (bufler-workspace--tab-parameter
+         ;; FIXME: This doesn't seem to work: after saving a new workspace, it can't be reset until it's opened again.
          'bufler-workspace-bookmark-name (tab-bar--current-tab-find))
         name)
   (bufler-workspace-set (bufler-buffer-workspace-path (current-buffer))
