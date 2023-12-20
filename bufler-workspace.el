@@ -93,6 +93,10 @@ Includes buffers from `window-prev-buffers' at the top of the
 list of buffers in `bufler-switch-buffer'."
   :type 'boolean)
 
+(defcustom bufler-workspace-mode-lighter "Bflr:"
+  "Lighter used in mode-line for `bufler-workspace-mode'."
+  :type 'string)
+
 ;;;; Variables
 
 (defvar burly-buffer-local-variables)
@@ -377,9 +381,10 @@ Works as `tab-line-tabs-function'."
 
 (defun bufler-workspace-mode-lighter ()
   "Return lighter string for mode line."
-  (concat "Bflr:" (if tab-bar-mode
-                      (bufler-workspace--tab-parameter 'bufler-workspace-path-formatted (tab-bar--current-tab-find))
-                    (frame-parameter nil 'bufler-workspace-path-formatted))))
+  (concat bufler-workspace-mode-lighter
+          (if tab-bar-mode
+              (bufler-workspace--tab-parameter 'bufler-workspace-path-formatted (tab-bar--current-tab-find))
+            (frame-parameter nil 'bufler-workspace-path-formatted))))
 
 (defun bufler-workspace-set-frame-name (name)
   "Set current frame's name according to NAME.
