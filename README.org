@@ -76,7 +76,7 @@ Bufler provides four primary, user-facing features.  They complement each other,
 1.  The command =bufler= shows a list of buffers grouped according to the defined grouping rules.  It allows manipulation of buffers and groups of buffers.
 2.  The command =bufler-switch-buffer= prompts for a buffer with completion and switches to the selected one.  Buffers are presented by their "path" in the groups.
 3.  The global minor mode =bufler-mode= allows each frame to have a "workspace," which is a buffer group selected by the user.  When the mode is active, the command =bufler-switch-buffer= presents only buffers from the current workspace (unless called with a prefix, in which case it shows all buffers), and the current workspace is displayed in the mode line and the frame's title.  Buffers can also be manually assigned to named workspaces.
-4.  The global minor mode =bufler-tabs-mode= uses the new Emacs 27 =tab-bar= and =tab-line= features to display workspaces and buffers.  The =tab-bar= shows top-level workspaces (and whatever the selected one is, even if not top-level), and the =tab-line= shows buffers from the current workspace.
+4.  The global minor mode =bufler-workspace-workspaces-as-tabs-mode= uses the new Emacs 27 =tab-bar= and =tab-line= features to display workspaces and buffers.  The =tab-bar= shows top-level workspaces (and whatever the selected one is, even if not top-level), and the =tab-line= shows buffers from the current workspace.
 
 :CONTENTS:
 - [[#workflow][Workflow]]
@@ -111,7 +111,7 @@ Then, you can write your own buffer-grouping rules to make them as simple or as 
 
 +  =bufler= :: Show the Bufler buffer list.
 +  =bufler-mode= :: Enable the Bufler workspace mode, which allows each frame to have a chosen workspace from Bufler's groups.
-+  =bufler-tabs-mode= :: Enable the Bufler workspace tabs mode, which uses =tab-bar-mode= and =tab-line-mode= from Emacs 27+ to display Bufler workspaces and buffers.
++  =bufler-workspace-workspaces-as-tabs-mode= :: Enable the Bufler workspace tabs mode, which uses =tab-bar-mode= and =tab-line-mode= from Emacs 27+ to display Bufler workspaces and buffers.
 +  =bufler-switch-buffer= :: Switch to a buffer selected from the frame's workspace.  Without any input, switch to the previous buffer.  With prefix, select from all buffers.  With two prefixes, also set the frame's workspace.
 +  =bufler-workspace-focus-buffer= :: Set current frame's workspace to the current buffer's workspace.
 +  =bufler-workspace-frame-set= :: Set the frame's workspace.  Setting the workspace may be done automatically by =bufler-switch-buffer=, but this command may be used to set the workspace to a group containing other groups, after which =bufler-switch-buffer= will present buffers from the selected group and its subgroups.
