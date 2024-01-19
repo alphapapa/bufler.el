@@ -1139,15 +1139,15 @@ NAME, okay, `checkdoc'?"
     (concat "Project: " project-root)))
 
 (bufler-defauto-group parent-project
-  (when-let* ((project (bufler-project-current nil (buffer-local-value 'default-directory buffer))))
-    (let* ((project-root (bufler-project-root project))
-           ;; Emacs needs a built-in function like `f-parent'.
-           (parent-dir (file-name-directory (directory-file-name project-root)))
-           (parent-dir-project (bufler-project-current nil parent-dir)))
-      (concat "Project: "
-              (if parent-dir-project
-                  (bufler-project-root parent-dir-project)
-                project-root)))))
+  (when-let* ((project (bufler-project-current nil (buffer-local-value 'default-directory buffer)))
+              (project-root (bufler-project-root project))
+              ;; Emacs needs a built-in function like `f-parent'.
+              (parent-dir (file-name-directory (directory-file-name project-root)))
+              (parent-dir-project (bufler-project-current nil parent-dir)))
+    (concat "Project: "
+            (if parent-dir-project
+                (bufler-project-root parent-dir-project)
+              project-root))))
 
 (eval-and-compile
   (declare-function projectile-project-name "ext:projectile" t t)
