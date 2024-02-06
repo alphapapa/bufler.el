@@ -316,6 +316,7 @@ Note as well that the existing ~bufler-workspace-workspaces-as-tabs-mode~ /overr
 *Fixes*
 
 + The ~dir~ buffer group uses the base buffer's directory for indirect buffers.
++ When testing whether two directories are related, both the paths as-given and the canonicalized paths are compared (so that if a subdirectory is a symlink to a directory outside the parent directory, it will still be considered related).
 
 ** 0.3
 

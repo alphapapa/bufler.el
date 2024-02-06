@@ -588,6 +588,10 @@ implementation is just one iteration of the concept._)
 
    • The ‘dir’ buffer group uses the base buffer’s directory for
      indirect buffers.
+   • When testing whether two directories are related, both the paths
+     as-given and the canonicalized paths are compared (so that if a
+     subdirectory is a symlink to a directory outside the parent
+     directory, it will still be considered related).
 
 
 File: README.info,  Node: 03,  Next: 02,  Prev: 04-pre,  Up: Changelog
@@ -717,12 +721,12 @@ Node: Prism support18229
 Node: Compared to Ibuffer18669
 Node: Changelog20419
 Node: 04-pre20599
-Node: 0323547
-Node: 0226459
-Node: 0126600
-Node: Credits26699
-Node: Development27388
-Node: License27558
+Node: 0323807
+Node: 0226719
+Node: 0126860
+Node: Credits26959
+Node: Development27648
+Node: License27818
 
 End Tag Table
 
