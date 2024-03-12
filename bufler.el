@@ -326,7 +326,7 @@ clear `bufler-cache', and regenerate buffer groups (which can be
 useful after changing `bufler-groups' if the buffer list has not
 yet changed).  With two universal prefix args, also show buffers
 which are otherwise filtered by `bufler-filter-buffer-fns'."
-  (interactive "P")  ;; FIXME: Using "P" broke showing filtered buffers.
+  (interactive "P")
   (let (format-table)
     (cl-labels
         ;; This gets a little hairy because we have to wrap `-group-by'
@@ -400,7 +400,7 @@ which are otherwise filtered by `bufler-filter-buffer-fns'."
         (bufler--reset-caches))
       (pcase-let* ((inhibit-read-only t)
                    (bufler-vc-refresh arg)
-                   (groups (bufler-buffers :filter-fns (unless (and (numberp arg) (>= arg 16))
+                   (groups (bufler-buffers :filter-fns (unless (equal arg '(16))
                                                          bufler-filter-buffer-fns)))
                    (`(,*format-table . ,column-sizes) (bufler-format-buffer-groups groups))
                    (header (concat (format (format " %%-%ss" (cdar column-sizes)) (caar column-sizes))
