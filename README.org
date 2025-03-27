@@ -317,6 +317,7 @@ Note as well that the existing ~bufler-workspace-workspaces-as-tabs-mode~ /overr
 
 + The ~dir~ buffer group uses the base buffer's directory for indirect buffers.
 + When testing whether two directories are related, both the paths as-given and the canonicalized paths are compared (so that if a subdirectory is a symlink to a directory outside the parent directory, it will still be considered related).
++ Auto-group ~parent-project~ expands the directory name.  ([[https://github.com/alphapapa/bufler.el/issues/95][#95]].  Thanks to [[https://github.com/mithraen][Denis Smirnov]] for reporting.)
 
 ** 0.3
 

@@ -1147,7 +1147,7 @@ NAME, okay, `checkdoc'?"
   (when-let* ((project (bufler-project-current nil (buffer-local-value 'default-directory buffer))))
     (let* ((project-root (bufler-project-root project))
            ;; Emacs needs a built-in function like `f-parent'.
-           (parent-dir (file-name-directory (directory-file-name project-root)))
+           (parent-dir (file-name-directory (directory-file-name (expand-file-name project-root))))
            (parent-dir-project (bufler-project-current nil parent-dir)))
       (concat "Project: "
               (if parent-dir-project
