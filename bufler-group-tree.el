@@ -150,29 +150,38 @@
   "Return a grouping function that groups items matching all of PREDS.
 The resulting group is named NAME.  This can also be used with a
 single predicate to apply a name to a group."
-  (byte-compile (lambda (item)
+  (let ((and-fn (lambda (item)
                   (when (cl-every (lambda (fn)
                                     (funcall fn item))
                                   preds)
                     name))))
+    (if (byte-code-function-p and-fn)
+        and-fn
+      (byte-compile and-fn))))
 
 (defun bufler-group-tree-or (name &rest preds)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups items matching any of PREDS.
 The resulting group is named NAME."
-  (byte-compile (lambda (item)
+  (let ((or-fn (lambda (item)
                   (when (cl-some (lambda (fn)
                                    (funcall fn item))
                                  preds)
                     name))))
+    (if (byte-code-function-p or-fn)
+        or-fn
+      (byte-compile or-fn))))
 
 (defun bufler-group-tree-not (name pred)
   ;; Copied from dash-functional.el.
   "Return a grouping function that groups items which do not match PRED.
 The resulting group is named NAME."
-  (byte-compile (lambda (item)
+  (let ((not-fn (lambda (item)
                   (unless (funcall pred item)
                     name))))
+    (if (byte-code-function-p not-fn)
+        not-fn
+      (byte-compile not-fn))))
 
 ;;;;; Group-defining macro
 
